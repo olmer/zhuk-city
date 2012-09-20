@@ -316,6 +316,7 @@ aside {
     height: 21px;
     float: left;
     margin-right: 5px;
+    position: relative;
 }
 .schedule-from input,
 .schedule-to input {
@@ -323,6 +324,7 @@ aside {
     height: 21px;
     color: #787878;
     font-size: 11px;
+    outline: none;
 }
 .schedule-transport {
     display: block;
@@ -662,9 +664,14 @@ aside {
     height: 100%;
     position: fixed;
     top: 60px;
-    left: 420px;
-    background: yellow;
+    left: 0px;
+    padding-left: 420px;
     z-index: 0;
+    box-sizing: border-box;
+    -o-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
 }
 footer {
     width: 100%;
@@ -1202,4 +1209,28 @@ footer {
 .category-list.active-for-hover li .subcategory:hover
 {
     /*display: block;*/
+}
+
+/*  TRANSPORT  */
+.gray-input .drop-list{
+    position: absolute;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    top: 20px;
+    left: -1px;
+    width: 160px;
+    z-index: 1000;
+}
+.gray-input .drop-list div{
+    padding: 2px 15px 2px 2px;
+    font-size: 10px;
+    line-height: 14px;
+    color: #666;
+    cursor: pointer;
+}
+.gray-input .drop-list div:hover{
+    background-color: #ddd;
+}
+.schedule-table.gray table td{
+    opacity: 0.5;
 }
