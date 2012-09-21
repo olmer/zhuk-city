@@ -5,10 +5,6 @@ $(document).ready(function() {
         $(this).addClass('active');
         $(this).next('.subcategory').addClass('active');
     });
-    $('.schedule-transport li').click(function(){
-        $('.schedule-transport li').removeClass('active');
-        $(this).addClass('active');
-    });
     $('.schedule-btn-sh').click(function() {
 
         if($('.schedule-btn-sh').hasClass('hide')) {
@@ -18,13 +14,6 @@ $(document).ready(function() {
             $(this).removeClass('show').addClass('hide');
             $(this).parent().next('.schedule-table').slideDown();
         }
-    });
-    $('input[type="text"]').focus(function(){
-        $(this).val('');
-
-    });
-    $('input [type="text"]').blur(function(){
-
     });
 
     $('.poster-wrap dd a').click(function(){
