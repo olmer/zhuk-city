@@ -1220,6 +1220,9 @@ footer {
     left: -1px;
     width: 160px;
     z-index: 1000;
+    max-height: 180px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 .gray-input .drop-list div{
     padding: 2px 15px 2px 2px;
@@ -1228,7 +1231,7 @@ footer {
     color: #666;
     cursor: pointer;
 }
-.gray-input .drop-list div:hover{
+.gray-input .drop-list div.focus{
     background-color: #ddd;
 }
 .schedule-table.gray table td{

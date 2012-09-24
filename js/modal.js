@@ -5,16 +5,7 @@ $(document).ready(function() {
         $(this).addClass('active');
         $(this).next('.subcategory').addClass('active');
     });
-    $('.schedule-btn-sh').click(function() {
 
-        if($('.schedule-btn-sh').hasClass('hide')) {
-            $(this).removeClass('hide').addClass('show');
-            $(this).parent().next('.schedule-table').slideUp();
-        } else {
-            $(this).removeClass('show').addClass('hide');
-            $(this).parent().next('.schedule-table').slideDown();
-        }
-    });
 
     $('.poster-wrap dd a').click(function(){
         $('.poster-wrap dd').removeClass('active');

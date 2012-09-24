@@ -1,5 +1,6 @@
 app = {
-  page:{
+
+  transport: {
     startStation:{
       firstBus:'ул. Гудкова',
       secondBus:'м. Кузьминки',
@@ -8,13 +9,265 @@ app = {
     },
     transportLimit: 5,
     transportType :'train',
+    transportRefreshInterval: 60000, //1 min
+
+
+    buildTransportForm:function () {
+      if (app.getCookie('transType')){
+        app.transport.transportType = app.getCookie('transType');
+      }
+
+      $('body').click(function () {
+        $('.gray-input.schedule-from input, .gray-input.schedule-to input').removeClass('active');
+        $('.drop-list').remove();
+        $('.schedule-table').removeClass('gray');
+      });
+
+      $('.schedule-btn-sh').click(function() {
+        if($('.schedule-btn-sh').hasClass('hide')) {
+            $(this).removeClass('hide').addClass('show');
+            $(this).parent().next('.schedule-table').slideUp();
+        } else {
+            $(this).removeClass('show').addClass('hide');
+            $(this).parent().next('.schedule-table').slideDown();
+            app.transport.layoutTransportList();
+        }
+      });
+
+      if (app.transport.transportType == 'bus') {
+        $('li.schedule-transport-bus').addClass('active');
+        $('.gray-input.schedule-from input').val(app.transport.startStation.firstBus);
+        $('.gray-input.schedule-to input').val(app.transport.startStation.secondBus);
+      }
+
+      if (app.transport.transportType == 'train') {
+        $('li.schedule-transport-train').addClass('active');
+        $('.gray-input.schedule-from input').val(app.transport.startStation.firstTrain);
+        $('.gray-input.schedule-to input').val(app.transport.startStation.secondTrain);
+      }
+
+      $('.gray-input.schedule-from input').bind('focus', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $('.drop-list').remove();
+        $('.gray-input.schedule-to input').removeClass('active');
+        if($(this).val().length>0 && !$('.gray-input.schedule-from input.active').length) {
+          this.select();
+          app.transport.showHelper('from',true);
+        }
+        if ($(this).val().length == 0){
+          app.transport.showHelper('from');
+        }
+        $(this).addClass('active');
+      }).mouseup(function(e){
+        e.preventDefault();
+        e.stopPropagation();
+      }).click(function(e){
+        e.preventDefault();
+        e.stopPropagation();
+      });
+      
+      $('.gray-input.schedule-to input').bind('focus', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $('.drop-list').remove();
+        $('.gray-input.schedule-from input').removeClass('active');
+        if($(this).val().length>0 && !$('.gray-input.schedule-to input.active').length) {
+          this.select();
+          app.transport.showHelper('to',true);
+        }
+        if ($(this).val().length == 0){
+          app.transport.showHelper('to');
+        }
+        $(this).addClass('active');
+      }).mouseup(function(e){
+        e.preventDefault();
+        e.stopPropagation();
+      }).click(function(e){
+        e.preventDefault();
+        e.stopPropagation();
+      });
+
+      $('.gray-input.schedule-from input').bind('keyup', function (e) {
+        console.log(e);
+        e.stopPropagation();
+        e.preventDefault();
+        if (e.keyCode != 13) {
+          if((e.keyCode > 45 && e.keyCode < 91) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 0){
+            app.transport.showHelper('from');
+         } //else if (e.keyCode == 38) {
+//            var prevElement = $('.drop-list div.focus').prev() ? $('.drop-list div.focus').prev() : $('.drop-list div')[$('.drop-list div').length - 1];
+//            $('.drop-list div.focus').removeClass('focus')
+//            prevElement.addClass('focus');
+//            console.log($('.drop-list').scrollTop())
+//          } else if (e.keyCode == 40) {
+//            var nextElement = $('.drop-list div.focus').next() ? $('.drop-list div.focus').next() : $('.drop-list div')[0];
+//            $('.drop-list div.focus').removeClass('focus')
+//            nextElement.addClass('focus');
+//          }
+        } else {
+          if ($('.drop-list div').length > 0) {
+            $('.schedule-from input').val($('.drop-list div.focus').text());
+          }
+          $('.drop-list').remove();
+          $('.schedule-table').removeClass('gray');
+          app.transport.layoutTransportList();
+        }
+      });
+      $('.gray-input.schedule-to input').bind('keyup', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        if (e.keyCode != 13) {
+          if((e.keyCode > 45 && e.keyCode < 91) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 0){
+            app.transport.showHelper('to');
+          } //else if (e.keyCode == 38) {
+//            var prevElement = $('.drop-list div.focus').prev() ? $('.drop-list div.focus').prev() : $('.drop-list div')[$('.drop-list div').length - 1];
+//            $('.drop-list div.focus').removeClass('focus')
+//            prevElement.addClass('focus');
+//          } else if (e.keyCode == 40) {
+//            var nextElement = $('.drop-list div.focus').next() ? $('.drop-list div.focus').next() : $('.drop-list div')[0];
+//            $('.drop-list div.focus').removeClass('focus')
+//            nextElement.addClass('focus');
+//          }
+        } else {
+          if ($('.drop-list div')) {
+            $('.schedule-to input').val($('.drop-list div.focus').text());
+          }
+          $('.drop-list').remove();
+          $('.schedule-table').removeClass('gray');
+          app.transport.layoutTransportList();
+        }
+      });
+      $('.schedule-transport li.schedule-transport-bus').bind('click', function() {
+        app.transport.transportType = 'bus';
+        $('.schedule-transport li').removeClass('active');
+        $(this).addClass('active');
+        $('.gray-input.schedule-from input').val(app.transport.startStation.firstBus);
+        $('.gray-input.schedule-to input').val(app.transport.startStation.secondBus);
+        app.transport.layoutTransportList();
+      })
+      $('.schedule-transport li.schedule-transport-train').bind('click', function() {
+        app.transport.transportType = 'train';
+        $('.schedule-transport li').removeClass('active');
+        $(this).addClass('active');
+        $('.gray-input.schedule-from input').val(app.transport.startStation.firstTrain);
+        $('.gray-input.schedule-to input').val(app.transport.startStation.secondTrain);
+        app.transport.layoutTransportList();
+      })
+      app.transport.layoutTransportList();
+
+      app.transport.tranportRefresh = window.setInterval(function(){
+        if(!$('.drop-list').length){
+          app.transport.layoutTransportList();
+        }
+      }, app.transport.transportRefreshInterval);
+    },
+
+
+
+
+    showHelper:function (direction, full) {
+      var selector = '.gray-input.schedule-' + direction;
+      $('.drop-list').remove();
+      if (!$(selector + ' div')[0]) {
+        $('<div class="drop-list"></div>').appendTo(selector);
+      }
+
+      var query = $(selector + ' input').val();
+      var type = app.transport.transportType;
+      $('.schedule-table').addClass('gray');
+      $(selector + ' div').empty();
+      for (var i = 0; i < app.transport_stations.length; i++) {
+        var item = app.transport_stations[i]
+        if (item.type == type) {
+          if ((item.title.toLowerCase().indexOf(query.toLowerCase()) + 1) || (!query.length) || full) {
+            $(selector + ' .drop-list').append($('<div></div>').text(item.title).click(
+              function (e) {
+                $(selector + ' input').val($(this).text());
+                $('.drop-list').remove();
+                app.transport.layoutTransportList();
+              }
+              ).mouseenter(
+              function(){
+                $('.drop-list div').removeClass('focus');
+                $(this).addClass('focus')
+              }
+              ))
+          }
+        }
+      }
+      if ($(selector + ' .drop-list:empty')[0]) {
+        $('.drop-list').remove();
+      }
+      $($('.drop-list div')[0]).addClass('focus')
+    },
+
+    layoutTransportList:function () {
+      if (!($('.gray-input.schedule-to input').val() && $('.gray-input.schedule-from input').val())) {
+        $('.schedule-table .list-row').remove();
+        $('<tr class="list-row"></tr>')
+          .append($('<td colspan="3">Ничего не найдено</td>'))
+          .appendTo('.schedule-table table')
+        return;
+      }
+      var fromVal = $('.gray-input.schedule-from input').val();
+      var toVal = $('.gray-input.schedule-to input').val();
+      var URL = 'http://test.zhukcity.ru/transport?act=get_schedule&type=' + app.transport.transportType + '&dep_from=' + fromVal + '&arr_to=' + toVal + '&when=today&limit=' + app.transport.transportLimit;
+      $.get(URL, function(data) {
+        if (data.success) {
+          if (data.items.length) {
+            app.transport.saveTransportCookie();
+            $('.schedule-table .list-row').remove();
+            for (var i = 0; i < data.items.length; i++) {
+              $('<tr class="list-row"></tr>')
+                .append($('<td>' + data.items[i].title + '</td>'))
+                .append($('<td>' + data.items[i].dep_time + '</td>'))
+                .append($('<td>' + data.items[i].arr_time + '</td>'))
+                .appendTo('.schedule-table table')
+            }
+          } else {
+            $('.schedule-table .list-row').remove();
+            $('<tr class="list-row"></tr>')
+              .append($('<td colspan="3">Ничего не найдено</td>'))
+              .appendTo('.schedule-table table')
+          }
+        }
+      });
+    },
+
+    saveTransportCookie: function() {
+      if (app.transport.transportType == 'bus') {
+        app.setCookie("transType", 'bus');
+        app.setCookie("firstBus", $('.gray-input.schedule-from input').val());
+        app.transport.startStation.firstBus = $('.gray-input.schedule-from input').val();
+        app.setCookie("secondBus", $('.gray-input.schedule-to input').val());
+        app.transport.startStation.secondBus = $('.gray-input.schedule-to input').val();
+      } else {
+        app.setCookie("transType", 'train');
+        app.setCookie("firstTrain", $('.gray-input.schedule-from input').val());
+        app.transport.startStation.firstTrain = $('.gray-input.schedule-from input').val();
+        app.setCookie("secondTrain", $('.gray-input.schedule-to input').val());
+        app.transport.startStation.secondTrain = $('.gray-input.schedule-to input').val();
+      }
+    },
+
+    getStationFromCookie:function() {
+      if (app.getCookie('firstBus'))  app.transport.startStation.firstBus = app.getCookie('firstBus');
+      if (app.getCookie('secondBus')) app.transport.startStation.secondBus = app.getCookie('secondBus');
+      if (app.getCookie('firstTrain')) app.transport.startStation.firstTrain = app.getCookie('firstTrain');
+      if (app.getCookie('secondTrain')) app.transport.startStation.secondTrain = app.getCookie('secondTrain');
+    }
+  },
+
+
+  page:{
+    
 
     init:function () {
-      app.page.getStationFromCookie();
-      app.page.buildTransportForm();
+      app.transport.getStationFromCookie();
+      app.transport.buildTransportForm();
       app.gmap.initMap();
       app.page.addCategoryMenuFunctionality();
-      console.log(Math.random());
     },
 
     getData:function () {
@@ -131,181 +384,13 @@ app = {
           '<a href="#" class="gray-btn"><span class="object-item-show-map"></span></a>'
         )));
       $('.filter-wrap').append(item);
-    },
-
-    setCookie: function (name, value, expires, path, domain, secure) {
-      document.cookie = name + "=" + escape(value) +
-        ((expires) ? "; expires=" + expires : "") +
-        ((path) ? "; path=" + path : "") +
-        ((domain) ? "; domain=" + domain : "") +
-        ((secure) ? "; secure" : "");
-    },
-    
-    getCookie: function(name) {
-      var cookie = " " + document.cookie;
-      var search = " " + name + "=";
-      var setStr = null;
-      var offset = 0;
-      var end = 0;
-      if (cookie.length > 0) {
-        offset = cookie.indexOf(search);
-        if (offset != -1) {
-          offset += search.length;
-          end = cookie.indexOf(";", offset)
-          if (end == -1) {
-            end = cookie.length;
-          }
-          setStr = unescape(cookie.substring(offset, end));
-        }
-      }
-      return(setStr);
-    },
-
-    getStationFromCookie:function() {
-      if(app.page.getCookie('firstBus'))  app.page.startStation.firstBus = app.page.getCookie('firstBus');
-      if(app.page.getCookie('secondBus')) app.page.startStation.secondBus = app.page.getCookie('secondBus');
-      if(app.page.getCookie('firsttrain')) app.page.startStation.firstTrain = app.page.getCookie('firstTrain');
-      if(app.page.getCookie('secondTrain')) app.page.startStation.secondTrain = app.page.getCookie('secondTrain');
-    },
-
-    buildTransportForm:function () {
-      if (app.page.transportType == 'bus') {
-        $('.gray-input.schedule-from input').val(app.page.startStation.firstBus);
-        $('.gray-input.schedule-to input').val(app.page.startStation.secondBus);
-      }
-      if (app.page.transportType == 'train') {
-        $('.gray-input.schedule-from input').val(app.page.startStation.firstTrain);
-        $('.gray-input.schedule-to input').val(app.page.startStation.secondTrain);
-      }
-      $('.gray-input input').bind('click',function(e){
-          e.stopPropagation();
-          e.preventDefault();
-          $(this).select();
-      })
-      $('.gray-input.schedule-from input').bind('keyup', function (e) {
-        e.stopPropagation();
-        e.preventDefault();
-        if (e.keyCode != 13) {
-          app.page.showHelper('from');
-        } else {
-          if ($('.drop-list div').length > 0) {
-            $('.schedule-from input').val($($('.drop-list div')[0]).text());
-          }
-          $('.drop-list').remove();
-          $('.schedule-table').removeClass('gray');
-          app.page.layoutTransportList();
-        }
-      });
-      $('.gray-input.schedule-to input').bind('keyup',function (e) {
-        e.stopPropagation();
-        e.preventDefault();
-        if (e.keyCode != 13) {
-          app.page.showHelper('to');
-        } else {
-          if ($('.drop-list div')) {
-            $('.schedule-to input').val($($('.drop-list div')[0]).text());
-          }
-          $('.drop-list').remove();
-          $('.schedule-table').removeClass('gray');
-          app.page.layoutTransportList();
-        }
-      });
-      $('.schedule-transport li.schedule-transport-bus').bind('click', function(){
-        app.page.transportType = 'bus';
-        $('.schedule-transport li').removeClass('active');
-        $(this).addClass('active');
-        $('.gray-input.schedule-from input').val(app.page.startStation.firstBus);
-        $('.gray-input.schedule-to input').val(app.page.startStation.secondBus);
-        app.page.layoutTransportList();
-      })
-      $('.schedule-transport li.schedule-transport-train').bind('click', function(){
-        app.page.transportType = 'train';
-        $('.schedule-transport li').removeClass('active');
-        $(this).addClass('active');
-        $('.gray-input.schedule-from input').val(app.page.startStation.firstTrain);
-        $('.gray-input.schedule-to input').val(app.page.startStation.secondTrain);
-        app.page.layoutTransportList();
-      })
-      app.page.layoutTransportList();
-    },
-
-    showHelper:function (direction) {
-      var selector = '.gray-input.schedule-' + direction;
-      if (!$(selector + ' div')[0]) {
-        $('<div class="drop-list"></div>').appendTo(selector);
-      }
-      $('body').click(function () {
-        $('.drop-list').remove();
-        $('.schedule-table').removeClass('gray');
-      })
-
-        var query = $(selector + ' input').val();
-        var type = app.page.transportType;
-        $('.schedule-table').addClass('gray');
-        $(selector + ' div').empty();
-        for (var i = 0; i < app.transport_stations.length; i++) {
-          var item = app.transport_stations[i]
-          if (item.type == type) {
-            if ((item.title.toLowerCase().indexOf(query.toLowerCase()) + 1)||(!query.length)) {
-              $(selector + ' .drop-list').append($('<div></div>').text(item.title).click(
-                function (e) {
-                  $(selector + ' input').val($(this).text());
-                  $(selector + ' .drop-list').remove();
-                  app.page.layoutTransportList();
-                }
-                ))
-            }
-          }
-        }
-        if ($(selector + ' .drop-list:empty')[0]) {
-          $(selector + ' .drop-list').remove();
-        }
-    },
-
-
-    layoutTransportList:function () {
-      if (!($('.gray-input.schedule-to input').val() && $('.gray-input.schedule-from input').val())) {
-        return;
-      }
-      app.page.saveTransportCookie();
-      var fromVal = $('.gray-input.schedule-from input').val();
-      var toVal = $('.gray-input.schedule-to input').val();
-      var transportType = $('.schedule-transport-bus active') ? 'bus' : 'train' ;
-      var URL = 'http://test.zhukcity.ru/transport?act=get_schedule&type=' + app.page.transportType + '&dep_from=' + fromVal + '&arr_to=' + toVal + '&when=today&limit=' + app.page.transportLimit;
-      $.get(URL, function(data){
-        if(data.success) {
-          if (data.items.length) {
-            $('.schedule-table .list-row').remove();
-            for (var i = 0; i < data.items.length; i++) {
-              $('<tr class="list-row"></tr>')
-                .append($('<td>' + data.items[i].title + '</td>'))
-                .append($('<td>' + data.items[i].dep_time + '</td>'))
-                .append($('<td>' + data.items[i].arr_time + '</td>'))
-                .appendTo('.schedule-table table')
-            }
-          } else {
-            $('.schedule-table .list-row').remove();
-            $('<tr class="list-row"></tr>')
-                .append($('<td colspan="3">Ничего не найденно</td>'))
-                .appendTo('.schedule-table table')
-          }
-        }
-      });
-    },
-
-    saveTransportCookie: function(){
-      if (app.page.transportType == 'bus') {
-        app.page.setCookie("firstBus", $('.gray-input.schedule-from input').val());
-        app.page.startStation.firstBus = $('.gray-input.schedule-from input').val();
-        app.page.setCookie("secondBus", $('.gray-input.schedule-to input').val());
-        app.page.startStation.secondBus = $('.gray-input.schedule-to input').val();
-      } else {
-        app.page.setCookie("firstTrain", $('.gray-input.schedule-from input').val());
-        app.page.startStation.firstTrain =  $('.gray-input.schedule-from input').val();
-        app.page.setCookie("secondTrain", $('.gray-input.schedule-to input').val());
-        app.page.startStation.secondTrain = $('.gray-input.schedule-to input').val();
-      }
     }
+
+
+
+
+
+
 
   },
   gmap:{
@@ -326,6 +411,33 @@ app = {
       }
       this.map = new google.maps.Map(window.document.getElementById('mapContainer'), startOptions);
     }
-  }
+  },
 
+  setCookie: function (name, value, expires, path, domain, secure) {
+    document.cookie = name + "=" + escape(value) +
+      ((expires) ? "; expires=" + expires : "") +
+      ((path) ? "; path=" + path : "") +
+      ((domain) ? "; domain=" + domain : "") +
+      ((secure) ? "; secure" : "");
+  },
+
+  getCookie: function(name) {
+    var cookie = " " + document.cookie;
+    var search = " " + name + "=";
+    var setStr = null;
+    var offset = 0;
+    var end = 0;
+    if (cookie.length > 0) {
+      offset = cookie.indexOf(search);
+      if (offset != -1) {
+        offset += search.length;
+        end = cookie.indexOf(";", offset)
+        if (end == -1) {
+          end = cookie.length;
+        }
+        setStr = unescape(cookie.substring(offset, end));
+      }
+    }
+    return(setStr);
+  }
 }
