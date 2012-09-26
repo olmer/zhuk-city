@@ -1,5 +1,7 @@
 app = {
 
+  objects:[],
+
   transport: {
     startStation:{
       firstBus:'ул. Гудкова',
@@ -13,7 +15,7 @@ app = {
 
 
     buildTransportForm:function () {
-      if (app.getCookie('transType')){
+      if (app.getCookie('transType')) {
         app.transport.transportType = app.getCookie('transType');
       }
 
@@ -24,13 +26,13 @@ app = {
       });
 
       $('.schedule-btn-sh').click(function() {
-        if($('.schedule-btn-sh').hasClass('hide')) {
-            $(this).removeClass('hide').addClass('show');
-            $(this).parent().next('.schedule-table').slideUp();
+        if ($('.schedule-btn-sh').hasClass('hide')) {
+          $(this).removeClass('hide').addClass('show');
+          $(this).parent().next('.schedule-table').slideUp();
         } else {
-            $(this).removeClass('show').addClass('hide');
-            $(this).parent().next('.schedule-table').slideDown();
-            app.transport.layoutTransportList();
+          $(this).removeClass('show').addClass('hide');
+          $(this).parent().next('.schedule-table').slideDown();
+          app.transport.layoutTransportList();
         }
       });
 
@@ -46,44 +48,48 @@ app = {
         $('.gray-input.schedule-to input').val(app.transport.startStation.secondTrain);
       }
 
-      $('.gray-input.schedule-from input').bind('focus', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        $('.drop-list').remove();
-        $('.gray-input.schedule-to input').removeClass('active');
-        if($(this).val().length>0 && !$('.gray-input.schedule-from input.active').length) {
-          this.select();
-          app.transport.showHelper('from',true);
-        }
-        if ($(this).val().length == 0){
-          app.transport.showHelper('from');
-        }
-        $(this).addClass('active');
-      }).mouseup(function(e){
-        e.preventDefault();
-        e.stopPropagation();
-      }).click(function(e){
+      $('.gray-input.schedule-from input').bind('focus',
+        function(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          $('.drop-list').remove();
+          $('.gray-input.schedule-to input').removeClass('active');
+          if ($(this).val().length > 0 && !$('.gray-input.schedule-from input.active').length) {
+            this.select();
+            app.transport.showHelper('from', true);
+          }
+          if ($(this).val().length == 0) {
+            app.transport.showHelper('from');
+          }
+          $(this).addClass('active');
+        }).mouseup(
+        function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }).click(function(e) {
         e.preventDefault();
         e.stopPropagation();
       });
-      
-      $('.gray-input.schedule-to input').bind('focus', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        $('.drop-list').remove();
-        $('.gray-input.schedule-from input').removeClass('active');
-        if($(this).val().length>0 && !$('.gray-input.schedule-to input.active').length) {
-          this.select();
-          app.transport.showHelper('to',true);
-        }
-        if ($(this).val().length == 0){
-          app.transport.showHelper('to');
-        }
-        $(this).addClass('active');
-      }).mouseup(function(e){
-        e.preventDefault();
-        e.stopPropagation();
-      }).click(function(e){
+
+      $('.gray-input.schedule-to input').bind('focus',
+        function(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          $('.drop-list').remove();
+          $('.gray-input.schedule-from input').removeClass('active');
+          if ($(this).val().length > 0 && !$('.gray-input.schedule-to input.active').length) {
+            this.select();
+            app.transport.showHelper('to', true);
+          }
+          if ($(this).val().length == 0) {
+            app.transport.showHelper('to');
+          }
+          $(this).addClass('active');
+        }).mouseup(
+        function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }).click(function(e) {
         e.preventDefault();
         e.stopPropagation();
       });
@@ -93,18 +99,9 @@ app = {
         e.stopPropagation();
         e.preventDefault();
         if (e.keyCode != 13) {
-          if((e.keyCode > 45 && e.keyCode < 91) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 0){
+          if ((e.keyCode > 45 && e.keyCode < 91) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 0) {
             app.transport.showHelper('from');
-         } //else if (e.keyCode == 38) {
-//            var prevElement = $('.drop-list div.focus').prev() ? $('.drop-list div.focus').prev() : $('.drop-list div')[$('.drop-list div').length - 1];
-//            $('.drop-list div.focus').removeClass('focus')
-//            prevElement.addClass('focus');
-//            console.log($('.drop-list').scrollTop())
-//          } else if (e.keyCode == 40) {
-//            var nextElement = $('.drop-list div.focus').next() ? $('.drop-list div.focus').next() : $('.drop-list div')[0];
-//            $('.drop-list div.focus').removeClass('focus')
-//            nextElement.addClass('focus');
-//          }
+          }
         } else {
           if ($('.drop-list div').length > 0) {
             $('.schedule-from input').val($('.drop-list div.focus').text());
@@ -118,17 +115,9 @@ app = {
         e.stopPropagation();
         e.preventDefault();
         if (e.keyCode != 13) {
-          if((e.keyCode > 45 && e.keyCode < 91) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 0){
+          if ((e.keyCode > 45 && e.keyCode < 91) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 0) {
             app.transport.showHelper('to');
-          } //else if (e.keyCode == 38) {
-//            var prevElement = $('.drop-list div.focus').prev() ? $('.drop-list div.focus').prev() : $('.drop-list div')[$('.drop-list div').length - 1];
-//            $('.drop-list div.focus').removeClass('focus')
-//            prevElement.addClass('focus');
-//          } else if (e.keyCode == 40) {
-//            var nextElement = $('.drop-list div.focus').next() ? $('.drop-list div.focus').next() : $('.drop-list div')[0];
-//            $('.drop-list div.focus').removeClass('focus')
-//            nextElement.addClass('focus');
-//          }
+          }
         } else {
           if ($('.drop-list div')) {
             $('.schedule-to input').val($('.drop-list div.focus').text());
@@ -156,15 +145,12 @@ app = {
       })
       app.transport.layoutTransportList();
 
-      app.transport.tranportRefresh = window.setInterval(function(){
-        if(!$('.drop-list').length){
+      app.transport.tranportRefresh = window.setInterval(function() {
+        if (!$('.drop-list').length) {
           app.transport.layoutTransportList();
         }
       }, app.transport.transportRefreshInterval);
     },
-
-
-
 
     showHelper:function (direction, full) {
       var selector = '.gray-input.schedule-' + direction;
@@ -172,7 +158,6 @@ app = {
       if (!$(selector + ' div')[0]) {
         $('<div class="drop-list"></div>').appendTo(selector);
       }
-
       var query = $(selector + ' input').val();
       var type = app.transport.transportType;
       $('.schedule-table').addClass('gray');
@@ -188,7 +173,7 @@ app = {
                 app.transport.layoutTransportList();
               }
               ).mouseenter(
-              function(){
+              function() {
                 $('.drop-list div').removeClass('focus');
                 $(this).addClass('focus')
               }
@@ -260,14 +245,21 @@ app = {
   },
 
 
+
+
+
+
+
+
+
+
   page:{
-    
+
 
     init:function () {
       app.transport.getStationFromCookie();
       app.transport.buildTransportForm();
       app.gmap.initMap();
-      app.page.addCategoryMenuFunctionality();
     },
 
     getData:function () {
@@ -385,14 +377,126 @@ app = {
         )));
       $('.filter-wrap').append(item);
     }
-
-
-
-
-
-
-
   },
+  menu:{
+    buildMenu: function() {
+      $('.subcategory a').click(function() {
+        app.menu.getObjects($(this).attr('data-subcategory'));
+      });
+    },
+    getObjects:function (id) {
+      var URL = 'http://test.zhukcity.ru/map?act=get_objects&cat_ids=' + id + '&sort_by=0';
+      $.get(URL, function (data) {
+        if (data.success) {
+          app.gmap.closeAllInfoWindows();
+          app.gmap.removeAllMarkers();
+          app.objects = [];
+          if (data.objects.length > 0) {
+            for (var i = 0; i < data.objects.length; i++) {
+              var mapItem = app.gmap.addMarker(data.objects[i]);
+              var item = {
+                data: data.objects[i],
+                mapItem: mapItem
+              }
+              app.objects.push(item);
+            }
+            app.menu.layoutSubcategoryItems();
+          }
+        }
+      })
+    },
+    buildTabs:function(activeTab) {
+      var tabsControll = '<ul class="tabs">' +
+        '<li class="posters"><a href="#">Афиши</a></li>' +
+        '<li class="categorys"><a href="#">Категории</a></li>' +
+        '<li class="news"><a href="#">Новости</a></li>' +
+        '</ul>' +
+        '<div class="list-filter">' +
+        '<ul class="object-list-filter">' +
+        '<li><a href="#" class="active">По названию</a></li>' +
+        '<li><a href="#">По рейтингу</a></li>' +
+        '<li><a href="#">По дате</a></li>' +
+        '</ul>' +
+        '<div class="work-filter">' +
+        'Работает' +
+        '<div class="ui-work-bg">' +
+        '<span class="ui-work-item off"></span>' +
+        '</div>' +
+        '</div>' +
+        '<div class="clear"></div>' +
+        '</div>'
+      $('<div class="filter-wrap">').html(tabsControll).appendTo('.items-list');
+      $($('.filter-wrap .tabs a')[activeTab]).addClass('active');
+    },
+
+    layoutSubcategoryItems:function() {
+      $('.category-list').addClass('hide-subcategory');
+      app.menu.buildTabs(1);
+      for (var i = 0; i < app.objects.length; i++) {
+        var item = app.objects[i];
+        console.log(app.objects[i]);
+        var listItem = $('<div class="list-item object-item">')
+          .append($('<span class="status-work">')
+          .addClass(item.data.operating_minutes >= 0 ? 'online' : '')
+          .html(item.data.operating_minutes >= 0 ? 'работает' : 'неработает'))
+          .append($('<a href="#" class="list-item-name">')
+          .html(item.data.name))
+          .append($('<p class="list-item-info">').html(
+          'Адрес: <a href="#">' + item.data.address + '</a> <br>' +
+            'Телефон: ' + item.data.phone + '  <br>' +
+            'Сайт: <a href="#">' + item.data.website + '</a> <br>'
+          ))
+          .append($('<div class="object-list-time">')
+          .append($('<ul class="object-list-time-details">')
+          .append($('<li>пн-пт: 9:00 - 18:00</li>'))
+          .append($('<li>сб: 10:00 - 15:00</li>'))
+          .append($('<li>вс: выходной</li>'))
+          .append($('<li>')
+          .html(
+          '<a class="open-lunch-info">перерывы</a>' +
+            '<div class="lunch-info">' +
+            '<table>' +
+            '<tr>' +
+            '<th>ежедневно</th>' +
+            '</tr>' +
+            '<tr>' +
+            '<td>11:00 - 11:20</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td>14:20 - 14:40</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td>16:20 - 16:40</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<th>в субботу</th>' +
+            '</tr>' +
+            '<tr>' +
+            '<td>10:20 - 10:45</td>' +
+            '</tr>' +
+            '</table>' +
+            '</div>'
+          ))))
+          .append($('<div class="object-item-footer">')
+          .append($('<div class="object-item-rating">')
+          .html(
+          '<span class="object-item-comments">' + item.data.n_reviews + '</span>' +
+            '<div class="rating-stars"></div>' +
+            'Рейтинг: <b>' + item.data.rating + '</b>'
+          ))
+          .append($('<div class="object-item-controls">')
+          .append('<a href="#" class="gray-btn">В закладки</a>')
+          .append('<a href="#" class="gray-btn location" data-object-id="' + item.data.id + '" ><span class="object-item-show-map"></span></a>')
+          ));
+        $('.filter-wrap').append(listItem);
+
+      }
+      $('.gray-btn.location').click(function(){
+        app.gmap.showObject($(this).attr('data-object-id'));
+      })
+    }
+  },
+
   gmap:{
     markers:{},
     startPosition:{
@@ -409,8 +513,103 @@ app = {
         center: new google.maps.LatLng(app.gmap.startPosition.lat, app.gmap.startPosition.lng),
         mapTypeId: google.maps.MapTypeId.ROADMAP
       }
-      this.map = new google.maps.Map(window.document.getElementById('mapContainer'), startOptions);
+      app.gmap.map = new google.maps.Map(window.document.getElementById('mapContainer'), startOptions);
+    },
+    addMarker:function(object) {
+      var marker = new google.maps.Marker({
+        position: new google.maps.LatLng(object.latitude, object.longitude),
+        icon: 'images/marker.1.png',
+        map: app.gmap.map,
+        title:"Hello World!"
+      });
+
+      var infoString = '<div class="object-onmap-wrap">' +
+        '<div class="onmap-arrow"></div>' +
+        '<div class="object-onmap-header">' +
+        '<h4 class="object-onmap-name">' + object.name + '</h4>' +
+        '<div class="onmap-comment-count">' + object.n_reviews + '</div>' +
+        '</div>' +
+        '<div class="object-onmap-content">' +
+        'Категория: <a href="#">Банки</a> <br>' +
+        'Адрес: <a href="#">' + object.address + '</a> <br>' +
+        'Телефон: ' + object.phone +
+        '</div>' +
+        '<div class="object-onmap-time">' +
+        object.worktime +
+        '</div>' +
+        '<div class="object-onmap-footer">' +
+        '<span class="object-onmap-rating">Рейтинг: <b>' + object.rating + '</b></span>' +
+        '<a href="#" class="object-onmap-comment">Оставить отзыв</a>' +
+        '</div>' +
+        '</div>';
+
+      var box = document.createElement("div");
+      box.style.cssText = "";
+      box.innerHTML = infoString;
+
+      var infoBoxOptions = {
+        content: box,
+        maxWidth: 0,
+        pixelOffset: new google.maps.Size(-100, -40),
+        zIndex: null,
+        alignBottom:true,
+        boxStyle: {
+          height: "auto",
+          opacity: 1,
+          width: "200px"
+        },
+        closeBoxMargin: "5px 5px 2px 2px",
+        closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
+        infoBoxClearance: new google.maps.Size(1, 1),
+        isHidden: false,
+        pane: "floatPane",
+        enableEventPropagation: false
+      };
+
+      var infoBox = new InfoBox(infoBoxOptions);
+
+      google.maps.event.addListener(marker, 'click', function() {
+        app.gmap.closeAllInfoWindows();
+        infoBox.open(app.gmap.map, marker);
+      });
+
+      var item = {
+        marker: marker,
+        infoBox: infoBox
+      }
+
+      return item;
+    },
+
+    showObject: function(id){
+      for (var i = 0; i < app.objects.length; i++) {
+        if(app.objects[i].data.id == id){
+          app.gmap.closeAllInfoWindows();
+          app.objects[i].mapItem.infoBox.open(app.gmap.map, app.objects[i].mapItem.marker);
+          app.gmap.map.setCenter(new google.maps.LatLng(app.objects[i].data.latitude, app.objects[i].data.longitude));
+        }
+      }
+    },
+
+    closeAllInfoWindows: function() {
+      for (var i = 0; i < app.objects.length; i++) {
+        app.objects[i].mapItem.infoBox.close();
+      }
+    },
+
+    removeAllMarkers: function() {
+      for (var i = 0; i < app.objects.length; i++) {
+        console.log(app.objects[i].mapItem.marker);
+        app.objects[i].mapItem.marker.setMap(null);
+      }
     }
+  },
+
+  init: function() {
+    app.transport.getStationFromCookie();
+    app.transport.buildTransportForm();
+    app.gmap.initMap();
+    app.menu.buildMenu();
   },
 
   setCookie: function (name, value, expires, path, domain, secure) {
