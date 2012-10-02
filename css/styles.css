@@ -1298,6 +1298,7 @@ footer {
     padding-bottom: 1px;
     border-bottom: 1px solid #ededed;
     margin-bottom: 7px;
+    min-height: 92px;
 }
 .comment-object-info {
     float: left;
@@ -1797,4 +1798,9 @@ footer {
 }
 .category-list.hide-subcategory .subcategory{
     display: none;
+}
+
+.filter-wrap .list-item:hover{
+    background-color:#eee;
+    cursor: pointer;
 }

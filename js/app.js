@@ -244,140 +244,6 @@ app = {
     }
   },
 
-
-
-
-
-
-
-
-
-
-  page:{
-
-
-    init:function () {
-      app.transport.getStationFromCookie();
-      app.transport.buildTransportForm();
-      app.gmap.initMap();
-    },
-
-    getData:function () {
-
-    },
-
-    addCategoryMenuFunctionality:function () {
-      $('.category-list li .subcategory a').click(function (e) {
-        $('.main-icon, .subcategory').removeClass('active');
-        $(this).closest('.subcategory').addClass('active');
-        $(this).closest('li').find('.main-icon').addClass('active');
-        app.page.showObjectListBySubCategory($(this).attr('data-subcategory'));
-      })
-    },
-
-    showObjectListBySubCategory:function (id) {
-      $('.category-list').removeClass('show-subcategore').addClass('active-for-hover');
-      $('.items-list').empty();
-      app.page.buildTabs(1);
-      app.page.getObjects(id)
-    },
-
-    buildTabs:function (activeTab) {
-      var tabsControll = '<ul class="tabs">' +
-        '<li class="posters"><a href="#">Афиши</a></li>' +
-        '<li class="categorys"><a href="#">Категории</a></li>' +
-        '<li class="news"><a href="#">Новости</a></li>' +
-        '</ul>' +
-        '<div class="list-filter">' +
-        '<ul class="object-list-filter">' +
-        '<li><a href="#" class="active">По названию</a></li>' +
-        '<li><a href="#">По рейтингу</a></li>' +
-        '<li><a href="#">По дате</a></li>' +
-        '</ul>' +
-        '<div class="work-filter">' +
-        'Работает' +
-        '<div class="ui-work-bg">' +
-        '<span class="ui-work-item off"></span>' +
-        '</div>' +
-        '</div>' +
-        '<div class="clear"></div>' +
-        '</div>'
-      $('<div class="filter-wrap">').html(tabsControll).appendTo('.items-list');
-      $($('.filter-wrap .tabs a')[activeTab]).addClass('active');
-    },
-
-    getObjects:function (id) {
-      var URL = 'http://test.zhukcity.ru/map?act=get_objects&cat_ids=' + id + '&sort_by=0';
-      $.get(URL, function (data) {
-        if (data.success) {
-          if (data.objects.length > 0) {
-            $('list-item').remove();
-            for (var i = 0; i < data.objects.length; i++) {
-              app.page.layoutObject(data.objects[i]);
-            }
-          }
-        }
-      })
-    },
-
-    layoutObject:function (data) {
-      var item = $('<div class="list-item object-item">')
-        .append($('<span class="status-work">')
-        .addClass(data.operating_minutes >= 0 ? 'online' : '')
-        .html(data.operating_minutes >= 0 ? 'работает' : 'неработает'))
-        .append($('<a href="#" class="list-item-name">')
-        .html(data.name))
-        .append($('<p class="list-item-info">').html(
-        'Адрес: <a href="#">' + data.address + '</a> <br>' +
-          'Телефон: ' + data.phone + '  <br>' +
-          'Сайт: <a href="#">' + data.website + '</a> <br>'
-        ))
-        .append($('<div class="object-list-time">')
-        .append($('<ul class="object-list-time-details">')
-        .append($('<li>пн-пт: 9:00 - 18:00</li>'))
-        .append($('<li>сб: 10:00 - 15:00</li>'))
-        .append($('<li>вс: выходной</li>'))
-        .append($('<li>')
-        .html(
-        '<a class="open-lunch-info">перерывы</a>' +
-          '<div class="lunch-info">' +
-          '<table>' +
-          '<tr>' +
-          '<th>ежедневно</th>' +
-          '</tr>' +
-          '<tr>' +
-          '<td>11:00 - 11:20</td>' +
-          '</tr>' +
-          '<tr>' +
-          '<td>14:20 - 14:40</td>' +
-          '</tr>' +
-          '<tr>' +
-          '<td>16:20 - 16:40</td>' +
-          '</tr>' +
-          '<tr>' +
-          '<th>в субботу</th>' +
-          '</tr>' +
-          '<tr>' +
-          '<td>10:20 - 10:45</td>' +
-          '</tr>' +
-          '</table>' +
-          '</div>'
-        ))))
-        .append($('<div class="object-item-footer">')
-        .append($('<div class="object-item-rating">')
-        .html(
-        '<span class="object-item-comments">' + data.n_reviews + '</span>' +
-          '<div class="rating-stars"></div>' +
-          'Рейтинг: <b>' + data.rating + '</b>'
-        ))
-        .append($('<div class="object-item-controls">')
-        .html(
-        '<a href="#" class="gray-btn">В закладки</a>' +
-          '<a href="#" class="gray-btn"><span class="object-item-show-map"></span></a>'
-        )));
-      $('.filter-wrap').append(item);
-    }
-  },
   menu:{
     buildMenu: function() {
       $('.subcategory a').click(function() {
@@ -388,6 +254,8 @@ app = {
       var URL = 'http://test.zhukcity.ru/map?act=get_objects&cat_ids=' + id + '&sort_by=0';
       $.get(URL, function (data) {
         if (data.success) {
+          console.log('!!!1',data);
+          app.curentSubcategory =  id;
           app.gmap.closeAllInfoWindows();
           app.gmap.removeAllMarkers();
           app.objects = [];
@@ -434,8 +302,7 @@ app = {
       app.menu.buildTabs(1);
       for (var i = 0; i < app.objects.length; i++) {
         var item = app.objects[i];
-        console.log(app.objects[i]);
-        var listItem = $('<div class="list-item object-item">')
+        var listItem = $('<div class="list-item object-item" data-obj-id=' + item.data.id + '>')
           .append($('<span class="status-work">')
           .addClass(item.data.operating_minutes >= 0 ? 'online' : '')
           .html(item.data.operating_minutes >= 0 ? 'работает' : 'неработает'))
@@ -486,13 +353,149 @@ app = {
           ))
           .append($('<div class="object-item-controls">')
           .append('<a href="#" class="gray-btn">В закладки</a>')
-          .append('<a href="#" class="gray-btn location" data-object-id="' + item.data.id + '" ><span class="object-item-show-map"></span></a>')
-          ));
+          .append($('<a href="#" class="gray-btn location" data-obj-id="' + item.data.id + '" ></a>').append(
+            $('<span class="object-item-show-map"></span>')
+          ))
+          ))
+
         $('.filter-wrap').append(listItem);
 
       }
       $('.gray-btn.location').click(function(){
-        app.gmap.showObject($(this).attr('data-object-id'));
+        e.preventDefault();
+        e.stopPropagation();
+        app.gmap.showObject($(this).attr('data-obj-id'));
+      })
+      $('.list-item.object-item').click(function(){
+        app.menu.openObjectDetails($(this).attr('data-obj-id'));
+      });
+    },
+
+    openObjectDetails:function(id){
+      $.getJSON('http://test.zhukcity.ru/map/?act=get_object&obj_id=' + id, function(data){
+        $('.list-item.object-item').remove();
+
+        console.log(data);
+
+        var details = $('<div class="list-item object-details">')
+          .append($('<span class="status-work">')
+            .addClass(data.operating_minutes >= 0 ? 'online' : '')
+            .html(data.operating_minutes >= 0 ? 'работает' : 'неработает'))
+          .append('<a href="#" class="list-item-name">' + data.name + '</a>')
+          .append('<p class="list-item-info">' +
+                    'Адрес: <a href="#">' + data.address + '</a> <br>' +
+                    'Телефон: ' + data.phone + '  <br>' +
+                    'Сайт: <a href="#"> ' + data.website + ' </a> <br>' +
+                  '</p>')
+          .append('<div class="object-list-time">'+
+                    '<ul class="object-list-time-details">'+
+                        '<li>пн-пт: 9:00 - 18:00</li>'+
+                        '<li>сб: 10:00 - 15:00</li>'+
+                        '<li>вс: выходной</li>'+
+                        '<li><a class="open-lunch-info">перерывы</a>'+
+                            '<div class="lunch-info" style="display: none; ">'+
+                                '<table>'+
+                                    '<tbody><tr>'+
+                                        '<th>ежедневно</th>'+
+                                    '</tr>'+
+                                    '<tr>'+
+                                        '<td>11:00 - 11:20</td>'+
+                                    '</tr>'+
+                                    '<tr>'+
+                                        '<td>14:20 - 14:40</td>'+
+                                    '</tr>'+
+                                    '<tr>'+
+                                        '<td>16:20 - 16:40</td>'+
+                                    '</tr>'+
+                                    '<tr>'+
+                                        '<th>в субботу</th>'+
+                                    '</tr>'+
+                                    '<tr>'+
+                                        '<td>10:20 - 10:45</td>'+
+                                    '</tr>'+
+                                '</tbody></table>'+
+                            '</div>'+
+                        '</li>'+
+                    '</ul>' +
+                '</div>')
+          .append('<div class="object-item-footer">'+
+                    '<div class="object-item-rating">'+
+                        '<div class="rating-stars" style="overflow: auto; "><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div></div>'+
+                        'Рейтинг: <b>' + data.rating + '</b>'+
+                    '</div>'+
+                    '<div class="object-item-controls">'+
+                        '<a href="#" class="gray-btn">В закладки</a>'+
+                    '</div>'+
+                '</div>')
+          .append('<div class="object-details-gallery">')
+          .append('<p class="object-details-info">')
+          .append('<a href="#" class="gray-btn back-object-list"><span class="arrow-left"></span>К списку обьектов</a>' +
+                '<a href="#" class="gray-btn add-comment-object open-modal">Оставить отзыв</a>'+
+                '<div class="modal add-comment-modal">'+
+                    '<a class="close-modal"></a>'+
+                    '<div class="modal-header">'+
+                        '<h3 class="modal-name">Оставить отзыв</h3>'+
+                    '</div>'+
+                    '<form>'+
+                        '<label>'+
+                            'Тема'+
+                            '<div class="modal-input theme-input">'+
+                                '<input type="text" value="">'+
+                            '</div>'+
+                        '</label>'+
+                        '<label>'+
+                            'Моя оценка'+
+                            '<div class="rating-stars" style="overflow: auto; "><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div></div>'+
+                        '</label>'+
+                        '<div class="clear"></div>'+
+                        '<div class="add-comment-textarea-wrap">'+
+                            'Текст отзыва<br>'+
+                            '<div class="add-comment-textarea">'+
+                                '<textarea></textarea>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="clear"></div>'+
+                        '<button class="blue-btn modal-submit">Отправить</button>'+
+                    '</form>'+
+                '</div>'+
+                '<div class="clear-r"></div>'+
+                '<div class="comment-object-wrap">'+
+                    '<span class="comments-object-count">Всего отзывов: <b>' + data.totalReviewsCount + '</b></span>'+
+                    '<a class="show-all-comments-object" href="#">Показать все</a>'+
+                    '<div class="clear-r"></div>'+
+                    '<section class="comments-list">'+
+                    '</section>'+
+                '</div>'+
+            '</div>')
+          .appendTo('.items-list.object-list');
+        if(data.reviews.length){
+          for(var i = 0; i < data.reviews.length; i++){
+            $('<div class="comment-object-item">' +
+                           ' <div class="comment-object-info">'+
+                                '<a href="#" class="comment-object-name female">' + data.reviews[i].user_name + '</a>'+
+                                '<span class="comment-object-date">' + data.reviews[i].date_time + '</span>'+
+                                '<div class="comment-object-rating">'+
+                                    '<span class="comment-object-rating-minus"></span>'+
+                                    '<span class="comment-object-rating-plus"></span>'+
+                                    '<a href="#" class="comment-object-rating-rate">' + data.reviews[i].votes + '</a>'+
+                                '</div>'+
+                            '</div>'+
+                            '<div class="comment-object-content">' +
+                                '<p class="comment-object-text">' + data.reviews[i].msg_text + '</p>'+
+                                '<span class="comment-object-mark">Моя оценка: <b>' + data.reviews[i].rating + '</b></span>' +
+                                '<a href="#" class="comment-object-answer">Ответить</a>' +
+                            '</div>' +
+                            '<div class="clear-r"></div>' +
+                        '</div>').appendTo('.comments-list')
+          }
+        }
+
+        $('.gray-btn.back-object-list').bind('click',function(){
+          $('.items-list').empty();
+          app.menu.layoutSubcategoryItems();
+        })
+
+        app.gmap.showObject(id);
       })
     }
   },
