@@ -254,7 +254,6 @@ app = {
       var URL = 'http://test.zhukcity.ru/map?act=get_objects&cat_ids=' + id + '&sort_by=0';
       $.get(URL, function (data) {
         if (data.success) {
-          console.log('!!!1',data);
           app.curentSubcategory =  id;
           app.gmap.closeAllInfoWindows();
           app.gmap.removeAllMarkers();
@@ -294,7 +293,23 @@ app = {
         '<div class="clear"></div>' +
         '</div>'
       $('<div class="filter-wrap">').html(tabsControll).appendTo('.items-list');
+      $('.news').bind('click',function(){
+        $(this).addClass('active');
+        $('.categotys').removeClass('active');
+        $('.posters').removeClass('active');
+        $('.object-list-filter').empty();
+      });
+      $('.posters').bind('click',function(){
+        $(this).addClass('active');
+        $('.categotys').removeClass('active');
+        $('.news').removeClass('active');
+        $('.object-list-filter').empty();
+      });
       $($('.filter-wrap .tabs a')[activeTab]).addClass('active');
+    },
+
+    layoutNewsItems:function(){
+
     },
 
     layoutSubcategoryItems:function() {
