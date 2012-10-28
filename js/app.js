@@ -523,6 +523,7 @@ app = {
             zoom:12
         },
         initMap:function () {
+            return false;
             $('<div id="mapContainer"></div>').css('width', '100%').css('height', '100%').css('z-index', '1')
                 .appendTo('.map');
             var startOptions = {
@@ -623,11 +624,31 @@ app = {
         }
     },
 
+    login: {
+        bind:function () {
+            var $loginBtn = $('button.login-btn');
+            $loginBtn.bind('click', function () {
+                $.post('http://test.zhukcity.ru/profile/?act=login', {
+                    login: 'login',
+                    passw: 'pass'
+                });
+                return false;
+            });
+            $('a.reg-link').bind('click', function () {
+                $.post('http://test.zhukcity.ru/profile/?act=captcha', function (data) {
+                    $('div.register-modal form label img').attr('src',
+                        'http://test.zhukcity.ru/images/code.png?id=' + data.code_id);
+                });
+            });
+        }
+    },
+
     init:function () {
         app.transport.getStationFromCookie();
         app.transport.buildTransportForm();
         app.gmap.initMap();
         app.menu.buildMenu();
+        app.login.bind();
     },
 
     setCookie:function (name, value, expires, path, domain, secure) {
