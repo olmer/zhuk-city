@@ -627,18 +627,44 @@ app = {
     login: {
         bind:function () {
             var $loginBtn = $('button.login-btn');
+            var captchaId = 1;
             $loginBtn.bind('click', function () {
+//                console.log(app.getCookie('SESS_ID'));
                 $.post('http://test.zhukcity.ru/profile/?act=login', {
-                    login: 'login',
-                    passw: 'pass'
-                });
+                    login: $('div.login-input input[type=text]').val(),
+                    passw: $('div.login-input input[type=password]').val()
+                }, function (data) {console.log(data)});
                 return false;
             });
             $('a.reg-link').bind('click', function () {
                 $.post('http://test.zhukcity.ru/profile/?act=captcha', function (data) {
+                    captchaId = data.code_id;
                     $('div.register-modal form label img').attr('src',
                         'http://test.zhukcity.ru/images/code.png?id=' + data.code_id);
                 });
+            });
+
+            $('div.register-modal form button.modal-submit').bind('click', function () {
+                form = 'div.register-modal form ';
+                var fields = {
+                    nickname: $(form + 'input[name=nickname]'),
+                    gender: $(form + 'input[name=gender]:checked').length !== 0
+                        ? $(form + 'input[name=gender]:checked')
+                        : $('<input>').attr({value: 0}),
+                    birthdate: $(form + 'input[name=birthdate]'),
+                    email: $(form + 'input[name=email]'),
+                    passw: $(form + 'input[name=passw]'),
+                    code : $(form + 'input[name=code]')
+                };
+                var data = {};
+                $.each(fields, function(k, v) {
+                    data[k] = v.val();
+                });
+                data['code_id'] = captchaId;
+                $.post('http://test.zhukcity.ru/profile/register/', data, function (data) {
+//                    console.log(data);
+                });
+                return false;
             });
         }
     },
