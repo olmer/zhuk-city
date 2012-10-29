@@ -626,17 +626,41 @@ app = {
 
     login: {
         bind:function () {
-            var $loginBtn = $('button.login-btn');
-            var captchaId = 1;
-            $loginBtn.bind('click', function () {
+            var $loginBtn = $('button.login-btn'),
+                captchaId = 1,
+                loginInputs = {
+                    login: $('div.login-input input[type=text]'),
+                    passw: $('div.login-input input[type=password]')
+                },
+                loginInputsValues = {login: '', passw: ''};
+
+            $.each(loginInputs, function (k, v) {
+                loginInputsValues[k] = v.val();
+            });
+            $.each(loginInputs, function (k, v) {
+                v.on('click', {default: loginInputsValues}, app.inputsSwitcherClick);
+                v.on('blur', {default: loginInputsValues}, app.inputsSwitcherBlur);
+            });
+
+            $loginBtn.on('click', function () {
 //                console.log(app.getCookie('SESS_ID'));
                 $.post('http://test.zhukcity.ru/profile/?act=login', {
-                    login: $('div.login-input input[type=text]').val(),
-                    passw: $('div.login-input input[type=password]').val()
-                }, function (data) {console.log(data)});
+                    login: loginInputs.login.val(),
+                    passw: loginInputs.passw.val()
+                }, function (data) {
+                    if (data.success === true) {
+                        $('div.login-form.unauthorized').css('display', 'none');
+                        $('div.login-form.authorized').css('display', 'block');
+                    } else if (data.success === false) {
+                        loginInputs.login.parent().addClass('input-error')
+                            .append('<div class="error-container">' +
+                            '<span class="error-container-arrow"></span>' + data.error + '</div>');
+                    }
+                });
                 return false;
             });
-            $('a.reg-link').bind('click', function () {
+
+            $('a.reg-link').on('click', function () {
                 $.post('http://test.zhukcity.ru/profile/?act=captcha', function (data) {
                     captchaId = data.code_id;
                     $('div.register-modal form label img').attr('src',
@@ -644,7 +668,7 @@ app = {
                 });
             });
 
-            $('div.register-modal form button.modal-submit').bind('click', function () {
+            $('div.register-modal form button.modal-submit').on('click', function () {
                 form = 'div.register-modal form ';
                 var fields = {
                     nickname: $(form + 'input[name=nickname]'),
@@ -666,6 +690,24 @@ app = {
                 });
                 return false;
             });
+        }
+    },
+
+    inputsSwitcherClick: function(e) {
+        var $this = $(this);
+        var def = e.data.default[$this.attr('name')],
+            current = $this.val();
+        if (current === def) {
+            $this.val('');
+        }
+    },
+
+    inputsSwitcherBlur: function(e) {
+        var $this = $(this);
+        var def = e.data.default[$this.attr('name')],
+            current = $this.val();
+        if (current === '') {
+            $this.val(def);
         }
     },
 
@@ -703,5 +745,29 @@ app = {
             }
         }
         return(setStr);
+    },
+
+    html: {
+        login: {
+            authorized: function (data) {
+                /*return '<div class="auth-user"> Здравствуйте <a class="login-links open-modal">' + data.username + '</a>'
+                    + '<div class="modal register-modal">'
+                    + '<a class="close-modal"></a>'
+                    + '<div class="modal-header">'
+                    + '<h3 class="modal-name">Личный кабинет</h3>'
+                    + '</div></div></div>'
+                    + '<a href="#" class="auth-user-exit">Выход</a>'
+                    + '<div class="clear"></div>'
+                    + '<a class="open-modal bookmark-link gray-btn">Закладки</a>'
+                    + '<div class="modal bookmark-modal"><a class="close-modal"></a></div>'
+                    + '<a class="open-modal places-link gray-btn">Просмотренные места</a>'
+                    + '<div class="modal bookmark-modal">'
+                    + '<a class="close-modal"></a>'
+                    + '<div class="modal-header">'
+                    + '<h3 class="modal-name">Просмотренные места</h3>'
+                    + '</div>'
+                    + '<div class="bookmark-table"></div></div>';*/
+            }
+        }
     }
 };

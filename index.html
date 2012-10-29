@@ -49,13 +49,13 @@
                 </form>
             </div>
         </div>
-        <div class="login-form">
+        <div class="login-form unauthorized">
             <form>
                 <div class="clear-input-text login-input">
-                    <input type="text" value="Логин">
+                    <input type="text" value="Логин" name="login">
                 </div>
                 <div class="clear-input-text login-input">
-                    <input type="password" value="Пароль" >
+                    <input type="password" value="Пароль" name="passw">
                 </div>
                 <button class="blue-btn login-btn">Вход</button>
             </form>
@@ -136,6 +136,780 @@
                     <button class="blue-btn modal-submit">Отправить</button>
                 </form>
             </div>
+        </div>
+        <div class="login-form authorized" style="display: none">
+
+        <div class="auth-user"> Здравствуйте <a class="login-links open-modal">Иннокентий</a>
+
+            <div class="modal register-modal">
+                <a class="close-modal"></a>
+
+                <div class="modal-header">
+                    <h3 class="modal-name">Личный кабинет</h3>
+                </div>
+                <form>
+                    <label>
+                        Псевдоним
+                        <div class="modal-input">
+                            <input type="text" value="Иннокентий" onfocus="if (this.value=='Иннокентий') this.value='';"
+                                   onblur="if (this.value==''){this.value='Иннокентий'}">
+                        </div>
+                    </label>
+
+                    <div class="choose-sex">
+                        <label>
+                            Не указано
+                            <input type="radio" name="sex" value="0">
+                        </label>
+                        <label>
+                            Муж.
+                            <input type="radio" name="sex" value="1">
+                        </label>
+                        <label>
+                            Жен.
+                            <input type="radio" name="sex" value="2">
+                        </label>
+
+                        <div class="clear"></div>
+                    </div>
+                    <label>
+                        Дата рождения
+                        <div class="modal-input">
+                            <input type="text" value="дд.мм.гггг" onfocus="if (this.value=='дд.мм.гггг') this.value='';"
+                                   onblur="if (this.value==''){this.value='дд.мм.гггг'}">
+                        </div>
+                    </label>
+                    <label>
+                        Email
+                        <div class="modal-input">
+                            <input type="text" value="example@mail.ua"
+                                   onfocus="if (this.value=='example@mail.ua') this.value='';"
+                                   onblur="if (this.value==''){this.value='example@mail.ua'}">
+                        </div>
+                    </label>
+                    <label>
+                        Сменить пароль
+                        <fieldset class="modal-near-inputs">
+                            <div class="modal-input fleft">
+                                <input type="text" value="Новый пароль"
+                                       onfocus="if (this.value=='Новый пароль') this.value='';"
+                                       onblur="if (this.value==''){this.value='Новый пароль'}">
+                            </div>
+                            <div class="modal-input fleft">
+                                <input type="text" value="Пароль ещё раз"
+                                       onfocus="if (this.value=='Пароль ещё раз') this.value='';"
+                                       onblur="if (this.value==''){this.value='Пароль ещё раз'}">
+                            </div>
+                        </fieldset>
+                    </label>
+                    <button class="blue-btn modal-submit">Сохранить</button>
+                </form>
+            </div>
+        </div>
+        <a href="#" class="auth-user-exit">Выход</a>
+
+        <div class="clear"></div>
+        <a class="open-modal bookmark-link gray-btn">Закладки</a>
+
+        <div class="modal bookmark-modal">
+        <a class="close-modal"></a>
+
+        <div class="modal-header">
+            <h3 class="modal-name">Закладки</h3>
+        </div>
+        <div class="bookmark-table">
+        <table>
+        <tr>
+            <td>
+                <a class="bookmark-table-name" href="#">Центральное отделение "БМ Банк"</a><br>
+
+                <div class="object-item-rating">
+                    <span class="object-item-comments">25</span>
+
+                    <div class="rating-stars"></div>
+                    Рейтинг: <b>0</b>
+                </div>
+            </td>
+            <td>
+                <p class="list-item-info">
+                    Адрес: <a href="#">ул. Саксаганского, 122/37</a> <br>
+                    Телефон: (044) 459-01-34 <br>
+                    Сайт: <a href="#">www.bm-bank.com</a> <br>
+                </p>
+            </td>
+            <td>
+                <div class="object-list-time">
+                    <ul class="object-list-time-details">
+                        <li>пн-пт: 9:00 - 18:00</li>
+                        <li>сб: 10:00 - 15:00</li>
+                        <li>вс: выходной</li>
+                        <li><a class="open-lunch-info">перерывы</a>
+
+                            <div class="lunch-info">
+                                <table>
+                                    <tr>
+                                        <th>ежедневно</th>
+                                    </tr>
+                                    <tr>
+                                        <td>11:00 - 11:20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:20 - 14:40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16:20 - 16:40</td>
+                                    </tr>
+                                    <tr>
+                                        <th>в субботу</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10:20 - 10:45</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <a class="bookmark-delete">Удалить</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a class="bookmark-table-name" href="#">Центральное отделение "БМ Банк"</a><br>
+
+                <div class="object-item-rating">
+                    <span class="object-item-comments">25</span>
+
+                    <div class="rating-stars"></div>
+                    Рейтинг: <b>0</b>
+                </div>
+            </td>
+            <td>
+                <p class="list-item-info">
+                    Адрес: <a href="#">ул. Саксаганского, 122/37</a> <br>
+                    Телефон: (044) 459-01-34 <br>
+                    Сайт: <a href="#">www.bm-bank.com</a> <br>
+                </p>
+            </td>
+            <td>
+                <div class="object-list-time">
+                    <ul class="object-list-time-details">
+                        <li>пн-пт: 9:00 - 18:00</li>
+                        <li>сб: 10:00 - 15:00</li>
+                        <li>вс: выходной</li>
+                        <li><a class="open-lunch-info">перерывы</a>
+
+                            <div class="lunch-info">
+                                <table>
+                                    <tr>
+                                        <th>ежедневно</th>
+                                    </tr>
+                                    <tr>
+                                        <td>11:00 - 11:20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:20 - 14:40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16:20 - 16:40</td>
+                                    </tr>
+                                    <tr>
+                                        <th>в субботу</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10:20 - 10:45</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <a class="bookmark-delete">Удалить</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a class="bookmark-table-name" href="#">Центральное отделение "БМ Банк"</a><br>
+
+                <div class="object-item-rating">
+                    <span class="object-item-comments">25</span>
+
+                    <div class="rating-stars"></div>
+                    Рейтинг: <b>0</b>
+                </div>
+            </td>
+            <td>
+                <p class="list-item-info">
+                    Адрес: <a href="#">ул. Саксаганского, 122/37</a> <br>
+                    Телефон: (044) 459-01-34 <br>
+                    Сайт: <a href="#">www.bm-bank.com</a> <br>
+                </p>
+            </td>
+            <td>
+                <div class="object-list-time">
+                    <ul class="object-list-time-details">
+                        <li>пн-пт: 9:00 - 18:00</li>
+                        <li>сб: 10:00 - 15:00</li>
+                        <li>вс: выходной</li>
+                        <li><a class="open-lunch-info">перерывы</a>
+
+                            <div class="lunch-info">
+                                <table>
+                                    <tr>
+                                        <th>ежедневно</th>
+                                    </tr>
+                                    <tr>
+                                        <td>11:00 - 11:20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:20 - 14:40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16:20 - 16:40</td>
+                                    </tr>
+                                    <tr>
+                                        <th>в субботу</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10:20 - 10:45</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <a class="bookmark-delete">Удалить</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a class="bookmark-table-name" href="#">Центральное отделение "БМ Банк"</a><br>
+
+                <div class="object-item-rating">
+                    <span class="object-item-comments">25</span>
+
+                    <div class="rating-stars"></div>
+                    Рейтинг: <b>0</b>
+                </div>
+            </td>
+            <td>
+                <p class="list-item-info">
+                    Адрес: <a href="#">ул. Саксаганского, 122/37</a> <br>
+                    Телефон: (044) 459-01-34 <br>
+                    Сайт: <a href="#">www.bm-bank.com</a> <br>
+                </p>
+            </td>
+            <td>
+                <div class="object-list-time">
+                    <ul class="object-list-time-details">
+                        <li>пн-пт: 9:00 - 18:00</li>
+                        <li>сб: 10:00 - 15:00</li>
+                        <li>вс: выходной</li>
+                        <li><a class="open-lunch-info">перерывы</a>
+
+                            <div class="lunch-info">
+                                <table>
+                                    <tr>
+                                        <th>ежедневно</th>
+                                    </tr>
+                                    <tr>
+                                        <td>11:00 - 11:20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:20 - 14:40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16:20 - 16:40</td>
+                                    </tr>
+                                    <tr>
+                                        <th>в субботу</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10:20 - 10:45</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <a class="bookmark-delete">Удалить</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a class="bookmark-table-name" href="#">Центральное отделение "БМ Банк"</a><br>
+
+                <div class="object-item-rating">
+                    <span class="object-item-comments">25</span>
+
+                    <div class="rating-stars"></div>
+                    Рейтинг: <b>0</b>
+                </div>
+            </td>
+            <td>
+                <p class="list-item-info">
+                    Адрес: <a href="#">ул. Саксаганского, 122/37</a> <br>
+                    Телефон: (044) 459-01-34 <br>
+                    Сайт: <a href="#">www.bm-bank.com</a> <br>
+                </p>
+            </td>
+            <td>
+                <div class="object-list-time">
+                    <ul class="object-list-time-details">
+                        <li>пн-пт: 9:00 - 18:00</li>
+                        <li>сб: 10:00 - 15:00</li>
+                        <li>вс: выходной</li>
+                        <li><a class="open-lunch-info">перерывы</a>
+
+                            <div class="lunch-info">
+                                <table>
+                                    <tr>
+                                        <th>ежедневно</th>
+                                    </tr>
+                                    <tr>
+                                        <td>11:00 - 11:20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:20 - 14:40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16:20 - 16:40</td>
+                                    </tr>
+                                    <tr>
+                                        <th>в субботу</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10:20 - 10:45</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <a class="bookmark-delete">Удалить</a>
+            </td>
+        </tr>
+
+        </table>
+        </div>
+        </div>
+        <a class="open-modal places-link gray-btn">Просмотренные места</a>
+
+        <div class="modal bookmark-modal">
+        <a class="close-modal"></a>
+
+        <div class="modal-header">
+            <h3 class="modal-name">Просмотренные места</h3>
+        </div>
+        <div class="bookmark-table">
+        <table>
+        <tr>
+            <td>
+                <a class="bookmark-table-name" href="#">Центральное отделение "БМ Банк"</a><br>
+
+                <div class="object-item-rating">
+                    <span class="object-item-comments">25</span>
+
+                    <div class="rating-stars"></div>
+                    Рейтинг: <b>0</b>
+                </div>
+            </td>
+            <td>
+                <p class="list-item-info">
+                    Адрес: <a href="#">ул. Саксаганского, 122/37</a> <br>
+                    Телефон: (044) 459-01-34 <br>
+                    Сайт: <a href="#">www.bm-bank.com</a> <br>
+                </p>
+            </td>
+            <td>
+                <div class="object-list-time">
+                    <ul class="object-list-time-details">
+                        <li>пн-пт: 9:00 - 18:00</li>
+                        <li>сб: 10:00 - 15:00</li>
+                        <li>вс: выходной</li>
+                        <li><a class="open-lunch-info">перерывы</a>
+
+                            <div class="lunch-info">
+                                <table>
+                                    <tr>
+                                        <th>ежедневно</th>
+                                    </tr>
+                                    <tr>
+                                        <td>11:00 - 11:20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:20 - 14:40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16:20 - 16:40</td>
+                                    </tr>
+                                    <tr>
+                                        <th>в субботу</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10:20 - 10:45</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <a class="bookmark-delete">Удалить</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a class="bookmark-table-name" href="#">Центральное отделение "БМ Банк"</a><br>
+
+                <div class="object-item-rating">
+                    <span class="object-item-comments">25</span>
+
+                    <div class="rating-stars"></div>
+                    Рейтинг: <b>0</b>
+                </div>
+            </td>
+            <td>
+                <p class="list-item-info">
+                    Адрес: <a href="#">ул. Саксаганского, 122/37</a> <br>
+                    Телефон: (044) 459-01-34 <br>
+                    Сайт: <a href="#">www.bm-bank.com</a> <br>
+                </p>
+            </td>
+            <td>
+                <div class="object-list-time">
+                    <ul class="object-list-time-details">
+                        <li>пн-пт: 9:00 - 18:00</li>
+                        <li>сб: 10:00 - 15:00</li>
+                        <li>вс: выходной</li>
+                        <li><a class="open-lunch-info">перерывы</a>
+
+                            <div class="lunch-info">
+                                <table>
+                                    <tr>
+                                        <th>ежедневно</th>
+                                    </tr>
+                                    <tr>
+                                        <td>11:00 - 11:20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:20 - 14:40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16:20 - 16:40</td>
+                                    </tr>
+                                    <tr>
+                                        <th>в субботу</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10:20 - 10:45</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <a class="bookmark-delete">Удалить</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a class="bookmark-table-name" href="#">Центральное отделение "БМ Банк"</a><br>
+
+                <div class="object-item-rating">
+                    <span class="object-item-comments">25</span>
+
+                    <div class="rating-stars"></div>
+                    Рейтинг: <b>0</b>
+                </div>
+            </td>
+            <td>
+                <p class="list-item-info">
+                    Адрес: <a href="#">ул. Саксаганского, 122/37</a> <br>
+                    Телефон: (044) 459-01-34 <br>
+                    Сайт: <a href="#">www.bm-bank.com</a> <br>
+                </p>
+            </td>
+            <td>
+                <div class="object-list-time">
+                    <ul class="object-list-time-details">
+                        <li>пн-пт: 9:00 - 18:00</li>
+                        <li>сб: 10:00 - 15:00</li>
+                        <li>вс: выходной</li>
+                        <li><a class="open-lunch-info">перерывы</a>
+
+                            <div class="lunch-info">
+                                <table>
+                                    <tr>
+                                        <th>ежедневно</th>
+                                    </tr>
+                                    <tr>
+                                        <td>11:00 - 11:20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:20 - 14:40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16:20 - 16:40</td>
+                                    </tr>
+                                    <tr>
+                                        <th>в субботу</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10:20 - 10:45</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <a class="bookmark-delete">Удалить</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a class="bookmark-table-name" href="#">Центральное отделение "БМ Банк"</a><br>
+
+                <div class="object-item-rating">
+                    <span class="object-item-comments">25</span>
+
+                    <div class="rating-stars"></div>
+                    Рейтинг: <b>0</b>
+                </div>
+            </td>
+            <td>
+                <p class="list-item-info">
+                    Адрес: <a href="#">ул. Саксаганского, 122/37</a> <br>
+                    Телефон: (044) 459-01-34 <br>
+                    Сайт: <a href="#">www.bm-bank.com</a> <br>
+                </p>
+            </td>
+            <td>
+                <div class="object-list-time">
+                    <ul class="object-list-time-details">
+                        <li>пн-пт: 9:00 - 18:00</li>
+                        <li>сб: 10:00 - 15:00</li>
+                        <li>вс: выходной</li>
+                        <li><a class="open-lunch-info">перерывы</a>
+
+                            <div class="lunch-info">
+                                <table>
+                                    <tr>
+                                        <th>ежедневно</th>
+                                    </tr>
+                                    <tr>
+                                        <td>11:00 - 11:20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:20 - 14:40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16:20 - 16:40</td>
+                                    </tr>
+                                    <tr>
+                                        <th>в субботу</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10:20 - 10:45</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <a class="bookmark-delete">Удалить</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a class="bookmark-table-name" href="#">Центральное отделение "БМ Банк"</a><br>
+
+                <div class="object-item-rating">
+                    <span class="object-item-comments">25</span>
+
+                    <div class="rating-stars"></div>
+                    Рейтинг: <b>0</b>
+                </div>
+            </td>
+            <td>
+                <p class="list-item-info">
+                    Адрес: <a href="#">ул. Саксаганского, 122/37</a> <br>
+                    Телефон: (044) 459-01-34 <br>
+                    Сайт: <a href="#">www.bm-bank.com</a> <br>
+                </p>
+            </td>
+            <td>
+                <div class="object-list-time">
+                    <ul class="object-list-time-details">
+                        <li>пн-пт: 9:00 - 18:00</li>
+                        <li>сб: 10:00 - 15:00</li>
+                        <li>вс: выходной</li>
+                        <li><a class="open-lunch-info">перерывы</a>
+
+                            <div class="lunch-info">
+                                <table>
+                                    <tr>
+                                        <th>ежедневно</th>
+                                    </tr>
+                                    <tr>
+                                        <td>11:00 - 11:20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:20 - 14:40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16:20 - 16:40</td>
+                                    </tr>
+                                    <tr>
+                                        <th>в субботу</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10:20 - 10:45</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <a class="bookmark-delete">Удалить</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a class="bookmark-table-name" href="#">Центральное отделение "БМ Банк"</a><br>
+
+                <div class="object-item-rating">
+                    <span class="object-item-comments">25</span>
+
+                    <div class="rating-stars"></div>
+                    Рейтинг: <b>0</b>
+                </div>
+            </td>
+            <td>
+                <p class="list-item-info">
+                    Адрес: <a href="#">ул. Саксаганского, 122/37</a> <br>
+                    Телефон: (044) 459-01-34 <br>
+                    Сайт: <a href="#">www.bm-bank.com</a> <br>
+                </p>
+            </td>
+            <td>
+                <div class="object-list-time">
+                    <ul class="object-list-time-details">
+                        <li>пн-пт: 9:00 - 18:00</li>
+                        <li>сб: 10:00 - 15:00</li>
+                        <li>вс: выходной</li>
+                        <li><a class="open-lunch-info">перерывы</a>
+
+                            <div class="lunch-info">
+                                <table>
+                                    <tr>
+                                        <th>ежедневно</th>
+                                    </tr>
+                                    <tr>
+                                        <td>11:00 - 11:20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:20 - 14:40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16:20 - 16:40</td>
+                                    </tr>
+                                    <tr>
+                                        <th>в субботу</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10:20 - 10:45</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <a class="bookmark-delete">Удалить</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a class="bookmark-table-name" href="#">Центральное отделение "БМ Банк"</a><br>
+
+                <div class="object-item-rating">
+                    <span class="object-item-comments">25</span>
+
+                    <div class="rating-stars"></div>
+                    Рейтинг: <b>0</b>
+                </div>
+            </td>
+            <td>
+                <p class="list-item-info">
+                    Адрес: <a href="#">ул. Саксаганского, 122/37</a> <br>
+                    Телефон: (044) 459-01-34 <br>
+                    Сайт: <a href="#">www.bm-bank.com</a> <br>
+                </p>
+            </td>
+            <td>
+                <div class="object-list-time">
+                    <ul class="object-list-time-details">
+                        <li>пн-пт: 9:00 - 18:00</li>
+                        <li>сб: 10:00 - 15:00</li>
+                        <li>вс: выходной</li>
+                        <li><a class="open-lunch-info">перерывы</a>
+
+                            <div class="lunch-info">
+                                <table>
+                                    <tr>
+                                        <th>ежедневно</th>
+                                    </tr>
+                                    <tr>
+                                        <td>11:00 - 11:20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:20 - 14:40</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16:20 - 16:40</td>
+                                    </tr>
+                                    <tr>
+                                        <th>в субботу</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10:20 - 10:45</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <a class="bookmark-delete">Удалить</a>
+            </td>
+        </tr>
+
+        </table>
+        </div>
+        </div>
+
         </div>
     </div>
 
