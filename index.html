@@ -53,6 +53,10 @@
             <form>
                 <div class="clear-input-text login-input">
                     <input type="text" value="Логин" name="login">
+                    <div class="error-container" style="display:none;">
+                        <span class="error-container-arrow"></span>
+                        <span class="error-message">Ошибка</span>
+                    </div>
                 </div>
                 <div class="clear-input-text login-input">
                     <input type="password" value="Пароль" name="passw">
@@ -139,7 +143,7 @@
         </div>
         <div class="login-form authorized" style="display: none">
 
-        <div class="auth-user"> Здравствуйте <a class="login-links open-modal">Иннокентий</a>
+        <div class="auth-user"> Здравствуйте <a class="login-links open-modal username-link"></a>
 
             <div class="modal register-modal">
                 <a class="close-modal"></a>
@@ -206,7 +210,7 @@
                 </form>
             </div>
         </div>
-        <a href="#" class="auth-user-exit">Выход</a>
+        <a href="" class="auth-user-exit" id="auth-user-exit">Выход</a>
 
         <div class="clear"></div>
         <a class="open-modal bookmark-link gray-btn">Закладки</a>

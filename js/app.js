@@ -1,5 +1,5 @@
 app = {
-
+    app_url: 'http://test.zhukcity.ru/',
     objects:[],
 
     transport:{
@@ -197,7 +197,7 @@ app = {
             }
             var fromVal = $('.gray-input.schedule-from input').val();
             var toVal = $('.gray-input.schedule-to input').val();
-            var URL = 'http://test.zhukcity.ru/transport?act=get_schedule&type=' + app.transport.transportType + '&dep_from=' + fromVal + '&arr_to=' + toVal + '&when=today&limit=' + app.transport.transportLimit;
+            var URL = app.app_url + 'transport?act=get_schedule&type=' + app.transport.transportType + '&dep_from=' + fromVal + '&arr_to=' + toVal + '&when=today&limit=' + app.transport.transportLimit;
             $.get(URL, function (data) {
                 if (data.success) {
                     if (data.items.length) {
@@ -251,7 +251,7 @@ app = {
             });
         },
         getObjects:function (id) {
-            var URL = 'http://test.zhukcity.ru/map?act=get_objects&cat_ids=' + id + '&sort_by=0';
+            var URL = app.app_url + 'map?act=get_objects&cat_ids=' + id + '&sort_by=0';
             $.get(URL, function (data) {
                 if (data.success) {
                     app.curentSubcategory = id;
@@ -387,7 +387,7 @@ app = {
         },
 
         openObjectDetails:function (id) {
-            $.getJSON('http://test.zhukcity.ru/map/?act=get_object&obj_id=' + id, function (data) {
+            $.getJSON(app.app_url + 'map/?act=get_object&obj_id=' + id, function (data) {
                 $('.list-item.object-item').remove();
 
                 console.log(data);
@@ -626,6 +626,7 @@ app = {
 
     login: {
         bind:function () {
+//            $.post(app.app_url + 'profile/?act=userinfo', function(data){console.log(data)});
             var $loginBtn = $('button.login-btn'),
                 captchaId = 1,
                 loginInputs = {
@@ -637,37 +638,51 @@ app = {
             $.each(loginInputs, function (k, v) {
                 loginInputsValues[k] = v.val();
             });
+            // Bind inputs default value switcher
             $.each(loginInputs, function (k, v) {
                 v.on('click', {default: loginInputsValues}, app.inputsSwitcherClick);
                 v.on('blur', {default: loginInputsValues}, app.inputsSwitcherBlur);
             });
 
+            // Login click
             $loginBtn.on('click', function () {
-//                console.log(app.getCookie('SESS_ID'));
-                $.post('http://test.zhukcity.ru/profile/?act=login', {
+                $.post(app.app_url + 'profile/?act=login', {
                     login: loginInputs.login.val(),
                     passw: loginInputs.passw.val()
                 }, function (data) {
                     if (data.success === true) {
                         $('div.login-form.unauthorized').css('display', 'none');
-                        $('div.login-form.authorized').css('display', 'block');
+                        $('div.login-form.authorized').css('display', 'block')
+                            .find('a.username-link').html(data.username);
                     } else if (data.success === false) {
                         loginInputs.login.parent().addClass('input-error')
-                            .append('<div class="error-container">' +
-                            '<span class="error-container-arrow"></span>' + data.error + '</div>');
+                            .find('div.error-container').css('display', '')
+                            .find('span.error-message').html(data.error);
                     }
                 });
                 return false;
             });
 
+            $('#auth-user-exit').bind('click', function () {
+                $.get(app.app_url + 'profile/?act=logout', function (data) {
+                    if (data.success === true) {
+                        $('div.login-form.unauthorized').css('display', 'block');
+                        $('div.login-form.authorized').css('display', 'none');
+                    }
+                });
+                return false;
+            });
+
+            // Open register, get captcha
             $('a.reg-link').on('click', function () {
-                $.post('http://test.zhukcity.ru/profile/?act=captcha', function (data) {
+                $.post(app.app_url + 'profile/?act=captcha', function (data) {
                     captchaId = data.code_id;
                     $('div.register-modal form label img').attr('src',
-                        'http://test.zhukcity.ru/images/code.png?id=' + data.code_id);
+                        app.app_url + 'images/code.png?id=' + data.code_id);
                 });
             });
 
+            // Submit register
             $('div.register-modal form button.modal-submit').on('click', function () {
                 form = 'div.register-modal form ';
                 var fields = {
@@ -685,8 +700,9 @@ app = {
                     data[k] = v.val();
                 });
                 data['code_id'] = captchaId;
-                $.post('http://test.zhukcity.ru/profile/register/', data, function (data) {
-//                    console.log(data);
+                $.post(app.app_url + 'profile/register/', data, function (data) {
+                    console.log(data);
+//                    TODO: success message
                 });
                 return false;
             });
