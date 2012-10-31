@@ -64,7 +64,7 @@
                 <button class="blue-btn login-btn">Вход</button>
             </form>
             <a class="login-links reg-link open-modal">Регистрация</a>
-            <div class="modal register-modal">
+            <div class="modal register-modal register-modal-register">
                 <a class="close-modal"></a>
                 <div class="modal-header">
                     <h3 class="modal-name">Регистрация</h3>
@@ -73,7 +73,9 @@
                     <label>
                         Псевдоним <span class="oblige">*</span>
                         <div class="modal-input">
-                            <input type="text" value="Иннокентий" name="nickname">
+                            <input type="text" value="Иннокентий" name="nickname"
+                                   onfocus="if (this.value=='Иннокентий') this.value='';"
+                                   onblur="if (this.value==''){this.value='Иннокентий'}">
                         </div>
                     </label>
                     <div class="choose-sex">
@@ -94,29 +96,39 @@
                     <label>
                         Дата рождения
                         <div class="modal-input">
-                            <input type="text" value="дд.мм.гггг" name="birthdate">
+                            <input type="text" value="дд.мм.гггг" name="birthdate"
+                                   onfocus="if (this.value=='дд.мм.гггг') this.value='';"
+                                   onblur="if (this.value==''){this.value='дд.мм.гггг'}">
                         </div>
                     </label>
                     <label>
                         Email
                         <div class="modal-input">
-                            <input type="text" value="example@mail.ua" name="email">
+                            <input type="text" value="example@mail.ua" name="email"
+                                   onfocus="if (this.value=='example@mail.ua') this.value='';"
+                                   onblur="if (this.value==''){this.value='example@mail.ua'}">
                         </div>
                     </label>
                     <label>
                         Пароль <span class="oblige">*</span>
                         <fieldset class="modal-near-inputs">
                             <div class="modal-input fleft">
-                                <input type="text" value="Введите пароль" name="passw">
+                                <input type="text" value="Введите пароль" name="passw"
+                                       onfocus="if (this.value=='Введите пароль') this.value='';"
+                                       onblur="if (this.value==''){this.value='Введите пароль'}">
                             </div>
                             <div class="modal-input fleft">
-                                <input type="text" value="Пароль ещё раз" name="passw-again">
+                                <input type="text" value="Пароль ещё раз" name="passw-again"
+                                       onfocus="if (this.value=='Пароль ещё раз') this.value='';"
+                                       onblur="if (this.value==''){this.value='Пароль ещё раз'}">
                             </div>
                         </fieldset>
                     </label>
                     <label>
                         <div class="modal-input fleft">
-                            <input type="text" value="Введите код с картинки" name="code">
+                            <input type="text" value="Введите код с картинки" name="code"
+                                   onfocus="if (this.value=='Введите код с картинки') this.value='';"
+                                   onblur="if (this.value==''){this.value='Введите код с картинки'}">
                         </div>
 
                         <img src="images/cacha-img.png">
@@ -145,7 +157,7 @@
 
         <div class="auth-user"> Здравствуйте <a class="login-links open-modal username-link"></a>
 
-            <div class="modal register-modal">
+            <div class="modal register-modal register-modal-login">
                 <a class="close-modal"></a>
 
                 <div class="modal-header">
@@ -156,22 +168,22 @@
                         Псевдоним
                         <div class="modal-input">
                             <input type="text" value="Иннокентий" onfocus="if (this.value=='Иннокентий') this.value='';"
-                                   onblur="if (this.value==''){this.value='Иннокентий'}">
+                                   onblur="if (this.value==''){this.value='Иннокентий'}" name="nickname">
                         </div>
                     </label>
 
                     <div class="choose-sex">
                         <label>
                             Не указано
-                            <input type="radio" name="sex" value="0">
+                            <input type="radio" name="gender" value="0" checked="checked">
                         </label>
                         <label>
                             Муж.
-                            <input type="radio" name="sex" value="1">
+                            <input type="radio" name="gender" value="M">
                         </label>
                         <label>
                             Жен.
-                            <input type="radio" name="sex" value="2">
+                            <input type="radio" name="gender" value="F">
                         </label>
 
                         <div class="clear"></div>
@@ -180,7 +192,7 @@
                         Дата рождения
                         <div class="modal-input">
                             <input type="text" value="дд.мм.гггг" onfocus="if (this.value=='дд.мм.гггг') this.value='';"
-                                   onblur="if (this.value==''){this.value='дд.мм.гггг'}">
+                                   onblur="if (this.value==''){this.value='дд.мм.гггг'}" name="birthdate">
                         </div>
                     </label>
                     <label>
@@ -188,7 +200,15 @@
                         <div class="modal-input">
                             <input type="text" value="example@mail.ua"
                                    onfocus="if (this.value=='example@mail.ua') this.value='';"
-                                   onblur="if (this.value==''){this.value='example@mail.ua'}">
+                                   onblur="if (this.value==''){this.value='example@mail.ua'}" name="email">
+                        </div>
+                    </label>
+                    <label>
+                        Старый пароль
+                        <div class="modal-input">
+                            <input type="text" value="Старый пароль"
+                                   onfocus="if (this.value=='Старый пароль') this.value='';"
+                                   onblur="if (this.value==''){this.value='Старый пароль'}" name="old_passw">
                         </div>
                     </label>
                     <label>
@@ -206,7 +226,7 @@
                             </div>
                         </fieldset>
                     </label>
-                    <button class="blue-btn modal-submit">Сохранить</button>
+                    <button class="blue-btn modal-submit personal-profile-save">Сохранить</button>
                 </form>
             </div>
         </div>

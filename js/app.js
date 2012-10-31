@@ -626,14 +626,43 @@ app = {
 
     login: {
         bind:function () {
-//            $.post(app.app_url + 'profile/?act=userinfo', function(data){console.log(data)});
+            $('div.register-modal input').on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
             var $loginBtn = $('button.login-btn'),
-                captchaId = 1,
                 loginInputs = {
                     login: $('div.login-input input[type=text]'),
                     passw: $('div.login-input input[type=password]')
                 },
-                loginInputsValues = {login: '', passw: ''};
+                loginInputsValues = {login: '', passw: ''},
+                $loginFormUnauthorized = $('div.login-form.unauthorized'),
+                $loginFormAuthorized = $('div.login-form.authorized');
+
+//            console.log(app.getCookie('SESS_ID'));
+
+            if (app.getCookie('SESS_ID')) {
+                $.post(app.app_url + 'profile/edit?act=get_profile', function (data) {
+                    if (data.success === true) {
+                        var $saveButton = $('button.personal-profile-save'),
+                            $personalProfile = $('div.register-modal-login');
+                        $loginFormUnauthorized.css('display', 'none');
+                        $loginFormAuthorized.css('display', 'block').find('a.username-link').html(data.nickname);
+                        $.each(data, function (k, v) {
+                            if (k !== 'gender') {
+                                $($personalProfile.find('input[name="' + k +'"]')).val(v);
+                            } else {
+                                $($personalProfile.find('input[name="gender"][value="' + v + '"]')).attr('checked', 'checked');
+                            }
+                        });
+                    }
+                    console.log(data);
+                });
+                $('div.register-modal-login form button.modal-submit').on('click', function () {
+                    app.login.processSaveData('login', null);
+                    return false;
+                });
+            }
 
             $.each(loginInputs, function (k, v) {
                 loginInputsValues[k] = v.val();
@@ -651,9 +680,11 @@ app = {
                     passw: loginInputs.passw.val()
                 }, function (data) {
                     if (data.success === true) {
-                        $('div.login-form.unauthorized').css('display', 'none');
-                        $('div.login-form.authorized').css('display', 'block')
+                        $loginFormUnauthorized.css('display', 'none');
+                        $loginFormAuthorized.css('display', 'block')
                             .find('a.username-link').html(data.username);
+                        loginInputs.login.siblings('div.error-container').css('display', 'none')
+                            .parent().removeClass('input-error');
                     } else if (data.success === false) {
                         loginInputs.login.parent().addClass('input-error')
                             .find('div.error-container').css('display', '')
@@ -666,12 +697,19 @@ app = {
             $('#auth-user-exit').bind('click', function () {
                 $.get(app.app_url + 'profile/?act=logout', function (data) {
                     if (data.success === true) {
-                        $('div.login-form.unauthorized').css('display', 'block');
-                        $('div.login-form.authorized').css('display', 'none');
+                        $loginFormUnauthorized.css('display', 'block');
+                        $loginFormAuthorized.css('display', 'none');
+//                        app.setCookie('SESS_ID', '');
                     }
                 });
                 return false;
             });
+
+            app.login.registration();
+        },
+
+        registration: function() {
+            var captchaId = 1;//default value
 
             // Open register, get captcha
             $('a.reg-link').on('click', function () {
@@ -683,28 +721,33 @@ app = {
             });
 
             // Submit register
-            $('div.register-modal form button.modal-submit').on('click', function () {
-                form = 'div.register-modal form ';
-                var fields = {
-                    nickname: $(form + 'input[name=nickname]'),
-                    gender: $(form + 'input[name=gender]:checked').length !== 0
-                        ? $(form + 'input[name=gender]:checked')
-                        : $('<input>').attr({value: 0}),
-                    birthdate: $(form + 'input[name=birthdate]'),
-                    email: $(form + 'input[name=email]'),
-                    passw: $(form + 'input[name=passw]'),
-                    code : $(form + 'input[name=code]')
-                };
-                var data = {};
-                $.each(fields, function(k, v) {
-                    data[k] = v.val();
-                });
-                data['code_id'] = captchaId;
-                $.post(app.app_url + 'profile/register/', data, function (data) {
-                    console.log(data);
-//                    TODO: success message
-                });
+            $('div.register-modal-register form button.modal-submit').on('click', function () {
+                app.login.processSaveData('register', captchaId);
                 return false;
+            });
+        },
+
+        processSaveData: function(actionType, captchaId) {
+            form = 'div.register-modal-' + actionType + ' form ';
+            var fields = {
+                nickname: $(form + 'input[name=nickname]'),
+                gender: $(form + 'input[name=gender]:checked').length !== 0
+                    ? $(form + 'input[name=gender]:checked')
+                    : $('<input>').attr({value: 0}),
+                birthdate: $(form + 'input[name=birthdate]'),
+                email: $(form + 'input[name=email]'),
+                passw: $(form + 'input[name=passw]'),
+                old_passw: $(form + 'input[name=old_passw]'),
+                code : $(form + 'input[name=code]')
+            };
+            var data = {};
+            $.each(fields, function(k, v) {
+                data[k] = v.val();
+            });
+            data['code_id'] = captchaId;
+            $.post(app.app_url + 'profile/' + (actionType === 'register' ? 'register' : 'edit' ) + '/', data, function (data) {
+                console.log(data);
+//                    TODO: success message
             });
         }
     },
