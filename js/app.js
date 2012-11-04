@@ -639,8 +639,17 @@ app = {
                 $loginFormUnauthorized = $('div.login-form.unauthorized'),
                 $loginFormAuthorized = $('div.login-form.authorized');
 
-//            console.log(app.getCookie('SESS_ID'));
 
+            $.each(loginInputs, function (k, v) {
+                loginInputsValues[k] = v.val();
+            });
+            // Bind inputs default value switcher
+            $.each(loginInputs, function (k, v) {
+                v.on('click', {default: loginInputsValues}, app.inputsSwitcherClick);
+                v.on('blur', {default: loginInputsValues}, app.inputsSwitcherBlur);
+            });
+
+            //Display profile data
             if (app.getCookie('SESS_ID')) {
                 $.post(app.app_url + 'profile/edit?act=get_profile', function (data) {
                     if (data.success === true) {
@@ -663,15 +672,6 @@ app = {
                     return false;
                 });
             }
-
-            $.each(loginInputs, function (k, v) {
-                loginInputsValues[k] = v.val();
-            });
-            // Bind inputs default value switcher
-            $.each(loginInputs, function (k, v) {
-                v.on('click', {default: loginInputsValues}, app.inputsSwitcherClick);
-                v.on('blur', {default: loginInputsValues}, app.inputsSwitcherBlur);
-            });
 
             // Login click
             $loginBtn.on('click', function () {
@@ -746,9 +746,29 @@ app = {
             });
             data['code_id'] = captchaId;
             $.post(app.app_url + 'profile/' + (actionType === 'register' ? 'register' : 'edit' ) + '/', data, function (data) {
-                console.log(data);
-//                    TODO: success message
+                if (data.success === false) {
+                    var $errField = $(form + 'input[name=' + data.field + ']');
+                    $(form).find('div.error-container').remove();
+                    $errField.parent().addClass('input-error')
+                        .append(app.errors.getInputError(data.error));
+//                    console.log($errField);
+                } else {
+                    $(form).find('div.error-container').remove();
+                    $(form).find('.input-error').removeClass('input-error');
+                    $.jGrowl("Изменения сохранены");
+//                    console.log(data);
+//                    console.log(123);
+                }
             });
+        }
+    },
+
+    errors: {
+        getInputError: function (message) {
+            return '<div class="error-container">'
+                + '<span class="error-container-arrow"></span>'
+                + '<span class="error-message">' + message + '</span>'
+                + '</div>';
         }
     },
 
