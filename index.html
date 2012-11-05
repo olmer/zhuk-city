@@ -144,12 +144,28 @@
                 <div class="modal-header">
                     <h3 class="modal-name">Забыли пароль?</h3>
                 </div>
-                <form>
+                <form class="forgot-password-form">
+                    <label>
+                        Псевдоним
+                        <div class="modal-input forgot-input">
+                            <input type="text" value="" name="nickname">
+                        </div>
+                    </label>
                     <label>
                         Введите email
                         <div class="modal-input forgot-input">
-                            <input type="text" value="example@mail.com">
+                            <input type="text" value="example@mail.com" name="email"
+                                   onfocus="if (this.value=='example@mail.com') this.value='';"
+                                   onblur="if (this.value==''){this.value='example@mail.com'}">
                         </div>
+                    </label>
+                    <label>
+                        <div class="modal-input fleft">
+                            <input type="text" value="Введите код с картинки" name="code"
+                                   onfocus="if (this.value=='Введите код с картинки') this.value='';"
+                                   onblur="if (this.value==''){this.value='Введите код с картинки'}">
+                        </div>
+                        <img src="images/cacha-img.png">
                     </label>
                     <button class="blue-btn modal-submit">Отправить</button>
                 </form>

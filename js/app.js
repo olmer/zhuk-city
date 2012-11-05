@@ -667,6 +667,9 @@ app = {
                 app.login.loadProfileData($loginFormUnauthorized, $loginFormAuthorized);
             }
 
+            //Bind forgot password actions
+            app.login.forgotPasswordBind();
+
             // Login click
             $loginBtn.on('click', function () {
                 $.post(app.app_url + 'profile/?act=login', {
@@ -708,7 +711,7 @@ app = {
             $('a.reg-link').on('click', function () {
                 $.post(app.app_url + 'profile/?act=captcha', function (data) {
                     captchaId = data.code_id;
-                    $('div.register-modal form label img').attr('src',
+                    $('div.register-modal-register form label img').attr('src',
                         app.app_url + 'images/code.png?id=' + data.code_id);
                 });
             });
@@ -720,7 +723,59 @@ app = {
             });
         },
 
-        processSaveData: function(actionType, captchaId) {
+        //Bind forgot password submit
+        forgotPasswordBind: function() {
+            var captchaId = 1; //default value
+
+            var submitObj = new app.login.ForgotPasswordSubmit();
+            // Open register, get captcha
+            $('a.forgot-link').on('click', function () {
+                $.post(app.app_url + 'profile/?act=captcha', function (data) {
+                    captchaId = data.code_id;
+                    $('div.forgot-modal form label img').attr('src',
+                        app.app_url + 'images/code.png?id=' + data.code_id);
+                    submitObj.captchaId = captchaId;
+                });
+            });
+            $('form.forgot-password-form button.modal-submit').on('click', submitObj, submitObj.submit);
+        },
+
+        ForgotPasswordSubmit: function () {
+            this.submit = function (e) {
+                var $this = e.data;
+                var formSelector = 'div.forgot-modal .forgot-password-form ';
+                var fields = {
+                    nickname: $(formSelector + 'input[name=nickname]'),
+                    email: $(formSelector + 'input[name=email]'),
+                    code: $(formSelector + 'input[name=code]')
+                };
+                var data = {};
+                $.each(fields, function(k, v) {
+                    data[k] = v.val();
+                });
+                data['code_id'] = $this.captchaId;
+
+                $.post(app.app_url + 'profile/password', data, function (data) {
+                    if (data.success === false) {
+                        app.login.displayErrorByField(formSelector, data.field, data.error);
+                    } else {
+                        app.login.clearErrors(formSelector);
+                        $.jGrowl('На Ваш E-mail отправлено письмо со ссылкой для смены пароля');
+                        $('div.forgot-modal').hide();
+                    }
+                });
+                return false;
+            }
+        },
+
+        /**
+         * Gather inputs' values, validation, saving
+         *
+         * @param actionType
+         * @param captchaId
+         * @return {Boolean}
+         */
+        processSaveData: function (actionType, captchaId) {
             form = 'div.register-modal-' + actionType + ' form ';
             var fields = {
                 nickname: $(form + 'input[name=nickname]'),
@@ -751,25 +806,55 @@ app = {
                     $.jGrowl(actionType === 'register' ? 'Регистрация успешна' : 'Изменения сохранены');
                 }
             });
+            return true;
         },
 
+        /**
+         * Compare passwords during register or profile save
+         *
+         * @param $password jQuery object
+         * @param $repeatedPassword jQuery object
+         * @return {Boolean}
+         */
         comparePasswords: function($password, $repeatedPassword) {
-            return $password.val() === $repeatedPassword.val();
+            return $password.val() === 'Введите пароль'
+                || $password.val() === 'Новый пароль'
+//                check all the variants about password comparison
+//                || $repeatedPassword.val() === 'Пароль еще раз'
+                || $password.val() === $repeatedPassword.val();
         },
 
-        displayErrorByField: function (form, fieldName, error) {
-            app.login.clearErrors(form);
-            var $errField = $(form + 'input[name=' + fieldName + ']');
-            $(form).find('div.error-container').remove();
+        /**
+         * Display an error near the field
+         *
+         * @param formSelector string
+         * @param fieldName string
+         * @param error string
+         */
+        displayErrorByField: function (formSelector, fieldName, error) {
+            app.login.clearErrors(formSelector);
+            var $errField = $(formSelector + 'input[name=' + fieldName + ']');
+            $(formSelector).find('div.error-container').remove();
             $errField.parent().addClass('input-error')
                 .append(app.errors.getInputError(error));
         },
 
-        clearErrors: function (form) {
-            $(form).find('div.error-container').remove();
-            $(form).find('.input-error').removeClass('input-error');
+        /**
+         * Clear all the errors in form
+         *
+         * @param formSelector string
+         */
+        clearErrors: function (formSelector) {
+            $(formSelector).find('div.error-container').remove();
+            $(formSelector).find('.input-error').removeClass('input-error');
         },
 
+        /**
+         * Fill in profile data
+         *
+         * @param $loginFormUnauthorized jQuery object
+         * @param $loginFormAuthorized jQuery object
+         */
         loadProfileData: function ($loginFormUnauthorized, $loginFormAuthorized) {
             $.post(app.app_url + 'profile/edit?act=get_profile', function (data) {
                 if (data.success === true) {
