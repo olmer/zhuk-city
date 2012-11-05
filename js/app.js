@@ -624,15 +624,21 @@ app = {
         }
     },
 
+    /**
+     * Object with all functionality related to login, profile, forgotten password etc
+     */
     login: {
-        bind:function () {
+        /**
+         * Init function
+         */
+        init: function () {
             $('div.register-modal input[name!=gender]').on('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
             });
 
             //Bind profile information load on click
-            $('a.name-open-profile').bind('click', function () {
+            $('a.name-open-profile').on('click', function () {
                 app.login.loadProfileData($loginFormUnauthorized, $loginFormAuthorized);
             });
 
@@ -668,7 +674,7 @@ app = {
             }
 
             //Bind forgot password actions
-            app.login.forgotPasswordBind();
+            app.login.forgotPasswordInit();
 
             // Login click
             $loginBtn.on('click', function () {
@@ -691,7 +697,7 @@ app = {
                 return false;
             });
 
-            $('#auth-user-exit').bind('click', function () {
+            $('#auth-user-exit').on('click', function () {
                 $.get(app.app_url + 'profile/?act=logout', function (data) {
                     if (data.success === true) {
                         $loginFormUnauthorized.css('display', 'block');
@@ -701,10 +707,13 @@ app = {
                 return false;
             });
 
-            app.login.registration();
+            app.login.registrationInit();
         },
 
-        registration: function() {
+        /**
+         * Registration initialize
+         */
+        registrationInit: function() {
             var captchaId = 1;//default value
 
             // Open register, get captcha
@@ -723,8 +732,10 @@ app = {
             });
         },
 
-        //Bind forgot password submit
-        forgotPasswordBind: function() {
+        /**
+         * Forgot password init
+         */
+        forgotPasswordInit: function() {
             var captchaId = 1; //default value
 
             var submitObj = new app.login.ForgotPasswordSubmit();
@@ -740,7 +751,18 @@ app = {
             $('form.forgot-password-form button.modal-submit').on('click', submitObj, submitObj.submit);
         },
 
+        /**
+         * Object, collecting forgot password information
+         *
+         * @constructor
+         */
         ForgotPasswordSubmit: function () {
+            /**
+             * Gather form information, validation, submitting
+             *
+             * @param e event
+             * @return {Boolean}
+             */
             this.submit = function (e) {
                 var $this = e.data;
                 var formSelector = 'div.forgot-modal .forgot-password-form ';
@@ -803,7 +825,10 @@ app = {
                     app.login.displayErrorByField(form, data.field, data.error);
                 } else {
                     app.login.clearErrors(form);
-                    $.jGrowl(actionType === 'register' ? 'Регистрация успешна' : 'Изменения сохранены');
+                    $.jGrowl(actionType === 'register'
+                        ? 'Вы были успешно зарегистрированы!'
+                            + 'Введите имя пользователя и пароль для авторизации на сайте'
+                        : 'Изменения сохранены');
                 }
             });
             return true;
@@ -873,7 +898,17 @@ app = {
         }
     },
 
+    /**
+     * Errors object
+     */
     errors: {
+
+        /**
+         * Get error with message
+         *
+         * @param message string
+         * @return {String}
+         */
         getInputError: function (message) {
             return '<div class="error-container">'
                 + '<span class="error-container-arrow"></span>'
@@ -882,6 +917,11 @@ app = {
         }
     },
 
+    /**
+     * Switch between default input value and empty value
+     *
+     * @param e event
+     */
     inputsSwitcherClick: function(e) {
         var $this = $(this);
         var def = e.data.default[$this.attr('name')],
@@ -891,6 +931,11 @@ app = {
         }
     },
 
+    /**
+     * Switch between default input value and empty value
+     *
+     * @param e event
+     */
     inputsSwitcherBlur: function(e) {
         var $this = $(this);
         var def = e.data.default[$this.attr('name')],
@@ -900,12 +945,15 @@ app = {
         }
     },
 
+    /**
+     * Main app init function
+     */
     init:function () {
         app.transport.getStationFromCookie();
         app.transport.buildTransportForm();
         app.gmap.initMap();
         app.menu.buildMenu();
-        app.login.bind();
+        app.login.init();
     },
 
     setCookie:function (name, value, expires, path, domain, secure) {
@@ -936,6 +984,9 @@ app = {
         return(setStr);
     },
 
+    /**
+     * @deprecated
+     */
     html: {
         login: {
             authorized: function (data) {
