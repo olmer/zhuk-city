@@ -390,7 +390,7 @@ app = {
             $.getJSON(app.app_url + 'map/?act=get_object&obj_id=' + id, function (data) {
                 $('.list-item.object-item').remove();
 
-                console.log(data);
+//                console.log(data);
 
                 var details = $('<div class="list-item object-details">')
                     .append($('<span class="status-work">')
@@ -618,7 +618,7 @@ app = {
 
         removeAllMarkers:function () {
             for (var i = 0; i < app.objects.length; i++) {
-                console.log(app.objects[i].mapItem.marker);
+//                console.log(app.objects[i].mapItem.marker);
                 app.objects[i].mapItem.marker.setMap(null);
             }
         }
@@ -630,6 +630,13 @@ app = {
                 e.preventDefault();
                 e.stopPropagation();
             });
+
+            //Bind profile information load on click
+            $('a.name-open-profile').bind('click', function () {
+                app.login.loadProfileData($loginFormUnauthorized, $loginFormAuthorized);
+            });
+
+            //Forms and inputs
             var $loginBtn = $('button.login-btn'),
                 loginInputs = {
                     login: $('div.login-input input[type=text]'),
@@ -640,37 +647,24 @@ app = {
                 $loginFormAuthorized = $('div.login-form.authorized');
 
 
+            // Bind inputs default value switcher
             $.each(loginInputs, function (k, v) {
                 loginInputsValues[k] = v.val();
             });
-            // Bind inputs default value switcher
             $.each(loginInputs, function (k, v) {
                 v.on('click', {default: loginInputsValues}, app.inputsSwitcherClick);
                 v.on('blur', {default: loginInputsValues}, app.inputsSwitcherBlur);
             });
 
+            //Bind profile save action
+            $('div.register-modal-login form button.modal-submit').on('click', function () {
+                app.login.processSaveData('login', null);
+                return false;
+            });
+
             //Display profile data
             if (app.getCookie('SESS_ID')) {
-                $.post(app.app_url + 'profile/edit?act=get_profile', function (data) {
-                    if (data.success === true) {
-                        var $saveButton = $('button.personal-profile-save'),
-                            $personalProfile = $('div.register-modal-login');
-                        $loginFormUnauthorized.css('display', 'none');
-                        $loginFormAuthorized.css('display', 'block').find('a.username-link').html(data.nickname);
-                        $.each(data, function (k, v) {
-                            if (k !== 'gender') {
-                                $($personalProfile.find('input[name="' + k +'"]')).val(v);
-                            } else {
-                                $($personalProfile.find('input[name="gender"][value="' + v + '"]')).attr('checked', 'checked');
-                            }
-                        });
-                    }
-                    console.log(data);
-                });
-                $('div.register-modal-login form button.modal-submit').on('click', function () {
-                    app.login.processSaveData('login', null);
-                    return false;
-                });
+                app.login.loadProfileData($loginFormUnauthorized, $loginFormAuthorized);
             }
 
             // Login click
@@ -699,7 +693,6 @@ app = {
                     if (data.success === true) {
                         $loginFormUnauthorized.css('display', 'block');
                         $loginFormAuthorized.css('display', 'none');
-//                        app.setCookie('SESS_ID', '');
                     }
                 });
                 return false;
@@ -737,6 +730,7 @@ app = {
                 birthdate: $(form + 'input[name=birthdate]'),
                 email: $(form + 'input[name=email]'),
                 passw: $(form + 'input[name=passw]'),
+                passw_again: $(form + 'input[name=passw-again]'),
                 old_passw: $(form + 'input[name=old_passw]'),
                 code : $(form + 'input[name=code]')
             };
@@ -745,19 +739,50 @@ app = {
                 data[k] = v.val();
             });
             data['code_id'] = captchaId;
+            if (!app.login.comparePasswords(fields.passw, fields.passw_again)) {
+                app.login.displayErrorByField(form, 'passw', 'Пароли не совпадают');
+                return false;
+            }
             $.post(app.app_url + 'profile/' + (actionType === 'register' ? 'register' : 'edit' ) + '/', data, function (data) {
                 if (data.success === false) {
-                    var $errField = $(form + 'input[name=' + data.field + ']');
-                    $(form).find('div.error-container').remove();
-                    $errField.parent().addClass('input-error')
-                        .append(app.errors.getInputError(data.error));
-//                    console.log($errField);
+                    app.login.displayErrorByField(form, data.field, data.error);
                 } else {
-                    $(form).find('div.error-container').remove();
-                    $(form).find('.input-error').removeClass('input-error');
-                    $.jGrowl("Изменения сохранены");
-//                    console.log(data);
-//                    console.log(123);
+                    app.login.clearErrors(form);
+                    $.jGrowl(actionType === 'register' ? 'Регистрация успешна' : 'Изменения сохранены');
+                }
+            });
+        },
+
+        comparePasswords: function($password, $repeatedPassword) {
+            return $password.val() === $repeatedPassword.val();
+        },
+
+        displayErrorByField: function (form, fieldName, error) {
+            app.login.clearErrors(form);
+            var $errField = $(form + 'input[name=' + fieldName + ']');
+            $(form).find('div.error-container').remove();
+            $errField.parent().addClass('input-error')
+                .append(app.errors.getInputError(error));
+        },
+
+        clearErrors: function (form) {
+            $(form).find('div.error-container').remove();
+            $(form).find('.input-error').removeClass('input-error');
+        },
+
+        loadProfileData: function ($loginFormUnauthorized, $loginFormAuthorized) {
+            $.post(app.app_url + 'profile/edit?act=get_profile', function (data) {
+                if (data.success === true) {
+                    var $personalProfile = $('div.register-modal-login');
+                    $loginFormUnauthorized.css('display', 'none');
+                    $loginFormAuthorized.css('display', 'block').find('a.username-link').html(data.nickname);
+                    $.each(data, function (k, v) {
+                        if (k !== 'gender') {
+                            $($personalProfile.find('input[name="' + k +'"]')).val(v);
+                        } else {
+                            $($personalProfile.find('input[name="gender"][value="' + v + '"]')).attr('checked', 'checked');
+                        }
+                    });
                 }
             });
         }
