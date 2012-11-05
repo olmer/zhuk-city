@@ -626,7 +626,7 @@ app = {
 
     login: {
         bind:function () {
-            $('div.register-modal input').on('click', function(e) {
+            $('div.register-modal input[name!=gender]').on('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
             });
