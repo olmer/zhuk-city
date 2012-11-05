@@ -2157,3 +2157,44 @@ footer {
     width: 0;
     height: 0;
 }
+
+/*****************************************************/
+/*****************************************************/
+/*****************************************************/
+/*  TRANSPORT  */
+.gray-input .drop-list{
+    position: absolute;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    top: 20px;
+    left: -1px;
+    width: 160px;
+    z-index: 1000;
+    max-height: 180px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.gray-input .drop-list div{
+    padding: 2px 15px 2px 2px;
+    font-size: 10px;
+    line-height: 14px;
+    color: #666;
+    cursor: pointer;
+}
+.gray-input .drop-list div.focus{
+    background-color: #ddd;
+}
+.schedule-table.gray table td{
+    opacity: 0.5;
+}
+.object-onmap-wrap {
+    position: relative !important;
+}
+.category-list.hide-subcategory .subcategory{
+    display: none;
+}
+
+.filter-wrap .list-item:hover{
+    background-color:#eee;
+    cursor: pointer;
+}
