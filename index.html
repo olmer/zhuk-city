@@ -78,7 +78,8 @@
                     <label>
                         Псевдоним <span class="oblige">*</span>
                         <div class="modal-input">
-                            <input type="text" value="Введите ваше имя" name="nickname"
+                            <input type="text" value="Введите ваше имя" data-defaultvalue="Введите ваше имя"
+                                   name="nickname"
                                    onfocus="if (this.value=='Введите ваше имя') this.value='';"
                                    onblur="if (this.value==''){this.value='Введите ваше имя'}">
                         </div>
@@ -97,7 +98,7 @@
                     <label>
                         Дата рождения
                         <div class="modal-input">
-                            <input type="text" value="дд.мм.гггг" name="birthdate"
+                            <input type="text" value="дд.мм.гггг" name="birthdate" data-defaultvalue="дд.мм.гггг"
                                    onfocus="if (this.value=='дд.мм.гггг') this.value='';"
                                    onblur="if (this.value==''){this.value='дд.мм.гггг'}">
                         </div>
@@ -105,7 +106,7 @@
                     <label>
                         Email
                         <div class="modal-input">
-                            <input type="text" value="example@mail.ua" name="email"
+                            <input type="text" value="example@mail.ua" name="email" data-defaultvalue="example@mail.ua"
                                    onfocus="if (this.value=='example@mail.ua') this.value='';"
                                    onblur="if (this.value==''){this.value='example@mail.ua'}">
                         </div>

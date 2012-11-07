@@ -731,6 +731,12 @@ app = {
 
             // Open register, get captcha
             $('a.reg-link').on('click', function () {
+                //Inputs' default values
+                $('div.register-modal-register form input').each(function (k, v) {
+                    var $field = $(v),
+                        def = $v.attr('data-defaultvalue');
+                    $field.val(def || '');
+                });
                 $.post(app.app_url + 'profile/?act=captcha', function (data) {
                     captchaId = data.code_id;
                     $('div.register-modal-register form label img').attr('src',
@@ -833,18 +839,20 @@ app = {
                 app.login.displayErrorByField(form, 'passw', 'Пароли не совпадают');
                 return false;
             }
-            $.post(app.app_url + 'profile/' + (actionType === 'register' ? 'register' : 'edit' ) + '/', data, function (data) {
-                if (data.success === false) {
-                    app.login.displayErrorByField(form, data.field, data.error);
-                } else {
-                    app.login.clearErrors(form);
-                    $.jGrowl(actionType === 'register'
-                        ? 'Вы были успешно зарегистрированы!'
-                            + 'Введите имя пользователя и пароль для авторизации на сайте'
-                        : 'Изменения сохранены');
-                    $('div.register-modal').hide();
+            $.post(app.app_url + 'profile/' + (actionType === 'register' ? 'register' : 'edit' ) + '/', data,
+                function (data) {
+                    if (data.success === false) {
+                        app.login.displayErrorByField(form, data.field, data.error);
+                    } else {
+                        app.login.clearErrors(form);
+                        $.jGrowl(actionType === 'register'
+                            ? 'Вы были успешно зарегистрированы!'
+                                + 'Введите имя пользователя и пароль для авторизации на сайте'
+                            : 'Изменения сохранены');
+                        $('div.register-modal').hide();
+                    }
                 }
-            });
+            );
             return true;
         },
 
@@ -902,13 +910,16 @@ app = {
             $.post(app.app_url + 'profile/edit?act=get_profile', function (data) {
                 if (data.success === true) {
                     var $personalProfile = $('div.register-modal-login');
+                    $personalProfile.find('input[name="old_passw"],input[name="passw"],input[name="passw-again"]')
+                        .val('');
                     $loginFormUnauthorized.css('display', 'none');
                     $loginFormAuthorized.css('display', 'block').find('a.username-link').html(data.nickname);
                     $.each(data, function (k, v) {
                         if (k !== 'gender') {
                             $($personalProfile.find('input[name="' + k +'"]')).val(v);
                         } else {
-                            $($personalProfile.find('input[name="gender"][value="' + v + '"]')).attr('checked', 'checked');
+                            $($personalProfile.find('input[name="gender"][value="' + v + '"]'))
+                                .attr('checked', 'checked');
                         }
                     });
                 }
