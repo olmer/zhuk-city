@@ -632,9 +632,14 @@ app = {
          * Init function
          */
         init: function () {
-            $('div.register-modal input[name!=gender]').on('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
+            $('div.register-modal input[name!=gender]').on({
+                'click': function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                },
+                'change keyup' : function(e) {
+                    app.login.clearErrors($(this).parent().parent());
+                }
             });
 
             //Bind profile information load on click
@@ -839,6 +844,7 @@ app = {
                         ? 'Вы были успешно зарегистрированы!'
                             + 'Введите имя пользователя и пароль для авторизации на сайте'
                         : 'Изменения сохранены');
+                    $('div.register-modal').hide();
                 }
             });
             return true;
@@ -872,6 +878,9 @@ app = {
             $(formSelector).find('div.error-container').remove();
             $errField.parent().addClass('input-error')
                 .append(app.errors.getInputError(error));
+            $('div.error-container').on('click', function () {
+                app.login.clearErrors(formSelector);
+            });
         },
 
         /**
@@ -880,8 +889,9 @@ app = {
          * @param formSelector string
          */
         clearErrors: function (formSelector) {
-            $(formSelector).find('div.error-container').remove();
-            $(formSelector).find('.input-error').removeClass('input-error');
+            var $obj = typeof formSelector === 'string' ? $(formSelector) : formSelector;
+            $obj.find('div.error-container').remove();
+            $obj.find('.input-error').removeClass('input-error');
         },
 
         /**
