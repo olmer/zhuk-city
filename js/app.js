@@ -632,14 +632,12 @@ app = {
          * Init function
          */
         init: function () {
-            $('div.register-modal input[name!=gender]').on({
-                'click': function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                },
-                'change keyup' : function(e) {
-                    app.login.clearErrors($(this).parent().parent());
-                }
+            $('div.register-modal input[name!=gender]').on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            $('div.register-modal input[name!=gender], div.login-form input').on('change keyup', function() {
+                app.login.clearErrors($(this).parent().parent());
             });
 
             //Bind profile information load on click
