@@ -692,9 +692,7 @@ app = {
                         loginInputs.login.siblings('div.error-container').css('display', 'none')
                             .parent().removeClass('input-error');
                     } else if (data.success === false) {
-                        loginInputs.login.parent().addClass('input-error')
-                            .find('div.error-container').css('display', '')
-                            .find('span.error-message').html(data.error);
+                        app.login.displayErrorByField('div.login-form form ', 'login', data.error);
                     }
                 });
                 return false;
