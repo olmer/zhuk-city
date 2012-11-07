@@ -707,6 +707,16 @@ app = {
                 return false;
             });
 
+            $('div.register-modal form input[name=birthdate]').datepicker(
+                {
+                    dateFormat: 'dd.mm.yy',
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: '1900:2013'
+                },
+                $.datepicker.regional['ru']
+            );
+
             app.login.registrationInit();
         },
 
