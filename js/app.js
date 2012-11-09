@@ -732,7 +732,7 @@ app = {
                 //Inputs' default values
                 $('div.register-modal-register form input').each(function (k, v) {
                     var $field = $(v),
-                        def = $v.attr('data-defaultvalue');
+                        def = $field.attr('data-defaultvalue');
                     $field.val(def || '');
                 });
                 $.post(app.app_url + 'profile/?act=captcha', function (data) {
