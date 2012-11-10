@@ -1011,6 +1011,24 @@ app = {
         return(setStr);
     },
 
+    request: {
+        get : null,
+        getGet: function (key) {
+            if (app.request.get === null) {
+                var get = {};
+                document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
+                    function decode(s) {
+                        return decodeURIComponent(s.split("+").join(" "));
+                    }
+
+                    get[decode(arguments[1])] = decode(arguments[2]);
+                });
+                app.request.get = get;
+            }
+            return key ? app.request.get[key] : app.request.get;
+        }
+    },
+
     /**
      * @deprecated
      */
