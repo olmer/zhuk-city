@@ -319,12 +319,10 @@ app = {
                 infoBox.open(app.gmap.map, marker);
             });
 
-            var item = {
+            return {
                 marker:marker,
                 infoBox:infoBox
             };
-
-            return item;
         },
 
         showObject:function (id) {
@@ -1037,33 +1035,6 @@ app = {
                 app.request.get = get;
             }
             return key ? app.request.get[key] : app.request.get;
-        }
-    },
-
-    /**
-     * @deprecated
-     */
-    html: {
-        login: {
-            authorized: function (data) {
-                /*return '<div class="auth-user"> Здравствуйте <a class="login-links open-modal">' + data.username + '</a>'
-                    + '<div class="modal register-modal">'
-                    + '<a class="close-modal"></a>'
-                    + '<div class="modal-header">'
-                    + '<h3 class="modal-name">Личный кабинет</h3>'
-                    + '</div></div></div>'
-                    + '<a href="#" class="auth-user-exit">Выход</a>'
-                    + '<div class="clear"></div>'
-                    + '<a class="open-modal bookmark-link gray-btn">Закладки</a>'
-                    + '<div class="modal bookmark-modal"><a class="close-modal"></a></div>'
-                    + '<a class="open-modal places-link gray-btn">Просмотренные места</a>'
-                    + '<div class="modal bookmark-modal">'
-                    + '<a class="close-modal"></a>'
-                    + '<div class="modal-header">'
-                    + '<h3 class="modal-name">Просмотренные места</h3>'
-                    + '</div>'
-                    + '<div class="bookmark-table"></div></div>';*/
-            }
         }
     }
 };
