@@ -243,278 +243,6 @@ app = {
             if (app.getCookie('secondTrain')) app.transport.startStation.secondTrain = app.getCookie('secondTrain');
         }
     },
-
-    menu:{
-        buildMenu:function () {
-            $('.subcategory a').click(function () {
-                app.menu.getObjects($(this).attr('data-subcategory'));
-            });
-        },
-        getObjects:function (id) {
-            var URL = app.app_url + 'map?act=get_objects&cat_ids=' + id + '&sort_by=0';
-            $.get(URL, function (data) {
-                if (data.success) {
-                    app.curentSubcategory = id;
-                    app.gmap.closeAllInfoWindows();
-                    app.gmap.removeAllMarkers();
-                    app.objects = [];
-                    if (data.objects.length > 0) {
-                        for (var i = 0; i < data.objects.length; i++) {
-                            var mapItem = app.gmap.addMarker(data.objects[i]);
-                            var item = {
-                                data:data.objects[i],
-                                mapItem:mapItem
-                            };
-                            app.objects.push(item);
-                        }
-                        app.menu.layoutSubcategoryItems();
-                    }
-                }
-            })
-        },
-        buildTabs:function (activeTab) {
-            var tabsControll = '<ul class="tabs">' +
-                '<li class="posters"><a href="#">Афиши</a></li>' +
-                '<li class="categorys"><a href="#">Категории</a></li>' +
-                '<li class="news"><a href="#">Новости</a></li>' +
-                '</ul>' +
-                '<div class="list-filter">' +
-                '<ul class="object-list-filter">' +
-                '<li><a href="#" class="active">По названию</a></li>' +
-                '<li><a href="#">По рейтингу</a></li>' +
-                '<li><a href="#">По дате</a></li>' +
-                '</ul>' +
-                '<div class="work-filter">' +
-                'Работает' +
-                '<div class="ui-work-bg">' +
-                '<span class="ui-work-item off"></span>' +
-                '</div>' +
-                '</div>' +
-                '<div class="clear"></div>' +
-                '</div>';
-            $('<div class="filter-wrap">').html(tabsControll).appendTo('.items-list');
-            $('.news').bind('click', function () {
-                $(this).addClass('active');
-                $('.categotys').removeClass('active');
-                $('.posters').removeClass('active');
-                $('.object-list-filter').empty();
-            });
-            $('.posters').bind('click', function () {
-                $(this).addClass('active');
-                $('.categotys').removeClass('active');
-                $('.news').removeClass('active');
-                $('.object-list-filter').empty();
-            });
-            $($('.filter-wrap .tabs a')[activeTab]).addClass('active');
-        },
-
-        layoutNewsItems:function () {
-
-        },
-
-        layoutSubcategoryItems:function () {
-            $('.category-list').addClass('hide-subcategory');
-            app.menu.buildTabs(1);
-            for (var i = 0; i < app.objects.length; i++) {
-                var item = app.objects[i];
-                var listItem = $('<div class="list-item object-item" data-obj-id=' + item.data.id + '>')
-                    .append($('<span class="status-work">')
-                    .addClass(item.data.operating_minutes >= 0 ? 'online' : '')
-                    .html(item.data.operating_minutes >= 0 ? 'работает' : 'неработает'))
-                    .append($('<a href="#" class="list-item-name">')
-                    .html(item.data.name))
-                    .append($('<p class="list-item-info">').html(
-                    'Адрес: <a href="#">' + item.data.address + '</a> <br>' +
-                        'Телефон: ' + item.data.phone + '  <br>' +
-                        'Сайт: <a href="#">' + item.data.website + '</a> <br>'
-                ))
-                    .append($('<div class="object-list-time">')
-                    .append($('<ul class="object-list-time-details">')
-                    .append($('<li>пн-пт: 9:00 - 18:00</li>'))
-                    .append($('<li>сб: 10:00 - 15:00</li>'))
-                    .append($('<li>вс: выходной</li>'))
-                    .append($('<li>')
-                    .html(
-                    '<a class="open-lunch-info">перерывы</a>' +
-                        '<div class="lunch-info">' +
-                        '<table>' +
-                        '<tr>' +
-                        '<th>ежедневно</th>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '<td>11:00 - 11:20</td>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '<td>14:20 - 14:40</td>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '<td>16:20 - 16:40</td>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '<th>в субботу</th>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '<td>10:20 - 10:45</td>' +
-                        '</tr>' +
-                        '</table>' +
-                        '</div>'
-                ))))
-                    .append($('<div class="object-item-footer">')
-                    .append($('<div class="object-item-rating">')
-                    .html(
-                    '<span class="object-item-comments">' + item.data.n_reviews + '</span>' +
-                        '<div class="rating-stars"></div>' +
-                        'Рейтинг: <b>' + item.data.rating + '</b>'
-                ))
-                    .append($('<div class="object-item-controls">')
-                    .append('<a href="#" class="gray-btn">В закладки</a>')
-                    .append($('<a href="#" class="gray-btn location" data-obj-id="' + item.data.id + '" ></a>').append(
-                    $('<span class="object-item-show-map"></span>')
-                ))
-                ));
-
-                $('.filter-wrap').append(listItem);
-
-            }
-            $('.gray-btn.location').click(function () {
-                e.preventDefault();
-                e.stopPropagation();
-                app.gmap.showObject($(this).attr('data-obj-id'));
-            });
-            $('.list-item.object-item').click(function () {
-                app.menu.openObjectDetails($(this).attr('data-obj-id'));
-            });
-        },
-
-        openObjectDetails:function (id) {
-            $.getJSON(app.app_url + 'map/?act=get_object&obj_id=' + id, function (data) {
-                $('.list-item.object-item').remove();
-
-//                console.log(data);
-
-                var details = $('<div class="list-item object-details">')
-                    .append($('<span class="status-work">')
-                    .addClass(data.operating_minutes >= 0 ? 'online' : '')
-                    .html(data.operating_minutes >= 0 ? 'работает' : 'неработает'))
-                    .append('<a href="#" class="list-item-name">' + data.name + '</a>')
-                    .append('<p class="list-item-info">' +
-                    'Адрес: <a href="#">' + data.address + '</a> <br>' +
-                    'Телефон: ' + data.phone + '  <br>' +
-                    'Сайт: <a href="#"> ' + data.website + ' </a> <br>' +
-                    '</p>')
-                    .append('<div class="object-list-time">'+
-                    '<ul class="object-list-time-details">'+
-                    '<li>пн-пт: 9:00 - 18:00</li>'+
-                    '<li>сб: 10:00 - 15:00</li>'+
-                    '<li>вс: выходной</li>'+
-                    '<li><a class="open-lunch-info">перерывы</a>'+
-                    '<div class="lunch-info" style="display: none; ">'+
-                    '<table>'+
-                    '<tbody><tr>'+
-                    '<th>ежедневно</th>'+
-                    '</tr>'+
-                    '<tr>'+
-                    '<td>11:00 - 11:20</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                    '<td>14:20 - 14:40</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                    '<td>16:20 - 16:40</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                    '<th>в субботу</th>'+
-                    '</tr>'+
-                    '<tr>'+
-                    '<td>10:20 - 10:45</td>'+
-                    '</tr>'+
-                    '</tbody></table>'+
-                    '</div>'+
-                    '</li>'+
-                    '</ul>' +
-                    '</div>')
-                    .append('<div class="object-item-footer">'+
-                    '<div class="object-item-rating">'+
-                    '<div class="rating-stars" style="overflow: auto; "><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div></div>'+
-                    'Рейтинг: <b>' + data.rating + '</b>'+
-                    '</div>'+
-                    '<div class="object-item-controls">'+
-                    '<a href="#" class="gray-btn">В закладки</a>'+
-                    '</div>'+
-                    '</div>')
-                    .append('<div class="object-details-gallery">')
-                    .append('<p class="object-details-info">')
-                    .append('<a href="#" class="gray-btn back-object-list"><span class="arrow-left"></span>К списку обьектов</a>' +
-                    '<a href="#" class="gray-btn add-comment-object open-modal">Оставить отзыв</a>'+
-                    '<div class="modal add-comment-modal">'+
-                    '<a class="close-modal"></a>'+
-                    '<div class="modal-header">'+
-                    '<h3 class="modal-name">Оставить отзыв</h3>'+
-                    '</div>'+
-                    '<form>'+
-                    '<label>'+
-                    'Тема'+
-                    '<div class="modal-input theme-input">'+
-                    '<input type="text" value="">'+
-                    '</div>'+
-                    '</label>'+
-                    '<label>'+
-                    'Моя оценка'+
-                    '<div class="rating-stars" style="overflow: auto; "><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div></div>'+
-                    '</label>'+
-                    '<div class="clear"></div>'+
-                    '<div class="add-comment-textarea-wrap">'+
-                    'Текст отзыва<br>'+
-                    '<div class="add-comment-textarea">'+
-                    '<textarea></textarea>'+
-                    '</div>'+
-                    '</div>'+
-                    '<div class="clear"></div>'+
-                    '<button class="blue-btn modal-submit">Отправить</button>'+
-                    '</form>'+
-                    '</div>'+
-                    '<div class="clear-r"></div>'+
-                    '<div class="comment-object-wrap">'+
-                    '<span class="comments-object-count">Всего отзывов: <b>' + data.totalReviewsCount + '</b></span>'+
-                    '<a class="show-all-comments-object" href="#">Показать все</a>'+
-                    '<div class="clear-r"></div>'+
-                    '<section class="comments-list">'+
-                    '</section>'+
-                    '</div>'+
-                    '</div>')
-                    .appendTo('.items-list.object-list');
-                if(data.reviews.length){
-                    for(var i = 0; i < data.reviews.length; i++){
-                        $('<div class="comment-object-item">' +
-                            ' <div class="comment-object-info">'+
-                            '<a href="#" class="comment-object-name female">' + data.reviews[i].user_name + '</a>'+
-                            '<span class="comment-object-date">' + data.reviews[i].date_time + '</span>'+
-                            '<div class="comment-object-rating">'+
-                            '<span class="comment-object-rating-minus"></span>'+
-                            '<span class="comment-object-rating-plus"></span>'+
-                            '<a href="#" class="comment-object-rating-rate">' + data.reviews[i].votes + '</a>'+
-                            '</div>'+
-                            '</div>'+
-                            '<div class="comment-object-content">' +
-                            '<p class="comment-object-text">' + data.reviews[i].msg_text + '</p>'+
-                            '<span class="comment-object-mark">Моя оценка: <b>' + data.reviews[i].rating + '</b></span>' +
-                            '<a href="#" class="comment-object-answer">Ответить</a>' +
-                            '</div>' +
-                            '<div class="clear-r"></div>' +
-                            '</div>').appendTo('.comments-list')
-                    }
-                }
-
-                $('.gray-btn.back-object-list').bind('click', function () {
-                    $('.items-list').empty();
-                    app.menu.layoutSubcategoryItems();
-                });
-
-                app.gmap.showObject(id);
-            })
-        }
-    },
-
     gmap:{
         markers:{},
         startPosition:{
@@ -523,7 +251,6 @@ app = {
             zoom:12
         },
         initMap:function () {
-            return false;
             $('<div id="mapContainer"></div>').css('width', '100%').css('height', '100%').css('z-index', '1')
                 .appendTo('.map');
             var startOptions = {
@@ -944,6 +671,290 @@ app = {
         }
     },
 
+    categories: {
+        init: function () {
+            app.categories.fillSubcategories();
+            var $subcategories = $('#category-list div.subcategory a').on('click', function () {
+                var $this = $(this);
+                app.categories.getObjects($this.attr('data-cat-id'));
+            });
+        },
+
+        fillSubcategories: function () {
+            var $categories = $('#category-list li'),
+                categoriesList = app.map_categories,
+                html = '';
+            $.each($categories, function (itemKeys, item) {
+                var $item = $(item);
+                $.each(categoriesList[$item.attr('data-cat-id')].subcategories, function (subitemKeys, subitem) {
+                    html += '<a data-cat-id="' + subitem.id + '">' + subitem.title + '</a> / ';
+                });
+                $item.find('div.subcategory').html(html);
+                html = '';
+            });
+        },
+
+        getObjects: function (id) {
+            var URL = app.app_url + 'map?act=get_objects&cat_ids=' + id + '&sort_by=0';
+            $.get(URL, function (data) {
+                if (data.success) {
+                    app.curentSubcategory = id;
+                    app.gmap.closeAllInfoWindows();
+                    app.gmap.removeAllMarkers();
+                    app.objects = [];
+                    if (data.objects.length > 0) {
+                        for (var i = 0; i < data.objects.length; i++) {
+                            var mapItem = app.gmap.addMarker(data.objects[i]);
+                            var item = {
+                                data:data.objects[i],
+                                mapItem:mapItem
+                            };
+                            app.objects.push(item);
+                        }
+                        app.categories.layoutSubcategoryItems();
+                    }
+                }
+            })
+        },
+
+        buildTabs:function (activeTab) {
+            var tabsControll = '<ul class="tabs">' +
+                '<li class="posters"><a href="#">Афиши</a></li>' +
+                '<li class="categorys"><a href="#">Категории</a></li>' +
+                '<li class="news"><a href="#">Новости</a></li>' +
+                '</ul>' +
+                '<div class="list-filter">' +
+                '<ul class="object-list-filter">' +
+                '<li><a href="#" class="active">По названию</a></li>' +
+                '<li><a href="#">По рейтингу</a></li>' +
+                '<li><a href="#">По дате</a></li>' +
+                '</ul>' +
+                '<div class="work-filter">' +
+                'Работает' +
+                '<div class="ui-work-bg">' +
+                '<span class="ui-work-item off"></span>' +
+                '</div>' +
+                '</div>' +
+                '<div class="clear"></div>' +
+                '</div>';
+            $('<div class="filter-wrap">').html(tabsControll).appendTo('.items-list');
+            $('.news').bind('click', function () {
+                $(this).addClass('active');
+                $('.categotys').removeClass('active');
+                $('.posters').removeClass('active');
+                $('.object-list-filter').empty();
+            });
+            $('.posters').bind('click', function () {
+                $(this).addClass('active');
+                $('.categotys').removeClass('active');
+                $('.news').removeClass('active');
+                $('.object-list-filter').empty();
+            });
+            $($('.filter-wrap .tabs a')[activeTab]).addClass('active');
+        },
+
+        layoutSubcategoryItems:function () {
+            $('.category-list').addClass('hide-subcategory');
+            app.categories.buildTabs(1);
+            for (var i = 0; i < app.objects.length; i++) {
+                var item = app.objects[i];
+                var listItem = $('<div class="list-item object-item" data-obj-id=' + item.data.id + '>')
+                    .append($('<span class="status-work">')
+                    .addClass(item.data.operating_minutes >= 0 ? 'online' : '')
+                    .html(item.data.operating_minutes >= 0 ? 'работает' : 'неработает'))
+                    .append($('<a href="#" class="list-item-name">')
+                    .html(item.data.name))
+                    .append($('<p class="list-item-info">').html(
+                    'Адрес: <a href="#">' + item.data.address + '</a> <br>' +
+                        'Телефон: ' + item.data.phone + '  <br>' +
+                        'Сайт: <a href="#">' + item.data.website + '</a> <br>'
+                ))
+                    .append($('<div class="object-list-time">')
+                    .append($('<ul class="object-list-time-details">')
+                    .append($('<li>пн-пт: 9:00 - 18:00</li>'))
+                    .append($('<li>сб: 10:00 - 15:00</li>'))
+                    .append($('<li>вс: выходной</li>'))
+                    .append($('<li>')
+                    .html(
+                    '<a class="open-lunch-info">перерывы</a>' +
+                        '<div class="lunch-info">' +
+                        '<table>' +
+                        '<tr>' +
+                        '<th>ежедневно</th>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td>11:00 - 11:20</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td>14:20 - 14:40</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td>16:20 - 16:40</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<th>в субботу</th>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td>10:20 - 10:45</td>' +
+                        '</tr>' +
+                        '</table>' +
+                        '</div>'
+                ))))
+                    .append($('<div class="object-item-footer">')
+                    .append($('<div class="object-item-rating">')
+                    .html(
+                    '<span class="object-item-comments">' + item.data.n_reviews + '</span>' +
+                        '<div class="rating-stars"></div>' +
+                        'Рейтинг: <b>' + item.data.rating + '</b>'
+                ))
+                    .append($('<div class="object-item-controls">')
+                    .append('<a href="#" class="gray-btn">В закладки</a>')
+                    .append($('<a href="#" class="gray-btn location" data-obj-id="' + item.data.id + '" ></a>').append(
+                    $('<span class="object-item-show-map"></span>')
+                ))
+                ));
+
+                $('.filter-wrap').append(listItem);
+
+            }
+            $('.gray-btn.location').click(function () {
+                e.preventDefault();
+                e.stopPropagation();
+                app.gmap.showObject($(this).attr('data-obj-id'));
+            });
+            $('.list-item.object-item').click(function () {
+                app.categories.openObjectDetails($(this).attr('data-obj-id'));
+            });
+        },
+
+        openObjectDetails:function (id) {
+            $.getJSON(app.app_url + 'map/?act=get_object&obj_id=' + id, function (data) {
+                $('.list-item.object-item').remove();
+
+//                console.log(data);
+
+                var details = $('<div class="list-item object-details">')
+                    .append($('<span class="status-work">')
+                    .addClass(data.operating_minutes >= 0 ? 'online' : '')
+                    .html(data.operating_minutes >= 0 ? 'работает' : 'неработает'))
+                    .append('<a href="#" class="list-item-name">' + data.name + '</a>')
+                    .append('<p class="list-item-info">' +
+                    'Адрес: <a href="#">' + data.address + '</a> <br>' +
+                    'Телефон: ' + data.phone + '  <br>' +
+                    'Сайт: <a href="#"> ' + data.website + ' </a> <br>' +
+                    '</p>')
+                    .append('<div class="object-list-time">'+
+                    '<ul class="object-list-time-details">'+
+                    '<li>пн-пт: 9:00 - 18:00</li>'+
+                    '<li>сб: 10:00 - 15:00</li>'+
+                    '<li>вс: выходной</li>'+
+                    '<li><a class="open-lunch-info">перерывы</a>'+
+                    '<div class="lunch-info" style="display: none; ">'+
+                    '<table>'+
+                    '<tbody><tr>'+
+                    '<th>ежедневно</th>'+
+                    '</tr>'+
+                    '<tr>'+
+                    '<td>11:00 - 11:20</td>'+
+                    '</tr>'+
+                    '<tr>'+
+                    '<td>14:20 - 14:40</td>'+
+                    '</tr>'+
+                    '<tr>'+
+                    '<td>16:20 - 16:40</td>'+
+                    '</tr>'+
+                    '<tr>'+
+                    '<th>в субботу</th>'+
+                    '</tr>'+
+                    '<tr>'+
+                    '<td>10:20 - 10:45</td>'+
+                    '</tr>'+
+                    '</tbody></table>'+
+                    '</div>'+
+                    '</li>'+
+                    '</ul>' +
+                    '</div>')
+                    .append('<div class="object-item-footer">'+
+                    '<div class="object-item-rating">'+
+                    '<div class="rating-stars" style="overflow: auto; "><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div></div>'+
+                    'Рейтинг: <b>' + data.rating + '</b>'+
+                    '</div>'+
+                    '<div class="object-item-controls">'+
+                    '<a href="#" class="gray-btn">В закладки</a>'+
+                    '</div>'+
+                    '</div>')
+                    .append('<div class="object-details-gallery">')
+                    .append('<p class="object-details-info">')
+                    .append('<a href="#" class="gray-btn back-object-list"><span class="arrow-left"></span>К списку обьектов</a>' +
+                    '<a href="#" class="gray-btn add-comment-object open-modal">Оставить отзыв</a>'+
+                    '<div class="modal add-comment-modal">'+
+                    '<a class="close-modal"></a>'+
+                    '<div class="modal-header">'+
+                    '<h3 class="modal-name">Оставить отзыв</h3>'+
+                    '</div>'+
+                    '<form>'+
+                    '<label>'+
+                    'Тема'+
+                    '<div class="modal-input theme-input">'+
+                    '<input type="text" value="">'+
+                    '</div>'+
+                    '</label>'+
+                    '<label>'+
+                    'Моя оценка'+
+                    '<div class="rating-stars" style="overflow: auto; "><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div></div>'+
+                    '</label>'+
+                    '<div class="clear"></div>'+
+                    '<div class="add-comment-textarea-wrap">'+
+                    'Текст отзыва<br>'+
+                    '<div class="add-comment-textarea">'+
+                    '<textarea></textarea>'+
+                    '</div>'+
+                    '</div>'+
+                    '<div class="clear"></div>'+
+                    '<button class="blue-btn modal-submit">Отправить</button>'+
+                    '</form>'+
+                    '</div>'+
+                    '<div class="clear-r"></div>'+
+                    '<div class="comment-object-wrap">'+
+                    '<span class="comments-object-count">Всего отзывов: <b>' + data.totalReviewsCount + '</b></span>'+
+                    '<a class="show-all-comments-object" href="#">Показать все</a>'+
+                    '<div class="clear-r"></div>'+
+                    '<section class="comments-list">'+
+                    '</section>'+
+                    '</div>'+
+                    '</div>')
+                    .appendTo('.items-list.object-list');
+                if(data.reviews.length){
+                    for(var i = 0; i < data.reviews.length; i++){
+                        $('<div class="comment-object-item">' +
+                            ' <div class="comment-object-info">'+
+                            '<a href="#" class="comment-object-name female">' + data.reviews[i].user_name + '</a>'+
+                            '<span class="comment-object-date">' + data.reviews[i].date_time + '</span>'+
+                            '<div class="comment-object-rating">'+
+                            '<span class="comment-object-rating-minus"></span>'+
+                            '<span class="comment-object-rating-plus"></span>'+
+                            '<a href="#" class="comment-object-rating-rate">' + data.reviews[i].votes + '</a>'+
+                            '</div>'+
+                            '</div>'+
+                            '<div class="comment-object-content">' +
+                            '<p class="comment-object-text">' + data.reviews[i].msg_text + '</p>'+
+                            '<span class="comment-object-mark">Моя оценка: <b>' + data.reviews[i].rating + '</b></span>' +
+                            '<a href="#" class="comment-object-answer">Ответить</a>' +
+                            '</div>' +
+                            '<div class="clear-r"></div>' +
+                            '</div>').appendTo('.comments-list')
+                    }
+                }
+
+                $('.gray-btn.back-object-list').bind('click', function () {
+                    $('.items-list').empty();
+                    app.categories.layoutSubcategoryItems();
+                });
+
+                app.gmap.showObject(id);
+            })
+        }
+    },
     /**
      * Switch between default input value and empty value
      *
@@ -979,8 +990,8 @@ app = {
         app.transport.getStationFromCookie();
         app.transport.buildTransportForm();
         app.gmap.initMap();
-        app.menu.buildMenu();
         app.login.init();
+        app.categories.init();
     },
 
     setCookie:function (name, value, expires, path, domain, secure) {
