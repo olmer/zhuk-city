@@ -1725,8 +1725,8 @@ footer {
 }
 .object-onmap-wrap {
     position: absolute;
-    top: 200px;
-    left: 200px;
+    /*top: 200px; temporal disable (bug)
+    left: 200px;*/
     background: #fff;
     -webkit-border-radius: 7px;
     -moz-border-radius: 7px;
