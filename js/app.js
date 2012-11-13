@@ -251,8 +251,11 @@ app = {
             zoom:12
         },
         initMap:function () {
-            $('<div id="mapContainer"></div>').css('width', '100%').css('height', '100%').css('z-index', '1')
-                .appendTo('.map');
+            $('<div id="mapContainer"></div>').css('z-index', '1').appendTo('.map');
+
+            app.gmap.resizeMap();
+            $(window).on('resize', app.gmap.resizeMap);
+
             var startOptions = {
                 mapTypeControl:true,
                 zoom:12,
@@ -260,6 +263,11 @@ app = {
                 mapTypeId:google.maps.MapTypeId.ROADMAP
             };
             app.gmap.map = new google.maps.Map(window.document.getElementById('mapContainer'), startOptions);
+        },
+        resizeMap: function () {
+            var width = parseInt($(window).width()) - parseInt($('aside.left-block').width()),
+                height = parseInt($(window).height()) - parseInt($('header').height()) - parseInt($('footer').height());
+            $('#mapContainer').css('width', width + 'px').css('height', height + 'px')
         },
         addMarker:function (object) {
             var marker = new google.maps.Marker({
