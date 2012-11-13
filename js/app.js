@@ -274,7 +274,7 @@ app = {
                 position:new google.maps.LatLng(object.latitude, object.longitude),
                 icon:'images/marker.1.png',
                 map:app.gmap.map,
-                title:"Hello World!"
+                title: object.name
             });
 
             var infoString = '<div class="object-onmap-wrap">' +
