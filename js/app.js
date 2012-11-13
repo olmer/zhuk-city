@@ -284,8 +284,8 @@ app = {
                 '<div class="onmap-comment-count">' + object.n_reviews + '</div>' +
                 '</div>' +
                 '<div class="object-onmap-content">' +
-                'Категория: <a href="#">Банки</a> <br>' +
-                'Адрес: <a href="#">' + object.address + '</a> <br>' +
+                'Категория: <a>Банки</a> <br>' +
+                'Адрес: <a>' + object.address + '</a> <br>' +
                 'Телефон: ' + object.phone +
                 '</div>' +
                 '<div class="object-onmap-time">' +
@@ -293,7 +293,7 @@ app = {
                 '</div>' +
                 '<div class="object-onmap-footer">' +
                 '<span class="object-onmap-rating">Рейтинг: <b>' + object.rating + '</b></span>' +
-                '<a href="#" class="object-onmap-comment">Оставить отзыв</a>' +
+                '<a class="object-onmap-comment">Оставить отзыв</a>' +
                 '</div>' +
                 '</div>';
 
@@ -725,15 +725,15 @@ app = {
 
         buildTabs:function (activeTab) {
             var tabsControll = '<ul class="tabs">' +
-                '<li class="posters"><a href="#">Афиши</a></li>' +
-                '<li class="categorys"><a href="#">Категории</a></li>' +
-                '<li class="news"><a href="#">Новости</a></li>' +
+                '<li class="posters"><a>Афиши</a></li>' +
+                '<li class="categorys"><a>Категории</a></li>' +
+                '<li class="news"><a>Новости</a></li>' +
                 '</ul>' +
                 '<div class="list-filter">' +
                 '<ul class="object-list-filter">' +
-                '<li><a href="#" class="active">По названию</a></li>' +
-                '<li><a href="#">По рейтингу</a></li>' +
-                '<li><a href="#">По дате</a></li>' +
+                '<li><a class="active">По названию</a></li>' +
+                '<li><a>По рейтингу</a></li>' +
+                '<li><a>По дате</a></li>' +
                 '</ul>' +
                 '<div class="work-filter">' +
                 'Работает' +
@@ -768,12 +768,12 @@ app = {
                     .append($('<span class="status-work">')
                     .addClass(item.data.operating_minutes >= 0 ? 'online' : '')
                     .html(item.data.operating_minutes >= 0 ? 'работает' : 'неработает'))
-                    .append($('<a href="#" class="list-item-name">')
+                    .append($('<a class="list-item-name">')
                     .html(item.data.name))
                     .append($('<p class="list-item-info">').html(
-                    'Адрес: <a href="#">' + item.data.address + '</a> <br>' +
+                    'Адрес: <a>' + item.data.address + '</a> <br>' +
                         'Телефон: ' + item.data.phone + '  <br>' +
-                        'Сайт: <a href="#">' + item.data.website + '</a> <br>'
+                        'Сайт: <a>' + item.data.website + '</a> <br>'
                 ))
                     .append($('<div class="object-list-time">')
                     .append($('<ul class="object-list-time-details">')
@@ -814,8 +814,8 @@ app = {
                         'Рейтинг: <b>' + item.data.rating + '</b>'
                 ))
                     .append($('<div class="object-item-controls">')
-                    .append('<a href="#" class="gray-btn">В закладки</a>')
-                    .append($('<a href="#" class="gray-btn location" data-obj-id="' + item.data.id + '" ></a>').append(
+                    .append('<a class="gray-btn">В закладки</a>')
+                    .append($('<a class="gray-btn location" data-obj-id="' + item.data.id + '" ></a>').append(
                     $('<span class="object-item-show-map"></span>')
                 ))
                 ));
@@ -830,6 +830,7 @@ app = {
             });
             $('.list-item.object-item').click(function () {
                 app.categories.openObjectDetails($(this).attr('data-obj-id'));
+                return false;
             });
         },
 
@@ -843,11 +844,11 @@ app = {
                     .append($('<span class="status-work">')
                     .addClass(data.operating_minutes >= 0 ? 'online' : '')
                     .html(data.operating_minutes >= 0 ? 'работает' : 'неработает'))
-                    .append('<a href="#" class="list-item-name">' + data.name + '</a>')
+                    .append('<a class="list-item-name">' + data.name + '</a>')
                     .append('<p class="list-item-info">' +
-                    'Адрес: <a href="#">' + data.address + '</a> <br>' +
+                    'Адрес: <a>' + data.address + '</a> <br>' +
                     'Телефон: ' + data.phone + '  <br>' +
-                    'Сайт: <a href="#"> ' + data.website + ' </a> <br>' +
+                    'Сайт: <a> ' + data.website + ' </a> <br>' +
                     '</p>')
                     .append('<div class="object-list-time">'+
                     '<ul class="object-list-time-details">'+
@@ -886,13 +887,13 @@ app = {
                     'Рейтинг: <b>' + data.rating + '</b>'+
                     '</div>'+
                     '<div class="object-item-controls">'+
-                    '<a href="#" class="gray-btn">В закладки</a>'+
+                    '<a class="gray-btn">В закладки</a>'+
                     '</div>'+
                     '</div>')
                     .append('<div class="object-details-gallery">')
                     .append('<p class="object-details-info">')
-                    .append('<a href="#" class="gray-btn back-object-list"><span class="arrow-left"></span>К списку обьектов</a>' +
-                    '<a href="#" class="gray-btn add-comment-object open-modal">Оставить отзыв</a>'+
+                    .append('<a class="gray-btn back-object-list"><span class="arrow-left"></span>К списку обьектов</a>' +
+                    '<a class="gray-btn add-comment-object open-modal">Оставить отзыв</a>'+
                     '<div class="modal add-comment-modal">'+
                     '<a class="close-modal"></a>'+
                     '<div class="modal-header">'+
@@ -923,7 +924,7 @@ app = {
                     '<div class="clear-r"></div>'+
                     '<div class="comment-object-wrap">'+
                     '<span class="comments-object-count">Всего отзывов: <b>' + data.totalReviewsCount + '</b></span>'+
-                    '<a class="show-all-comments-object" href="#">Показать все</a>'+
+                    '<a class="show-all-comments-object">Показать все</a>'+
                     '<div class="clear-r"></div>'+
                     '<section class="comments-list">'+
                     '</section>'+
@@ -934,18 +935,18 @@ app = {
                     for(var i = 0; i < data.reviews.length; i++){
                         $('<div class="comment-object-item">' +
                             ' <div class="comment-object-info">'+
-                            '<a href="#" class="comment-object-name female">' + data.reviews[i].user_name + '</a>'+
+                            '<a class="comment-object-name female">' + data.reviews[i].user_name + '</a>'+
                             '<span class="comment-object-date">' + data.reviews[i].date_time + '</span>'+
                             '<div class="comment-object-rating">'+
                             '<span class="comment-object-rating-minus"></span>'+
                             '<span class="comment-object-rating-plus"></span>'+
-                            '<a href="#" class="comment-object-rating-rate">' + data.reviews[i].votes + '</a>'+
+                            '<a class="comment-object-rating-rate">' + data.reviews[i].votes + '</a>'+
                             '</div>'+
                             '</div>'+
                             '<div class="comment-object-content">' +
                             '<p class="comment-object-text">' + data.reviews[i].msg_text + '</p>'+
                             '<span class="comment-object-mark">Моя оценка: <b>' + data.reviews[i].rating + '</b></span>' +
-                            '<a href="#" class="comment-object-answer">Ответить</a>' +
+                            '<a class="comment-object-answer">Ответить</a>' +
                             '</div>' +
                             '<div class="clear-r"></div>' +
                             '</div>').appendTo('.comments-list')
