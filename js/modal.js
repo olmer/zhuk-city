@@ -55,14 +55,6 @@ $(document).ready(function() {
         $('.tabs a').removeClass('active');
         $(this).addClass('active');
     });
-    $('.open-lunch-info').hover(
-        function(){
-            $(this).next('.lunch-info').show();
-        },
-        function(){
-            $(this).next('.lunch-info').hide();
-        }
-    );
     $(document).ready(function() {
         $('.rating-stars').ratings(5).bind('ratingchanged', function(event, data) {
            $(this).next('b').html(data.rating);

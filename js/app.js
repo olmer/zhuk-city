@@ -312,7 +312,7 @@ app = {
                     opacity:1,
                     width:"200px"
                 },
-                closeBoxMargin:"5px 5px 2px 2px",
+                closeBoxMargin:"-12px -13px 0 0",
                 closeBoxURL:"http://www.google.com/intl/en_us/mapfiles/close.gif",
                 infoBoxClearance:new google.maps.Size(1, 1),
                 isHidden:false,
@@ -771,41 +771,25 @@ app = {
                     .append($('<a class="list-item-name">')
                     .html(item.data.name))
                     .append($('<p class="list-item-info">').html(
-                    'Адрес: <a>' + item.data.address + '</a> <br>' +
+                        'Адрес: <a>' + item.data.address + '</a> <br>' +
                         'Телефон: ' + item.data.phone + '  <br>' +
                         'Сайт: <a>' + item.data.website + '</a> <br>'
-                ))
+                    ))
                     .append($('<div class="object-list-time">')
                     .append($('<ul class="object-list-time-details">')
-                    .append($('<li>пн-пт: 9:00 - 18:00</li>'))
-                    .append($('<li>сб: 10:00 - 15:00</li>'))
-                    .append($('<li>вс: выходной</li>'))
-                    .append($('<li>')
-                    .html(
-                    '<a class="open-lunch-info">перерывы</a>' +
-                        '<div class="lunch-info">' +
-                        '<table>' +
-                        '<tr>' +
-                        '<th>ежедневно</th>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '<td>11:00 - 11:20</td>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '<td>14:20 - 14:40</td>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '<td>16:20 - 16:40</td>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '<th>в субботу</th>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '<td>10:20 - 10:45</td>' +
-                        '</tr>' +
-                        '</table>' +
-                        '</div>'
-                ))))
+                    .append($('<li>' + item.data.worktime + '</li>'))
+                    .append(item.data.worktime_breaks === '' ? '' : $('<li>') //do not show link and items if empty
+                        .html(
+                            '<a class="open-lunch-info">перерывы</a>' +
+                            '<div class="lunch-info">' +
+                            '<table>' +
+                            '<tr>' +
+                            '<th>' + item.data.worktime_breaks + '</th>' +
+                            '</tr>' +
+                            '</table>' +
+                            '</div>'
+                        )
+                    )))
                     .append($('<div class="object-item-footer">')
                     .append($('<div class="object-item-rating">')
                     .html(
@@ -832,6 +816,10 @@ app = {
                 app.categories.openObjectDetails($(this).attr('data-obj-id'));
                 return false;
             });
+            $('.open-lunch-info').hover(
+                function() {$(this).next('.lunch-info').show();},
+                function() {$(this).next('.lunch-info').hide();}
+            );
         },
 
         openObjectDetails:function (id) {
