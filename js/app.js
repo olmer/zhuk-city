@@ -759,7 +759,7 @@ app = {
             $($('.filter-wrap .tabs a')[activeTab]).addClass('active');
         },
 
-        layoutSubcategoryItems:function () {
+        layoutSubcategoryItems:function () {//items list
             $('.category-list').addClass('hide-subcategory');
             app.categories.buildTabs(1);
             for (var i = 0; i < app.objects.length; i++) {
@@ -772,8 +772,9 @@ app = {
                     .html(item.data.name))
                     .append($('<p class="list-item-info">').html(
                         'Адрес: <a>' + item.data.address + '</a> <br>' +
-                        'Телефон: ' + item.data.phone + '  <br>' +
-                        'Сайт: <a>' + item.data.website + '</a> <br>'
+                        (item.data.phone ? 'Телефон: ' + item.data.phone + '  <br>' : '') +
+                        (item.data.website ? 'Сайт: <a href="' + item.data.website + '" target="_blank" class="website-link">'
+                            + item.data.website + '</a> <br>' : '')
                     ))
                     .append($('<div class="object-list-time">')
                     .append($('<ul class="object-list-time-details">')
@@ -816,13 +817,16 @@ app = {
                 app.categories.openObjectDetails($(this).attr('data-obj-id'));
                 return false;
             });
+            $('.list-item.object-item .website-link').on('click', function (e) {
+                e.stopPropagation();
+            });
             $('.open-lunch-info').hover(
                 function() {$(this).next('.lunch-info').show();},
                 function() {$(this).next('.lunch-info').hide();}
             );
         },
 
-        openObjectDetails:function (id) {
+        openObjectDetails:function (id) {//item details
             $.getJSON(app.app_url + 'map/?act=get_object&obj_id=' + id, function (data) {
                 $('.list-item.object-item').remove();
 
@@ -836,37 +840,21 @@ app = {
                     .append('<p class="list-item-info">' +
                     'Адрес: <a>' + data.address + '</a> <br>' +
                     'Телефон: ' + data.phone + '  <br>' +
-                    'Сайт: <a> ' + data.website + ' </a> <br>' +
+                    'Сайт: <a href="' + data.website + '" target="_blank" class="website-link">'
+                    + data.website + '</a> <br>' +
                     '</p>')
                     .append('<div class="object-list-time">'+
                     '<ul class="object-list-time-details">'+
-                    '<li>пн-пт: 9:00 - 18:00</li>'+
-                    '<li>сб: 10:00 - 15:00</li>'+
-                    '<li>вс: выходной</li>'+
+                    '<li>' + data.worktime + '</li>'+ (data.worktime_breaks ?
                     '<li><a class="open-lunch-info">перерывы</a>'+
                     '<div class="lunch-info" style="display: none; ">'+
                     '<table>'+
                     '<tbody><tr>'+
-                    '<th>ежедневно</th>'+
-                    '</tr>'+
-                    '<tr>'+
-                    '<td>11:00 - 11:20</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                    '<td>14:20 - 14:40</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                    '<td>16:20 - 16:40</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                    '<th>в субботу</th>'+
-                    '</tr>'+
-                    '<tr>'+
-                    '<td>10:20 - 10:45</td>'+
+                    '<td>' + data.worktime_breaks + '</td>'+
                     '</tr>'+
                     '</tbody></table>'+
                     '</div>'+
-                    '</li>'+
+                    '</li>' : '' ) +
                     '</ul>' +
                     '</div>')
                     .append('<div class="object-item-footer">'+
@@ -877,8 +865,9 @@ app = {
                     '<div class="object-item-controls">'+
                     '<a class="gray-btn">В закладки</a>'+
                     '</div>'+
-                    '</div>')
-                    .append('<div class="object-details-gallery">')
+                    '</div>');
+
+                    details.append('<div class="object-details-gallery">')
                     .append('<p class="object-details-info">')
                     .append('<a class="gray-btn back-object-list"><span class="arrow-left"></span>К списку обьектов</a>' +
                     '<a class="gray-btn add-comment-object open-modal">Оставить отзыв</a>'+
@@ -919,6 +908,12 @@ app = {
                     '</div>'+
                     '</div>')
                     .appendTo('.items-list.object-list');
+
+                $('.open-lunch-info').hover(
+                    function() {$(this).next('.lunch-info').show();},
+                    function() {$(this).next('.lunch-info').hide();}
+                );
+
                 if(data.reviews.length){
                     for(var i = 0; i < data.reviews.length; i++){
                         $('<div class="comment-object-item">' +
