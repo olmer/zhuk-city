@@ -682,7 +682,7 @@ app = {
             app.categories.fillSubcategories();
             var $subcategories = $('#category-list div.subcategory a').on('click', function () {
                 var $this = $(this);
-                app.categories.getObjects($this.attr('data-cat-id'));
+                app.categories.fillObjectsData($this.attr('data-cat-id'));
             });
         },
 
@@ -700,7 +700,7 @@ app = {
             });
         },
 
-        getObjects: function (id) {
+        fillObjectsData: function (id) {
             var URL = app.app_url + 'map?act=get_objects&cat_ids=' + id + '&sort_by=0';
             $.get(URL, function (data) {
                 if (data.success) {
@@ -717,7 +717,7 @@ app = {
                             };
                             app.objects.push(item);
                         }
-                        app.categories.layoutSubcategoryItems();
+                        app.categories.printSubcategoryItems();
                     }
                 }
             })
@@ -759,7 +759,7 @@ app = {
             $($('.filter-wrap .tabs a')[activeTab]).addClass('active');
         },
 
-        layoutSubcategoryItems:function () {//items list
+        printSubcategoryItems:function () {//items list
             $('.category-list').addClass('hide-subcategory');
             app.categories.buildTabs(1);
             for (var i = 0; i < app.objects.length; i++) {
@@ -820,17 +820,12 @@ app = {
             $('.list-item.object-item .website-link').on('click', function (e) {
                 e.stopPropagation();
             });
-            $('.open-lunch-info').hover(
-                function() {$(this).next('.lunch-info').show();},
-                function() {$(this).next('.lunch-info').hide();}
-            );
+            app.bind.lunchInfo().ratings();
         },
 
         openObjectDetails:function (id) {//item details
             $.getJSON(app.app_url + 'map/?act=get_object&obj_id=' + id, function (data) {
                 $('.list-item.object-item').remove();
-
-//                console.log(data);
 
                 var details = $('<div class="list-item object-details">')
                     .append($('<span class="status-work">')
@@ -859,7 +854,7 @@ app = {
                     '</div>')
                     .append('<div class="object-item-footer">'+
                     '<div class="object-item-rating">'+
-                    '<div class="rating-stars" style="overflow: auto; "><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div></div>'+
+                    '<div class="rating-stars"></div>'+
                     'Рейтинг: <b>' + data.rating + '</b>'+
                     '</div>'+
                     '<div class="object-item-controls">'+
@@ -885,7 +880,7 @@ app = {
                     '</label>'+
                     '<label>'+
                     'Моя оценка'+
-                    '<div class="rating-stars" style="overflow: auto; "><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div><div class="jquery-ratings-star"></div></div>'+
+                    '<div class="rating-stars"></div>'+
                     '</label>'+
                     '<div class="clear"></div>'+
                     '<div class="add-comment-textarea-wrap">'+
@@ -909,10 +904,7 @@ app = {
                     '</div>')
                     .appendTo('.items-list.object-list');
 
-                $('.open-lunch-info').hover(
-                    function() {$(this).next('.lunch-info').show();},
-                    function() {$(this).next('.lunch-info').hide();}
-                );
+                app.bind.ratings().lunchInfo();
 
                 if(data.reviews.length){
                     for(var i = 0; i < data.reviews.length; i++){
@@ -938,7 +930,7 @@ app = {
 
                 $('.gray-btn.back-object-list').bind('click', function () {
                     $('.items-list').empty();
-                    app.categories.layoutSubcategoryItems();
+                    app.categories.printSubcategoryItems();
                 });
 
                 app.gmap.showObject(id);
@@ -1027,6 +1019,23 @@ app = {
                 app.request.get = get;
             }
             return key ? app.request.get[key] : app.request.get;
+        }
+    },
+
+    bind: {
+        ratings: function () {
+            $('.rating-stars').ratings(5).bind('ratingchanged', function(event, data) {
+                $(this).next('b').html(data.rating);
+            });
+            return app.bind;
+        },
+
+        lunchInfo: function () {
+            $('.open-lunch-info').hover(
+                function() {$(this).next('.lunch-info').show();},
+                function() {$(this).next('.lunch-info').hide();}
+            );
+            return app.bind;
         }
     }
 };

@@ -55,10 +55,5 @@ $(document).ready(function() {
         $('.tabs a').removeClass('active');
         $(this).addClass('active');
     });
-    $(document).ready(function() {
-        $('.rating-stars').ratings(5).bind('ratingchanged', function(event, data) {
-           $(this).next('b').html(data.rating);
-        });
-    });
 
 });
