@@ -764,10 +764,11 @@ app = {
             app.categories.buildTabs(1);
             for (var i = 0; i < app.objects.length; i++) {
                 var item = app.objects[i];
+//                console.log(item);
                 var listItem = $('<div class="list-item object-item" data-obj-id=' + item.data.id + '>')
-                    .append($('<span class="status-work">')
-                    .addClass(item.data.operating_minutes >= 0 ? 'online' : '')
-                    .html(item.data.operating_minutes >= 0 ? 'работает' : 'неработает'))
+                    .append(!item.data.operating_minutes ? '' : ($('<span class="status-work">')
+                    .addClass(item.data.operating_minutes > 0 ? 'online' : 'offline')
+                    .html(item.data.operating_minutes > 0 ? 'работает' : 'не работает')))
                     .append($('<a class="list-item-name">')
                     .html(item.data.name))
                     .append($('<p class="list-item-info">').html(
@@ -806,6 +807,7 @@ app = {
                 ));
 
                 $('.filter-wrap').append(listItem);
+                app.bind.ratings(listItem.find('.rating-stars'), item.data.rating);
 
             }
             $('.gray-btn.location').click(function () {
@@ -820,7 +822,7 @@ app = {
             $('.list-item.object-item .website-link').on('click', function (e) {
                 e.stopPropagation();
             });
-            app.bind.lunchInfo().ratings();
+            app.bind.lunchInfo();
         },
 
         openObjectDetails:function (id) {//item details
@@ -904,7 +906,7 @@ app = {
                     '</div>')
                     .appendTo('.items-list.object-list');
 
-                app.bind.ratings().lunchInfo();
+                app.bind.ratings($('div.rating-stars'), data.rating).lunchInfo();
 
                 if(data.reviews.length){
                     for(var i = 0; i < data.reviews.length; i++){
@@ -1023,8 +1025,8 @@ app = {
     },
 
     bind: {
-        ratings: function () {
-            $('.rating-stars').ratings(5).bind('ratingchanged', function(event, data) {
+        ratings: function ($obj, initialRating) {
+            $obj.ratings(5, initialRating || 0).bind('ratingchanged', function(event, data) {
                 $(this).next('b').html(data.rating);
             });
             return app.bind;
