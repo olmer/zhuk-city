@@ -1057,8 +1057,8 @@ footer {
     border: 1px solid #84ad0f;
 }
 .status-work.offline {
-    background: #ff3939;
-    border: 1px solid #af1212;
+    background: #bbbeb7;
+    border: 1px solid #6e6f6e;
 }
 .list-item-name {
     width: 215px;
