@@ -762,6 +762,7 @@ app = {
         printSubcategoryItems:function () {//items list
             $('.category-list').addClass('hide-subcategory');
             app.categories.buildTabs(1);
+            var wrapper = $('.filter-wrap');
             for (var i = 0; i < app.objects.length; i++) {
                 var item = app.objects[i];
 //                console.log(item);
@@ -806,7 +807,7 @@ app = {
                 ))
                 ));
 
-                $('.filter-wrap').append(listItem);
+                wrapper.append(listItem);
                 app.bind.ratings(listItem.find('.rating-stars'), item.data.rating);
 
             }
@@ -823,6 +824,25 @@ app = {
                 e.stopPropagation();
             });
             app.bind.lunchInfo();
+            $('div.work-filter').on('click', {items: wrapper.find('div.list-item')}, app.categories.workingFilter);
+        },
+
+        workingFilter: function (e) {
+            var switcher = $(this).find('span.ui-work-item');
+            if (switcher.hasClass('off')) {
+                switcher.removeClass('off').addClass('on');
+                $.each(e.data.items, function (k, v) {
+                    var $v = $(v);
+                    if (!$v.find('span.status-work.online').length) {
+                        $v.hide(500);
+                    }
+                });
+            } else {
+                switcher.removeClass('on').addClass('off');
+                $.each(e.data.items, function (k, v) {
+                    $(v).show(500);
+                });
+            }
         },
 
         openObjectDetails:function (id) {//item details
