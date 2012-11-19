@@ -794,12 +794,12 @@ app = {
                         )
                     )))
                     .append($('<div class="object-item-footer">')
-                    .append($('<div class="object-item-rating">')
+                    .append(!item.data.n_reviews && !item.data.rating ? '' : $('<div class="object-item-rating">')
                     .html(
                     '<span class="object-item-comments">' + item.data.n_reviews + '</span>' +
                         '<div class="rating-stars"></div>' +
                         'Рейтинг: <b>' + item.data.rating + '</b>'
-                ))
+                    ))
                     .append($('<div class="object-item-controls">')
                     .append('<a class="gray-btn">В закладки</a>')
                     .append($('<a class="gray-btn location" data-obj-id="' + item.data.id + '" ></a>').append(
