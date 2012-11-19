@@ -20,7 +20,7 @@ jQuery.fn.ratings = function(stars, initialRating) {
         var starsCollection = Array();
 
         //Save the initial rating.
-        containerElement.rating = initialRating;
+        containerElement.rating = Math.round(initialRating);
 
         //Set the container div's overflow to auto.  This ensure it will grow to
         //hold all of its children.

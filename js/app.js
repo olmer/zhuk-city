@@ -700,9 +700,10 @@ app = {
             });
         },
 
-        fillObjectsData: function (id) {
-            var URL = app.app_url + 'map?act=get_objects&cat_ids=' + id + '&sort_by=0';
+        fillObjectsData: function (id, sortBy) {
+            var URL = app.app_url + 'map?act=get_objects&cat_ids=' + id + '&sort_by=' + (sortBy || 0);
             $.get(URL, function (data) {
+                $('section.items-list.object-list').html('');
                 if (data.success) {
                     app.curentSubcategory = id;
                     app.gmap.closeAllInfoWindows();
@@ -717,13 +718,13 @@ app = {
                             };
                             app.objects.push(item);
                         }
-                        app.categories.printSubcategoryItems();
+                        app.categories.printSubcategoryItems(id, sortBy || 'name');
                     }
                 }
             })
         },
 
-        buildTabs:function (activeTab) {
+        buildTabs:function (activeTab, categoryId, activeFilter) {//too much arguments. todo: think
             var tabsControll = '<ul class="tabs">' +
                 '<li class="posters"><a>Афиши</a></li>' +
                 '<li class="categorys"><a>Категории</a></li>' +
@@ -731,9 +732,15 @@ app = {
                 '</ul>' +
                 '<div class="list-filter">' +
                 '<ul class="object-list-filter">' +
-                '<li><a class="active">По названию</a></li>' +
-                '<li><a>По рейтингу</a></li>' +
-                '<li><a>По дате</a></li>' +
+                '<li><a id="sort-by-name"'
+                    + (activeFilter === 'name' ? ' class="active"' : '')
+                    + ' data-cat-id="' + categoryId +'">По названию</a></li>' +
+                '<li><a id="sort-by-rating"'
+                    + (activeFilter === 'rating' ? ' class="active"' : '')
+                    + 'data-cat-id="' + categoryId +'">По рейтингу</a></li>' +
+                '<li><a id="sort-by-date"'
+                    + (activeFilter === 'date_added' ? ' class="active"' : '')
+                    + 'data-cat-id="' + categoryId +'">По дате</a></li>' +
                 '</ul>' +
                 '<div class="work-filter">' +
                 'Работает' +
@@ -759,9 +766,9 @@ app = {
             $($('.filter-wrap .tabs a')[activeTab]).addClass('active');
         },
 
-        printSubcategoryItems:function () {//items list
+        printSubcategoryItems:function (categoryId, activeFilter) {//items list
             $('.category-list').addClass('hide-subcategory');
-            app.categories.buildTabs(1);
+            app.categories.buildTabs(1, categoryId, activeFilter);
             var wrapper = $('.filter-wrap');
             for (var i = 0; i < app.objects.length; i++) {
                 var item = app.objects[i];
@@ -824,8 +831,8 @@ app = {
             $('.list-item.object-item .website-link').on('click', function (e) {
                 e.stopPropagation();
             });
-            app.bind.lunchInfo();
             $('div.work-filter').on('click', {items: wrapper.find('div.list-item')}, app.categories.workingFilter);
+            app.bind.lunchInfo().objectsFilter();
         },
 
         workingFilter: function (e) {
@@ -1058,6 +1065,27 @@ app = {
                 function() {$(this).next('.lunch-info').show();},
                 function() {$(this).next('.lunch-info').hide();}
             );
+            return app.bind;
+        },
+
+        objectsFilter: function () {
+            var filter = function (e) {
+                var $this = $(this);
+                if ($this.hasClass('active')) {
+                    return false;
+                }
+                $.each(filters, function (k, v) {
+                    $(v).removeClass('active');
+                });
+                filters[e.data.field].addClass('active');
+                app.categories.fillObjectsData($this.attr('data-cat-id'), e.data.field);
+                return true;
+            };
+            var filters = {name: $('#sort-by-name'), rating: $('#sort-by-rating'), date_added: $('#sort-by-date')};
+
+            filters.name.on('click', {field: 'name'}, filter);
+            filters.rating.on('click', {field: 'rating'}, filter);
+            filters.date_added.on('click', {field: 'date_added'}, filter);
             return app.bind;
         }
     }
