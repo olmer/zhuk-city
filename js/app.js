@@ -766,7 +766,8 @@ app = {
             for (var i = 0; i < app.objects.length; i++) {
                 var item = app.objects[i];
 //                console.log(item);
-                var listItem = $('<div class="list-item object-item" data-obj-id=' + item.data.id + '>')
+                var listItem = $('<div class="list-item object-item" data-status-online="'
+                    + !!item.data.operating_minutes +'" data-obj-id=' + item.data.id + '>')
                     .append(!item.data.operating_minutes ? '' : ($('<span class="status-work">')
                     .addClass(item.data.operating_minutes > 0 ? 'online' : 'offline')
                     .html(item.data.operating_minutes > 0 ? 'работает' : 'не работает')))
@@ -833,14 +834,14 @@ app = {
                 switcher.removeClass('off').addClass('on');
                 $.each(e.data.items, function (k, v) {
                     var $v = $(v);
-                    if (!$v.find('span.status-work.online').length) {
-                        $v.hide(500);
+                    if ($v.attr('data-status-online') === 'false') {
+                        $v.slideUp(300);
                     }
                 });
             } else {
                 switcher.removeClass('on').addClass('off');
                 $.each(e.data.items, function (k, v) {
-                    $(v).show(500);
+                    $(v).slideDown(300);
                 });
             }
         },
