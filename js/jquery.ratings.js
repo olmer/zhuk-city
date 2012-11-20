@@ -1,4 +1,4 @@
-jQuery.fn.ratings = function(stars, initialRating) {
+jQuery.fn.ratings = function(stars, initialRating, disabled) {
 
     //Save  the jQuery object for later use.
     var elements = this;
@@ -57,27 +57,29 @@ jQuery.fn.ratings = function(stars, initialRating) {
                 containerElement.rating = this.rating;
             });
 
-            star.mouseenter(function() {
-                //Highlight selected stars.
-                for(var index = 0; index < this.rating; index++) {
-                    starsCollection[index].addClass('jquery-ratings-full');
-                }
-                //Unhighlight unselected stars.
-                for(var index = this.rating; index < stars; index++) {
-                    starsCollection[index].removeClass('jquery-ratings-full');
-                }
-            });
+            if (!disabled) {
+                star.mouseenter(function() {
+                    //Highlight selected stars.
+                    for(var index = 0; index < this.rating; index++) {
+                        starsCollection[index].addClass('jquery-ratings-full');
+                    }
+                    //Unhighlight unselected stars.
+                    for(var index = this.rating; index < stars; index++) {
+                        starsCollection[index].removeClass('jquery-ratings-full');
+                    }
+                });
 
-            container.mouseleave(function() {
-                //Highlight selected stars.
-                for(var index = 0; index < containerElement.rating; index++) {
-                    starsCollection[index].addClass('jquery-ratings-full');
-                }
-                //Unhighlight unselected stars.
-                for(var index = containerElement.rating; index < stars ; index++) {
-                    starsCollection[index].removeClass('jquery-ratings-full');
-                }
-            });
+                container.mouseleave(function() {
+                    //Highlight selected stars.
+                    for(var index = 0; index < containerElement.rating; index++) {
+                        starsCollection[index].addClass('jquery-ratings-full');
+                    }
+                    //Unhighlight unselected stars.
+                    for(var index = containerElement.rating; index < stars ; index++) {
+                        starsCollection[index].removeClass('jquery-ratings-full');
+                    }
+                });
+            }
         }
     });
 };

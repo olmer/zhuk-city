@@ -2200,3 +2200,7 @@ footer {
     background-color:#eee;
     cursor: pointer;
 }
+
+a.wo-underscore {
+    text-decoration: none;
+}

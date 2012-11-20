@@ -719,7 +719,7 @@ app = {
                             };
                             app.objects.push(item);
                         }
-                        app.categories.printSubcategoryItems(id, sortBy || 'name');
+                        app.categories.printSubcategoryItems(id, sortBy || 0);
                     }
                 }
             })
@@ -734,13 +734,13 @@ app = {
                 '<div class="list-filter">' +
                 '<ul class="object-list-filter">' +
                 '<li><a id="sort-by-name"'
-                    + (activeFilter === 'name' ? ' class="active"' : '')
+                    + (activeFilter === 1 ? ' class="active"' : '')
                     + ' data-cat-id="' + categoryId +'">По названию</a></li>' +
                 '<li><a id="sort-by-rating"'
-                    + (activeFilter === 'rating' ? ' class="active"' : '')
+                    + (activeFilter === 0 ? ' class="active"' : '')
                     + 'data-cat-id="' + categoryId +'">По рейтингу</a></li>' +
                 '<li><a id="sort-by-date"'
-                    + (activeFilter === 'date_added' ? ' class="active"' : '')
+                    + (activeFilter === 2 ? ' class="active"' : '')
                     + 'data-cat-id="' + categoryId +'">По дате</a></li>' +
                 '</ul>' +
                 '<div class="work-filter">' +
@@ -782,9 +782,9 @@ app = {
                     .append($('<a class="list-item-name">')
                     .html(item.data.name))
                     .append($('<p class="list-item-info">').html(
-                        'Адрес: <a>' + item.data.address + '</a> <br>' +
+                        'Адрес: <a class="wo-underscore">' + item.data.address + '</a> <br>' +
                         (item.data.phone ? 'Телефон: ' + item.data.phone + '  <br>' : '') +
-                        (item.data.website ? 'Сайт: <a href="' + item.data.website + '" target="_blank" class="website-link">'
+                        (item.data.website ? 'Сайт: <a href="' + item.data.website + '" target="_blank" class="website-link wo-underscore">'
                             + item.data.website + '</a> <br>' : '')
                     ))
                     .append($('<div class="object-list-time">')
@@ -817,7 +817,7 @@ app = {
                 ));
 
                 wrapper.append(listItem);
-                app.bind.ratings(listItem.find('.rating-stars'), item.data.rating);
+                app.bind.ratings(listItem.find('.rating-stars'), item.data.rating, true);
 
             }
             $('.gray-btn.location').click(function () {
@@ -864,9 +864,9 @@ app = {
                     .html(data.operating_minutes >= 0 ? 'работает' : 'неработает'))
                     .append('<a class="list-item-name">' + data.name + '</a>')
                     .append('<p class="list-item-info">' +
-                    'Адрес: <a>' + data.address + '</a> <br>' +
+                    'Адрес: <a class="wo-underscore">' + data.address + '</a> <br>' +
                     'Телефон: ' + data.phone + '  <br>' +
-                    'Сайт: <a href="' + data.website + '" target="_blank" class="website-link">'
+                    'Сайт: <a href="' + data.website + '" target="_blank" class="website-link wo-underscore">'
                     + data.website + '</a> <br>' +
                     '</p>')
                     .append('<div class="object-list-time">'+
@@ -1054,8 +1054,8 @@ app = {
     },
 
     bind: {
-        ratings: function ($obj, initialRating) {
-            $obj.ratings(5, initialRating || 0).bind('ratingchanged', function(event, data) {
+        ratings: function ($obj, initialRating, disabled) {
+            $obj.ratings(5, initialRating || 0, disabled || false).bind('ratingchanged', function(event, data) {
                 $(this).next('b').html(data.rating);
             });
             return app.bind;
@@ -1082,11 +1082,11 @@ app = {
                 app.categories.fillObjectsData($this.attr('data-cat-id'), e.data.field);
                 return true;
             };
-            var filters = {name: $('#sort-by-name'), rating: $('#sort-by-rating'), date_added: $('#sort-by-date')};
+            var filters = {1: $('#sort-by-name'), 0: $('#sort-by-rating'), 2: $('#sort-by-date')};
 
-            filters.name.on('click', {field: 'name'}, filter);
-            filters.rating.on('click', {field: 'rating'}, filter);
-            filters.date_added.on('click', {field: 'date_added'}, filter);
+            filters[1].on('click', {field: 1}, filter);
+            filters[0].on('click', {field: 0}, filter);
+            filters[2].on('click', {field: 2}, filter);
             return app.bind;
         }
     }
