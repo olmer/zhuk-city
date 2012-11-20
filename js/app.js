@@ -339,6 +339,7 @@ app = {
                     app.gmap.closeAllInfoWindows();
                     app.objects[i].mapItem.infoBox.open(app.gmap.map, app.objects[i].mapItem.marker);
                     app.gmap.map.setCenter(new google.maps.LatLng(app.objects[i].data.latitude, app.objects[i].data.longitude));
+                    app.gmap.map.setZoom(app.gmap.startPosition.zoom);
                 }
             }
         },
