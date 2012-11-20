@@ -953,7 +953,7 @@ app = {
                             '<span class="comment-object-mark">Моя оценка: <b>' + data.reviews[i].rating + '</b></span>' +
                             '<a class="comment-object-answer">Ответить</a>' +
                             '</div>' +
-                            '<div class="clear-r"></div>' +
+                            '<div class="clear"></div>' +
                             '</div>').appendTo('.comments-list')
                     }
                 }

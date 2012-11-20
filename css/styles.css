@@ -1340,6 +1340,7 @@ footer {
 }
 
 .comment-object-item {
+    height: 80px;
     padding-bottom: 15px;
     border-bottom: 1px solid #ededed;
     margin-bottom: 7px;
