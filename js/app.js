@@ -1,5 +1,10 @@
 app = {
-    app_url: 'http://test.zhukcity.ru/',
+    CONST: {
+        app_url: 'http://test.zhukcity.ru/',
+        worktime_min: 0, //values to display active/unactive object
+        worktime_max: 0
+    },
+
     objects:[],
 
     transport:{
@@ -197,7 +202,7 @@ app = {
             }
             var fromVal = $('.gray-input.schedule-from input').val();
             var toVal = $('.gray-input.schedule-to input').val();
-            var URL = app.app_url + 'transport?act=get_schedule&type=' + app.transport.transportType + '&dep_from=' + fromVal + '&arr_to=' + toVal + '&when=today&limit=' + app.transport.transportLimit;
+            var URL = app.CONST.app_url + 'transport?act=get_schedule&type=' + app.transport.transportType + '&dep_from=' + fromVal + '&arr_to=' + toVal + '&when=today&limit=' + app.transport.transportLimit;
             $.get(URL, function (data) {
                 if (data.success) {
                     if (data.items.length) {
@@ -415,7 +420,7 @@ app = {
 
             // Login click
             $loginBtn.on('click', function () {
-                $.post(app.app_url + 'profile/?act=login', {
+                $.post(app.CONST.app_url + 'profile/?act=login', {
                     login: loginInputs.login.val(),
                     passw: loginInputs.passw.val()
                 }, function (data) {
@@ -433,7 +438,7 @@ app = {
             });
 
             $('#auth-user-exit').on('click', function () {
-                $.get(app.app_url + 'profile/?act=logout', function (data) {
+                $.get(app.CONST.app_url + 'profile/?act=logout', function (data) {
                     if (data.success === true) {
                         $loginFormUnauthorized.css('display', 'block');
                         $loginFormAuthorized.css('display', 'none');
@@ -469,10 +474,10 @@ app = {
                         def = $field.attr('data-defaultvalue');
                     $field.val(def || '');
                 });
-                $.post(app.app_url + 'profile/?act=captcha', function (data) {
+                $.post(app.CONST.app_url + 'profile/?act=captcha', function (data) {
                     captchaId = data.code_id;
                     $('div.register-modal-register form label img').attr('src',
-                        app.app_url + 'images/code.png?id=' + data.code_id);
+                        app.CONST.app_url + 'images/code.png?id=' + data.code_id);
                 });
             });
 
@@ -492,10 +497,10 @@ app = {
             var submitObj = new app.login.ForgotPasswordSubmit();
             // Open register, get captcha
             $('a.forgot-link').on('click', function () {
-                $.post(app.app_url + 'profile/?act=captcha', function (data) {
+                $.post(app.CONST.app_url + 'profile/?act=captcha', function (data) {
                     captchaId = data.code_id;
                     $('div.forgot-modal form label img').attr('src',
-                        app.app_url + 'images/code.png?id=' + data.code_id);
+                        app.CONST.app_url + 'images/code.png?id=' + data.code_id);
                     submitObj.captchaId = captchaId;
                 });
             });
@@ -528,7 +533,7 @@ app = {
                 });
                 data['code_id'] = $this.captchaId;
 
-                $.post(app.app_url + 'profile/password', data, function (data) {
+                $.post(app.CONST.app_url + 'profile/password', data, function (data) {
                     if (data.success === false) {
                         app.login.displayErrorByField(formSelector, data.field, data.error);
                     } else {
@@ -571,7 +576,7 @@ app = {
                 app.login.displayErrorByField(form, 'passw', 'Пароли не совпадают');
                 return false;
             }
-            $.post(app.app_url + 'profile/' + (actionType === 'register' ? 'register' : 'edit' ) + '/', data,
+            $.post(app.CONST.app_url + 'profile/' + (actionType === 'register' ? 'register' : 'edit' ) + '/', data,
                 function (data) {
                     if (data.success === false) {
                         app.login.displayErrorByField(form, data.field, data.error);
@@ -639,7 +644,7 @@ app = {
          * @param $loginFormAuthorized jQuery object
          */
         loadProfileData: function ($loginFormUnauthorized, $loginFormAuthorized) {
-            $.post(app.app_url + 'profile/edit?act=get_profile', function (data) {
+            $.post(app.CONST.app_url + 'profile/edit?act=get_profile', function (data) {
                 if (data.success === true) {
                     var $personalProfile = $('div.register-modal-login');
                     $personalProfile.find('input[name="old_passw"],input[name="passw"],input[name="passw-again"]')
@@ -702,7 +707,7 @@ app = {
         },
 
         fillObjectsData: function (id, sortBy) {
-            var URL = app.app_url + 'map?act=get_objects&cat_ids=' + id + '&sort_by=' + (sortBy || 0);
+            var URL = app.CONST.app_url + 'map?act=get_objects&cat_ids=' + id + '&sort_by=' + (sortBy || 0);
             $.get(URL, function (data) {
                 $('section.items-list.object-list').html('');
                 if (data.success) {
@@ -773,23 +778,23 @@ app = {
             var wrapper = $('.filter-wrap');
             for (var i = 0; i < app.objects.length; i++) {
                 var item = app.objects[i];
-//                console.log(item);
+
                 var listItem = $('<div class="list-item object-item" data-status-online="'
                     + !!item.data.operating_minutes +'" data-obj-id=' + item.data.id + '>')
                     .append(!item.data.operating_minutes ? '' : ($('<span class="status-work">')
-                    .addClass(item.data.operating_minutes > 0 ? 'online' : 'offline')
-                    .html(item.data.operating_minutes > 0 ? 'работает' : 'не работает')))
+                    .addClass(item.data.operating_minutes > app.CONST.worktime_max ? 'online' : 'offline')
+                    .html(item.data.operating_minutes > app.CONST.worktime_max ? 'работает' : 'не работает')))
                     .append($('<a class="list-item-name">')
                     .html(item.data.name))
                     .append($('<p class="list-item-info">').html(
                         'Адрес: <a class="wo-underscore">' + item.data.address + '</a> <br>' +
-                        (item.data.phone ? 'Телефон: ' + item.data.phone + '  <br>' : '') +
+                        (item.data.phone ? 'Телефон: ' + item.data.phone.replace('\n', '<br/>') + '  <br>' : '') +
                         (item.data.website ? 'Сайт: <a href="' + item.data.website + '" target="_blank" class="website-link wo-underscore">'
                             + item.data.website + '</a> <br>' : '')
                     ))
                     .append($('<div class="object-list-time">')
                     .append($('<ul class="object-list-time-details">')
-                    .append($('<li>' + item.data.worktime + '</li>'))
+                    .append($('<li>' + item.data.worktime.replace('\n', '<br/>') + '</li>'))
                     .append(item.data.worktime_breaks === '' ? '' : $('<li>') //do not show link and items if empty
                         .html(
                             '<a class="open-lunch-info">перерывы</a>' +
@@ -855,17 +860,18 @@ app = {
         },
 
         openObjectDetails:function (id) {//item details
-            $.getJSON(app.app_url + 'map/?act=get_object&obj_id=' + id, function (data) {
+            $.getJSON(app.CONST.app_url + 'map/?act=get_object&obj_id=' + id, function (data) {
                 $('.list-item.object-item').remove();
+//                console.log(data);
 
                 var details = $('<div class="list-item object-details">')
-                    .append($('<span class="status-work">')
-                    .addClass(data.operating_minutes >= 0 ? 'online' : '')
-                    .html(data.operating_minutes >= 0 ? 'работает' : 'неработает'))
-                    .append('<a class="list-item-name">' + data.name + '</a>')
+                    .append(!data.operating_minutes ? '' : ($('<span class="status-work">')
+                    .addClass(data.operating_minutes > app.CONST.worktime_max ? 'online' : 'offline')
+                    .html(data.operating_minutes > app.CONST.worktime_max ? 'работает' : 'неработает')))
+                    .append('<a class="list-item-name">' + (data.full_name ? data.full_name : data.name) + '</a>')
                     .append('<p class="list-item-info">' +
-                    'Адрес: <a class="wo-underscore">' + data.address + '</a> <br>' +
-                    'Телефон: ' + data.phone + '  <br>' +
+                    'Адрес: <a class="wo-underscore">' + data.address.replace('\n', '<br/>') + '</a> <br>' +
+                    'Телефон: ' + data.phone.replace('\n', '<br/>') + '  <br>' +
                     'Сайт: <a href="' + data.website + '" target="_blank" class="website-link wo-underscore">'
                     + data.website + '</a> <br>' +
                     '</p>')
@@ -935,7 +941,7 @@ app = {
                     '</div>')
                     .appendTo('.items-list.object-list');
 
-                app.bind.ratings($('div.rating-stars'), data.rating).lunchInfo();
+                app.bind.ratings($('div.rating-stars'), data.rating, true).lunchInfo();
 
                 if(data.reviews.length){
                     for(var i = 0; i < data.reviews.length; i++){
