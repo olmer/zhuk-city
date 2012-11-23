@@ -790,7 +790,7 @@ app = {
                         'Адрес: <a class="wo-underscore">' + item.data.address + '</a> <br>' +
                         (item.data.phone ? 'Телефон: ' + item.data.phone.replace('\n', '<br/>') + '  <br>' : '') +
                         (item.data.website ? 'Сайт: <a href="' + item.data.website + '" target="_blank" class="website-link wo-underscore">'
-                            + item.data.website + '</a> <br>' : '')
+                            + item.data.website.split('/')[2] + '</a> <br>' : '')
                     ))
                     .append($('<div class="object-list-time">')
                     .append($('<ul class="object-list-time-details">')
@@ -801,7 +801,7 @@ app = {
                             '<div class="lunch-info">' +
                             '<table>' +
                             '<tr>' +
-                            '<th>' + item.data.worktime_breaks + '</th>' +
+                            '<th>' + item.data.worktime_breaks.replace('\n', '<br/>') + '</th>' +
                             '</tr>' +
                             '</table>' +
                             '</div>'
@@ -869,23 +869,21 @@ app = {
                     .addClass(data.operating_minutes > app.CONST.worktime_max ? 'online' : 'offline')
                     .html(data.operating_minutes > app.CONST.worktime_max ? 'работает' : 'неработает')))
                     .append('<a class="list-item-name">' + (data.full_name ? data.full_name : data.name) + '</a>')
-                    .append('<p class="list-item-info">' +
-                    'Адрес: <a class="wo-underscore">' + data.address.replace('\n', '<br/>') + '</a> <br>' +
-                    'Телефон: ' + data.phone.replace('\n', '<br/>') + '  <br>' +
-                    'Сайт: <a href="' + data.website + '" target="_blank" class="website-link wo-underscore">'
-                    + data.website + '</a> <br>' +
+                    .append('<p class="list-item-info">' + (data.address ?
+                    'Адрес: <a class="wo-underscore">' + data.address.replace('\n', '<br/>') + '</a> <br>' : '') +
+                    (data.phone ? 'Телефон: ' + data.phone.replace('\n', '<br/>') + '  <br>' : '') +
+                    (data.website ? 'Сайт: <a href="' + data.website + '" target="_blank" class="website-link wo-underscore">'
+                    + data.website.split('/')[2] + '</a> <br>' : '') + //.split('/')[2] - get domain
                     '</p>')
                     .append('<div class="object-list-time">'+
                     '<ul class="object-list-time-details">'+
-                    '<li>' + data.worktime + '</li>'+ (data.worktime_breaks ?
-                    '<li><a class="open-lunch-info">перерывы</a>'+
-                    '<div class="lunch-info" style="display: none; ">'+
+                    '<li>' + data.worktime.replace('\n', '<br/>') + '</li>'+ (data.worktime_breaks ?
+                    '<li>'+
                     '<table>'+
                     '<tbody><tr>'+
-                    '<td>' + data.worktime_breaks + '</td>'+
+                    '<td>' + data.worktime_breaks.replace('\n', '<br/>') + '</td>'+
                     '</tr>'+
                     '</tbody></table>'+
-                    '</div>'+
                     '</li>' : '' ) +
                     '</ul>' +
                     '</div>')
@@ -899,8 +897,25 @@ app = {
                     '</div>'+
                     '</div>');
 
-                    details.append('<div class="object-details-gallery">')
-                    .append('<p class="object-details-info">')
+                    var gallery = $('<ul>');
+                $.each(data.attachments, function (k, v) {
+                    if (v.type !== 'image' || v.has_thumb !== true) {
+                        return true;
+                    }
+                    gallery.append('<li><a class="lightbox-open"' +
+                        ' data-title="' + v.title + '"'+
+                        ' data-descr="' + v.descr + '"'+
+                            ' href="' + app.CONST.app_url +'map/attachments' + v.id + '">' +
+                        '<img' +
+                            ' src="' + app.CONST.app_url + 'map/attachments/thumb/' + v.id + '"' +
+                            ' width="' + v.thumb_width +'"/>' +
+                        '</a></li>');
+                    console.log(v);
+                    return true;
+                });
+
+                    details.append($('<div class="object-details-gallery">').append(gallery))
+                        .append('<p class="object-details-info">')
                     .append('<a class="gray-btn back-object-list"><span class="arrow-left"></span>К списку обьектов</a>' +
                     '<a class="gray-btn add-comment-object open-modal">Оставить отзыв</a>'+
                     '<div class="modal add-comment-modal">'+
@@ -968,6 +983,12 @@ app = {
                 $('.gray-btn.back-object-list').bind('click', function () {
                     $('.items-list').empty();
                     app.categories.printSubcategoryItems();
+                });
+
+                $("a.lightbox-open").lightBox({
+                    imageBtnClose: 'images/lightbox-btn-close.gif',
+                    imageBtnPrev: 'images/lightbox-btn-prev.gif',
+                    imageBtnNext: 'images/lightbox-btn-next.gif'
                 });
 
                 app.gmap.showObject(id);
