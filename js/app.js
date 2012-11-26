@@ -873,7 +873,7 @@ app = {
                     'Адрес: <a class="wo-underscore">' + data.address.replace('\n', '<br/>') + '</a> <br>' : '') +
                     (data.phone ? 'Телефон: ' + data.phone.replace('\n', '<br/>') + '  <br>' : '') +
                     (data.website ? 'Сайт: <a href="' + data.website + '" target="_blank" class="website-link wo-underscore">'
-                    + data.website.split('/')[2] + '</a> <br>' : '') + //.split('/')[2] - get domain
+                    + data.website.split('/')[2] + '</a> <br>' : '') + // parse domain from link
                     '</p>')
                     .append('<div class="object-list-time">'+
                     '<ul class="object-list-time-details">'+
@@ -897,25 +897,41 @@ app = {
                     '</div>'+
                     '</div>');
 
-                    var gallery = $('<ul>');
+                var gallery = $('<ul>'), links = '';
                 $.each(data.attachments, function (k, v) {
                     if (v.type !== 'image' || v.has_thumb !== true) {
-                        return true;
+                        links += '<a' +
+                            ' href="' + app.CONST.app_url +'map/attachments/' + v.id + '"' +
+                            ' alt="' + v.descr + '">' + (v.title ? v.title : v.filename) + '</a>';
+                    } else {
+                        gallery.append('<li><a class="lightbox-open"' +
+                            ' data-title="' + v.title + '"'+
+                            ' data-descr="' + v.descr + '"'+
+                                ' href="' + app.CONST.app_url +'map/attachments/' + v.id + '">' +
+                            '<img' +
+                                ' src="' + app.CONST.app_url + 'map/attachments/thumb/' + v.id + '"' +
+                                ' width="' + v.thumb_width +'"/>' +
+                            '</a></li>');
                     }
-                    gallery.append('<li><a class="lightbox-open"' +
-                        ' data-title="' + v.title + '"'+
-                        ' data-descr="' + v.descr + '"'+
-                            ' href="' + app.CONST.app_url +'map/attachments' + v.id + '">' +
-                        '<img' +
-                            ' src="' + app.CONST.app_url + 'map/attachments/thumb/' + v.id + '"' +
-                            ' width="' + v.thumb_width +'"/>' +
-                        '</a></li>');
-                    console.log(v);
-                    return true;
                 });
+                while (gallery.find('li').length % 4 !== 0) { //Markup fix while it cannot display correct float clear
+                    gallery.append('<li style="visibility: hidden;height:46px;"/>');
+                }
+                links = (data.descr_full ? data.descr_full : data.descr_brief) + '<br/>' + links;
 
-                    details.append($('<div class="object-details-gallery">').append(gallery))
-                        .append('<p class="object-details-info">')
+                details.append($('<div class="object-details-gallery">').append(gallery))
+                    .append($('<p class="object-details-info"/>').append(links))
+                    .append($('<div class="mistake-add">'
+                    +'<a class="open-add-file">Добавить файл</a>'
+                        +'<div class="add-file-wrap">'
+                            +'<a class="close">Закрыть</a>'
+                            +'<form>'
+                                +'<input type="file">'
+                                    +'<button class="blue-btn add-file-btn">Добавить</button>'
+                                +'</form>'
+                            +'</div>'
+                            +'<a class="show-error">Сообщить об ошибке</a>'
+                        +'</div>'))
                     .append('<a class="gray-btn back-object-list"><span class="arrow-left"></span>К списку обьектов</a>' +
                     '<a class="gray-btn add-comment-object open-modal">Оставить отзыв</a>'+
                     '<div class="modal add-comment-modal">'+
@@ -948,7 +964,7 @@ app = {
                     '<div class="clear-r"></div>'+
                     '<div class="comment-object-wrap">'+
                     '<span class="comments-object-count">Всего отзывов: <b>' + data.totalReviewsCount + '</b></span>'+
-                    '<a class="show-all-comments-object">Показать все</a>'+
+                    //'<a class="show-all-comments-object">Показать все</a>'+
                     '<div class="clear-r"></div>'+
                     '<section class="comments-list">'+
                     '</section>'+
@@ -958,22 +974,27 @@ app = {
 
                 app.bind.ratings($('div.rating-stars'), data.rating, true).lunchInfo();
 
-                if(data.reviews.length){
-                    for(var i = 0; i < data.reviews.length; i++){
+                if (data.reviews.length) {
+                    for (var i = 0; i < data.reviews.length; i++) {
+                        var item = data.reviews[i];
                         $('<div class="comment-object-item">' +
                             ' <div class="comment-object-info">'+
-                            '<a class="comment-object-name female">' + data.reviews[i].user_name + '</a>'+
-                            '<span class="comment-object-date">' + data.reviews[i].date_time + '</span>'+
-                            '<div class="comment-object-rating">'+
-                            '<span class="comment-object-rating-minus"></span>'+
-                            '<span class="comment-object-rating-plus"></span>'+
-                            '<a class="comment-object-rating-rate">' + data.reviews[i].votes + '</a>'+
+                            '<a class="comment-object-name ' + (item.user_gender === 'M' ? 'male' : 'female') + '">'
+                                + item.user_name + '</a>'+
+                            '<span class="comment-object-date">' + item.date_time + '</span>'+
+                            '<div class="comment-object-mark-new">Оценка: <br/>'+
+                            '<span>' + item.rating + '</span>'+
                             '</div>'+
                             '</div>'+
                             '<div class="comment-object-content">' +
-                            '<p class="comment-object-text">' + data.reviews[i].msg_text + '</p>'+
-                            '<span class="comment-object-mark">Моя оценка: <b>' + data.reviews[i].rating + '</b></span>' +
-                            '<a class="comment-object-answer">Ответить</a>' +
+                            '<p class="comment-object-text">' + item.msg_text + '</p>'+
+                            '<div class="comment-object-marker">'+
+                            'Отзыв полезен?'+
+                                '<span class="comment-object-marker-ins">'+
+                                    '<a class="comment-object-marker-yes green">Да</a> 10 / '+
+                                    '<a class="comment-object-marker-no red">Нет</a> 15'+
+                                '</span>'+
+                            '</div>'+
                             '</div>' +
                             '<div class="clear"></div>' +
                             '</div>').appendTo('.comments-list')
@@ -1115,6 +1136,12 @@ app = {
             filters[0].on('click', {field: 0}, filter);
             filters[2].on('click', {field: 2}, filter);
             return app.bind;
+        }
+    },
+
+    user: {
+        isAuthorized: function () {
+            return false;
         }
     }
 };
