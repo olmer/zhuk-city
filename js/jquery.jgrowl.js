@@ -209,7 +209,7 @@
 			o.themeState = (o.themeState == '') ? '' : 'ui-state-' + o.themeState;
 
 			var notification = $(
-				'<div class="jGrowl-notification ' + o.themeState + ' ui-corner-all' +
+				'<div class="jGrowl-notification ' + o.themeState + ' jGrowl-class-' + o.add_class + ' ui-corner-all' +
 				((o.group != undefined && o.group != '') ? ' ' + o.group : '') + '">' +
 				'<div class="jGrowl-close">' + o.closeTemplate + '</div>' +
 				'<div class="jGrowl-header">' + o.header + '</div>' +

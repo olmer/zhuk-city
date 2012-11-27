@@ -2057,6 +2057,13 @@ footer {
 .news-useful-no {
     color: red;
 }
+
+.comment-object-marker-ins.already-voted a {
+    color: gray;
+    text-decoration: none;
+    cursor: default;
+}
+
 .lightbox-image-details {
     display: none !important;
 }

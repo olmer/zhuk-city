@@ -81,7 +81,7 @@ div.center div.jGrowl-notification, div.center div.jGrowl-closer {
 
 div.jGrowl div.jGrowl-notification, div.jGrowl div.jGrowl-closer {
 	background-color: 		green;
-	opacity: 				.85;
+	/*opacity: 				.85;*/
 	-ms-filter: 			"progid:DXImageTransform.Microsoft.Alpha(Opacity=85)"; 
 	filter: 				progid:DXImageTransform.Microsoft.Alpha(Opacity=85); 
 	zoom: 					1;
@@ -95,6 +95,18 @@ div.jGrowl div.jGrowl-notification, div.jGrowl div.jGrowl-closer {
 	display: 				none;
 	-moz-border-radius: 	5px;
 	-webkit-border-radius:	5px;
+}
+
+div.jGrowl div.jGrowl-notification.jGrowl-class-success {
+    background:     		green;
+    color:                  white;
+    border:                 1px solid green;
+}
+
+div.jGrowl div.jGrowl-notification.jGrowl-class-fail {
+    background:     		red;
+    color:                  white;
+    border:                 1px solid red;
 }
 
 div.jGrowl div.jGrowl-notification {

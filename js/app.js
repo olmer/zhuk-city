@@ -472,7 +472,7 @@ app = {
                 $('div.register-modal-register form input').each(function (k, v) {
                     var $field = $(v),
                         def = $field.attr('data-defaultvalue');
-                    $field.val(def || '');
+                    $field.val(def || ($field.attr('name') === 'gender' ? $field.val() : ''));
                 });
                 $.post(app.CONST.app_url + 'profile/?act=captcha', function (data) {
                     captchaId = data.code_id;
@@ -538,7 +538,10 @@ app = {
                         app.login.displayErrorByField(formSelector, data.field, data.error);
                     } else {
                         app.login.clearErrors(formSelector);
-                        $.jGrowl('На Ваш E-mail отправлено письмо со ссылкой для смены пароля');
+                        $.jGrowl(
+                            'На Ваш E-mail отправлено письмо со ссылкой для смены пароля',
+                            {'add_class': 'success'}
+                        );
                         $('div.forgot-modal').hide();
                     }
                 });
@@ -585,7 +588,7 @@ app = {
                         $.jGrowl(actionType === 'register'
                             ? 'Вы были успешно зарегистрированы!'
                                 + 'Введите имя пользователя и пароль для авторизации на сайте'
-                            : 'Изменения сохранены');
+                            : 'Изменения сохранены',  {'add_class': 'success'});
                         $('div.register-modal').hide();
                     }
                 }
@@ -730,7 +733,7 @@ app = {
             })
         },
 
-        buildTabs:function (activeTab, categoryId, activeFilter) {//too much arguments. todo: think
+        buildTabs:function (activeTab, categoryId, activeFilter) {
             var tabsControll = '<ul class="tabs">' +
                 '<li class="posters"><a>Афиши</a></li>' +
                 '<li class="categorys"><a>Категории</a></li>' +
@@ -977,6 +980,7 @@ app = {
                 if (data.reviews.length) {
                     for (var i = 0; i < data.reviews.length; i++) {
                         var item = data.reviews[i];
+//                        console.log(item);
                         $('<div class="comment-object-item">' +
                             ' <div class="comment-object-info">'+
                             '<a class="comment-object-name ' + (item.user_gender === 'M' ? 'male' : 'female') + '">'
@@ -990,9 +994,13 @@ app = {
                             '<p class="comment-object-text">' + item.msg_text + '</p>'+
                             '<div class="comment-object-marker">'+
                             'Отзыв полезен?'+
-                                '<span class="comment-object-marker-ins">'+
-                                    '<a class="comment-object-marker-yes green">Да</a> 10 / '+
-                                    '<a class="comment-object-marker-no red">Нет</a> 15'+
+                                '<span class="comment-object-marker-ins'
+                                    + (item.already_voted ? ' already-voted' : '')
+                                    + '" data-id="' + item.id + '">'+
+                                    '<a class="comment-object-marker-yes green" data-val="1">Да</a> '
+                                        + item.votes_plus + ' / '+
+                                    '<a class="comment-object-marker-no red" data-val="-1">Нет</a> '
+                                        + item.votes_minus +
                                 '</span>'+
                             '</div>'+
                             '</div>' +
@@ -1000,6 +1008,8 @@ app = {
                             '</div>').appendTo('.comments-list')
                     }
                 }
+
+                $('a.comment-object-marker-yes, a.comment-object-marker-no').on('click', app.bind.voteForComment);
 
                 $('.gray-btn.back-object-list').bind('click', function () {
                     $('.items-list').empty();
@@ -1136,6 +1146,21 @@ app = {
             filters[0].on('click', {field: 0}, filter);
             filters[2].on('click', {field: 2}, filter);
             return app.bind;
+        },
+
+        voteForComment: function (e) {
+            var $this = $(this);
+            if ($this.parent().hasClass('already-voted')) {
+                return false;
+            }
+            $.get(app.CONST.app_url + 'map/?act=vote_object_review&id='
+                + $(this).parent().attr('data-id') + '&vote=' + $(this).attr('data-val'),
+            function (data) {
+                if (data.success === false) {
+                    $.jGrowl(data.error, {'add_class': 'fail'});
+                }
+            });
+            return true;
         }
     },
 
