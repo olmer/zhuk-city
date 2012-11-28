@@ -97,13 +97,13 @@ div.jGrowl div.jGrowl-notification, div.jGrowl div.jGrowl-closer {
 	-webkit-border-radius:	5px;
 }
 
-div.jGrowl div.jGrowl-notification.jGrowl-class-success {
+div.jGrowl div.jGrowl-notification.jGrowl-class-success, div.jGrowl div.jGrowl-closer {
     background:     		green;
     color:                  white;
     border:                 1px solid green;
 }
 
-div.jGrowl div.jGrowl-notification.jGrowl-class-fail {
+div.jGrowl div.jGrowl-notification.jGrowl-class-fail, div.jGrowl div.jGrowl-closer {
     background:     		red;
     color:                  white;
     border:                 1px solid red;

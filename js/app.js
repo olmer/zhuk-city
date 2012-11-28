@@ -411,7 +411,7 @@ app = {
             });
 
             //Display profile data
-            if (app.getCookie('SESS_ID')) {
+            if (app.user.isAuthorized()) {
                 app.login.loadProfileData($loginFormUnauthorized, $loginFormAuthorized);
             }
 
@@ -442,6 +442,7 @@ app = {
                     if (data.success === true) {
                         $loginFormUnauthorized.css('display', 'block');
                         $loginFormAuthorized.css('display', 'none');
+                        app.user.justLoggedOut = true;
                     }
                 });
                 return false;
@@ -896,7 +897,7 @@ app = {
                     'Рейтинг: <b>' + data.rating + '</b>'+
                     '</div>'+
                     '<div class="object-item-controls">'+
-                    '<a class="gray-btn">В закладки</a>'+
+                    '<a class="gray-btn object-item-addto-bookmarks">В закладки</a>'+
                     '</div>'+
                     '</div>');
 
@@ -972,10 +973,13 @@ app = {
                     '<section class="comments-list">'+
                     '</section>'+
                     '</div>'+
-                    '</div>')
-                    .appendTo('.items-list.object-list');
+                    '</div>');
 
-                app.bind.ratings($('div.rating-stars'), data.rating, true).lunchInfo();
+                details.appendTo('.items-list.object-list');
+
+                app.bind.ratings($('div.rating-stars'), data.rating, true);
+                app.bind.lunchInfo();
+                app.bind.objectItemAddToBookmarks($('a.object-item-addto-bookmarks'));
 
                 if (data.reviews.length) {
                     for (var i = 0; i < data.reviews.length; i++) {
@@ -997,11 +1001,11 @@ app = {
                                 '<span class="comment-object-marker-ins'
                                     + (item.already_voted ? ' already-voted' : '')
                                     + '" data-id="' + item.id + '">'+
-                                    '<a class="comment-object-marker-yes green" data-val="1">Да</a> '
-                                        + item.votes_plus + ' / '+
-                                    '<a class="comment-object-marker-no red" data-val="-1">Нет</a> '
+                                    '<a class="comment-object-marker-yes green" data-val="1">Да</a> <span>'
+                                        + item.votes_plus + '</span> / '+
+                                    '<a class="comment-object-marker-no red" data-val="-1">Нет</a> <span>'
                                         + item.votes_minus +
-                                '</span>'+
+                                '</span></span>'+
                             '</div>'+
                             '</div>' +
                             '<div class="clear"></div>' +
@@ -1156,17 +1160,34 @@ app = {
             $.get(app.CONST.app_url + 'map/?act=vote_object_review&id='
                 + $(this).parent().attr('data-id') + '&vote=' + $(this).attr('data-val'),
             function (data) {
-                if (data.success === false) {
+                if (data.success !== true) {
                     $.jGrowl(data.error, {'add_class': 'fail'});
+                } else {
+                    $this.next('span').html(parseInt($this.next('span').html()) + 1);
+                    $this.parent().addClass('already-voted');
                 }
             });
             return true;
+        },
+
+        objectItemAddToBookmarks: function (object) {
+            object.on('click', function () {
+                if (!app.user.isAuthorized()) {
+                    $.jGrowl(
+                        'Чтобы добавить в закладки необходимо зарегистрироваться на сайте.' +
+                        ' Если Вы уже зарегистрированы, введите имя пользователя и пароль в верхней правой части окна',
+                        {add_class: 'fail'}
+                    );
+                }
+                return false;
+            });
         }
     },
 
     user: {
+        justLoggedOut: false,
         isAuthorized: function () {
-            return false;
+            return app.user.justLoggedOut ? false : !!app.getCookie('SESS_ID');
         }
     }
 };
