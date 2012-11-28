@@ -168,11 +168,11 @@ app = {
             $('.schedule-table').addClass('gray');
             $(selector + ' div').empty();
             for (var i = 0; i < app.transport_stations.length; i++) {
-                var item = app.transport_stations[i]
+                var item = app.transport_stations[i];
                 if (item.type == type) {
                     if ((item.title.toLowerCase().indexOf(query.toLowerCase()) + 1) || (!query.length) || full) {
                         $(selector + ' .drop-list').append($('<div></div>').text(item.title).click(
-                            function (e) {
+                            function () {
                                 $(selector + ' input').val($(this).text());
                                 $('.drop-list').remove();
                                 app.transport.layoutTransportList();
@@ -197,12 +197,13 @@ app = {
                 $('.schedule-table .list-row').remove();
                 $('<tr class="list-row"></tr>')
                     .append($('<td colspan="3">Ничего не найдено</td>'))
-                    .appendTo('.schedule-table table')
+                    .appendTo('.schedule-table table');
                 return;
             }
             var fromVal = $('.gray-input.schedule-from input').val();
             var toVal = $('.gray-input.schedule-to input').val();
-            var URL = app.CONST.app_url + 'transport?act=get_schedule&type=' + app.transport.transportType + '&dep_from=' + fromVal + '&arr_to=' + toVal + '&when=today&limit=' + app.transport.transportLimit;
+            var URL = app.CONST.app_url + 'transport?act=get_schedule&type=' + app.transport.transportType
+                + '&dep_from=' + fromVal + '&arr_to=' + toVal + '&when=today&limit=' + app.transport.transportLimit;
             $.get(URL, function (data) {
                 if (data.success) {
                     if (data.items.length) {
@@ -558,7 +559,7 @@ app = {
          * @return {Boolean}
          */
         processSaveData: function (actionType, captchaId) {
-            form = 'div.register-modal-' + actionType + ' form ';
+            var form = 'div.register-modal-' + actionType + ' form ';
             var fields = {
                 nickname: $(form + 'input[name=nickname]'),
                 gender: $(form + 'input[name=gender]:checked').length !== 0
@@ -690,7 +691,7 @@ app = {
     categories: {
         init: function () {
             app.categories.fillSubcategories();
-            var $subcategories = $('#category-list div.subcategory a').on('click', function () {
+            $('#category-list div.subcategory a').on('click', function () {
                 var $this = $(this);
                 app.categories.fillObjectsData($this.attr('data-cat-id'));
             });
@@ -793,7 +794,8 @@ app = {
                     .append($('<p class="list-item-info">').html(
                         'Адрес: <a class="wo-underscore">' + item.data.address + '</a> <br>' +
                         (item.data.phone ? 'Телефон: ' + item.data.phone.replace('\n', '<br/>') + '  <br>' : '') +
-                        (item.data.website ? 'Сайт: <a href="' + item.data.website + '" target="_blank" class="website-link wo-underscore">'
+                        (item.data.website ? 'Сайт: <a href="' + item.data.website
+                            + '" target="_blank" class="website-link wo-underscore">'
                             + item.data.website.split('/')[2] + '</a> <br>' : '')
                     ))
                     .append($('<div class="object-list-time">')
@@ -876,7 +878,8 @@ app = {
                     .append('<p class="list-item-info">' + (data.address ?
                     'Адрес: <a class="wo-underscore">' + data.address.replace('\n', '<br/>') + '</a> <br>' : '') +
                     (data.phone ? 'Телефон: ' + data.phone.replace('\n', '<br/>') + '  <br>' : '') +
-                    (data.website ? 'Сайт: <a href="' + data.website + '" target="_blank" class="website-link wo-underscore">'
+                    (data.website ? 'Сайт: <a href="' + data.website
+                        + '" target="_blank" class="website-link wo-underscore">'
                     + data.website.split('/')[2] + '</a> <br>' : '') + // parse domain from link
                     '</p>')
                     .append('<div class="object-list-time">'+
@@ -936,7 +939,7 @@ app = {
                             +'</div>'
                             +'<a class="show-error">Сообщить об ошибке</a>'
                         +'</div>'))
-                    .append('<a class="gray-btn back-object-list"><span class="arrow-left"></span>К списку обьектов</a>' +
+                .append('<a class="gray-btn back-object-list"><span class="arrow-left"></span>К списку обьектов</a>' +
                     '<a class="gray-btn add-comment-object open-modal">Оставить отзыв</a>'+
                     '<div class="modal add-comment-modal">'+
                     '<a class="close-modal"></a>'+
@@ -1098,7 +1101,7 @@ app = {
     },
 
     request: {
-        get : null,
+        get : null/*,
         getGet: function (key) {
             if (app.request.get === null) {
                 var get = {};
@@ -1112,7 +1115,7 @@ app = {
                 app.request.get = get;
             }
             return key ? app.request.get[key] : app.request.get;
-        }
+        }*/
     },
 
     bind: {
@@ -1152,7 +1155,7 @@ app = {
             return app.bind;
         },
 
-        voteForComment: function (e) {
+        voteForComment: function () {
             var $this = $(this);
             if ($this.parent().hasClass('already-voted')) {
                 return false;
