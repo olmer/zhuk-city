@@ -980,12 +980,14 @@ app = {
 
                 details.appendTo('.items-list.object-list');
 
-                app.bind.ratings($('div.rating-stars'), data.rating, true);
+                app.bind.ratings($('div.object-item-footer .rating-stars'), data.rating, true);
+                app.bind.ratings($('div.object-details .add-comment-modal .rating-stars'));
                 app.bind.lunchInfo();
                 app.bind.objectItemAddToBookmarks($('a.object-item-addto-bookmarks'));
                 app.bind.objectItemAddFile($('div.object-details .open-add-file'));
                 app.bind.objectItemShowError($('div.object-details .show-error'));
                 app.bind.objectItemSendReview($('div.object-details .add-comment-object'));
+                app.bind.closeAllModals();
 
                 if (data.reviews.length) {
                     for (var i = 0; i < data.reviews.length; i++) {
@@ -1021,7 +1023,7 @@ app = {
 
                 $('a.comment-object-marker-yes, a.comment-object-marker-no').on('click', app.bind.voteForComment);
 
-                $('.gray-btn.back-object-list').bind('click', function () {
+                $('.gray-btn.back-object-list').on('click', function () {
                     $('.items-list').empty();
                     app.categories.printSubcategoryItems();
                 });
@@ -1217,7 +1219,9 @@ app = {
 
         objectItemSendReview: function (object) {
             object.on('click', function () {
-                if (!app.user.isAuthorized()) {
+                if (app.user.isAuthorized()) {
+                    $(this).next('.modal').show();
+                } else {
                     $.jGrowl(
                         'Чтобы оставить отзыв необходимо зарегистрироваться на сайте.' +
                         ' Если Вы уже зарегистрированы, введите имя пользователя и пароль в верхней правой части окна',
@@ -1225,6 +1229,12 @@ app = {
                     );
                 }
                 return false;
+            });
+        },
+
+        closeAllModals: function () {
+            $('.close-modal').click(function() {
+                $(this).parent('.modal').hide();
             });
         }
     },
