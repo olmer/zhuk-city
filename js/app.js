@@ -983,6 +983,9 @@ app = {
                 app.bind.ratings($('div.rating-stars'), data.rating, true);
                 app.bind.lunchInfo();
                 app.bind.objectItemAddToBookmarks($('a.object-item-addto-bookmarks'));
+                app.bind.objectItemAddFile($('div.object-details .open-add-file'));
+                app.bind.objectItemShowError($('div.object-details .show-error'));
+                app.bind.objectItemSendReview($('div.object-details .add-comment-object'));
 
                 if (data.reviews.length) {
                     for (var i = 0; i < data.reviews.length; i++) {
@@ -1178,6 +1181,45 @@ app = {
                 if (!app.user.isAuthorized()) {
                     $.jGrowl(
                         'Чтобы добавить в закладки необходимо зарегистрироваться на сайте.' +
+                        ' Если Вы уже зарегистрированы, введите имя пользователя и пароль в верхней правой части окна',
+                        {add_class: 'fail'}
+                    );
+                }
+                return false;
+            });
+        },
+
+        objectItemAddFile: function (object) {
+            object.on('click', function () {
+                if (!app.user.isAuthorized()) {
+                    $.jGrowl(
+                        'Чтобы добавить файл необходимо зарегистрироваться на сайте.' +
+                        ' Если Вы уже зарегистрированы, введите имя пользователя и пароль в верхней правой части окна',
+                        {add_class: 'fail'}
+                    );
+                }
+                return false;
+            });
+        },
+
+        objectItemShowError: function (object) {
+            object.on('click', function () {
+                if (!app.user.isAuthorized()) {
+                    $.jGrowl(
+                        'Чтобы сообщить об ошибке необходимо зарегистрироваться на сайте.' +
+                        ' Если Вы уже зарегистрированы, введите имя пользователя и пароль в верхней правой части окна',
+                        {add_class: 'fail'}
+                    );
+                }
+                return false;
+            });
+        },
+
+        objectItemSendReview: function (object) {
+            object.on('click', function () {
+                if (!app.user.isAuthorized()) {
+                    $.jGrowl(
+                        'Чтобы оставить отзыв необходимо зарегистрироваться на сайте.' +
                         ' Если Вы уже зарегистрированы, введите имя пользователя и пароль в верхней правой части окна',
                         {add_class: 'fail'}
                     );

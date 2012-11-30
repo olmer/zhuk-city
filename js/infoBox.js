@@ -703,8 +703,8 @@ InfoBox.prototype.hide = function () {
  *  (usually a <tt>google.maps.Marker</tt>) is specified, the position
  *  of the InfoBox is set to the position of the <tt>anchor</tt>. If the
  *  anchor is dragged to a new location, the InfoBox moves as well.
- * @param {Map|StreetViewPanorama} map
- * @param {MVCObject} [anchor]
+ * @param map
+ * @param [anchor]
  */
 InfoBox.prototype.open = function (map, anchor) {
 
