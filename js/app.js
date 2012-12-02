@@ -946,11 +946,11 @@ app = {
                     '<div class="modal-header">'+
                     '<h3 class="modal-name">Оставить отзыв</h3>'+
                     '</div>'+
-                    '<form>'+
+                    '<form id="object-details-send-review-form">'+
                     '<label>'+
                     'Тема'+
                     '<div class="modal-input theme-input">'+
-                    '<input type="text" value="">'+
+                    '<input type="text" name="subject" value="">'+
                     '</div>'+
                     '</label>'+
                     '<label>'+
@@ -961,11 +961,11 @@ app = {
                     '<div class="add-comment-textarea-wrap">'+
                     'Текст отзыва<br>'+
                     '<div class="add-comment-textarea">'+
-                    '<textarea></textarea>'+
+                    '<textarea name="text"></textarea>'+
                     '</div>'+
                     '</div>'+
                     '<div class="clear"></div>'+
-                    '<button class="blue-btn modal-submit">Отправить</button>'+
+                    '<button class="blue-btn modal-submit" name="submit">Отправить</button>'+
                     '</form>'+
                     '</div>'+
                     '<div class="clear-r"></div>'+
@@ -988,36 +988,11 @@ app = {
                 app.bind.objectItemShowError($('div.object-details .show-error'));
                 app.bind.objectItemSendReview($('div.object-details .add-comment-object'));
                 app.bind.closeAllModals();
+                app.bind.objectSubmitReview($('#object-details-send-review-form'), data.id);
 
                 if (data.reviews.length) {
                     for (var i = 0; i < data.reviews.length; i++) {
-                        var item = data.reviews[i];
-//                        console.log(item);
-                        $('<div class="comment-object-item">' +
-                            ' <div class="comment-object-info">'+
-                            '<a class="comment-object-name ' + (item.user_gender === 'M' ? 'male' : 'female') + '">'
-                                + item.user_name + '</a>'+
-                            '<span class="comment-object-date">' + item.date_time + '</span>'+
-                            '<div class="comment-object-mark-new">Оценка: <br/>'+
-                            '<span>' + item.rating + '</span>'+
-                            '</div>'+
-                            '</div>'+
-                            '<div class="comment-object-content">' +
-                            '<p class="comment-object-text">' + item.msg_text + '</p>'+
-                            '<div class="comment-object-marker">'+
-                            'Отзыв полезен?'+
-                                '<span class="comment-object-marker-ins'
-                                    + (item.already_voted ? ' already-voted' : '')
-                                    + '" data-id="' + item.id + '">'+
-                                    '<a class="comment-object-marker-yes green" data-val="1">Да</a> <span>'
-                                        + item.votes_plus + '</span> / '+
-                                    '<a class="comment-object-marker-no red" data-val="-1">Нет</a> <span>'
-                                        + item.votes_minus +
-                                '</span></span>'+
-                            '</div>'+
-                            '</div>' +
-                            '<div class="clear"></div>' +
-                            '</div>').appendTo('.comments-list')
+                        app.categories.appendNewReview($('.comments-list'), data.reviews[i]);
                     }
                 }
 
@@ -1035,7 +1010,35 @@ app = {
                 });
 
                 app.gmap.showObject(id);
-            })
+            });
+        },
+
+        appendNewReview: function (object, item, action, cssClass) {
+            $('<div class="comment-object-item' + (cssClass ? ' ' + cssClass : '') + '">' +
+                ' <div class="comment-object-info">'+
+                '<a class="comment-object-name ' + (item.user_gender === 'M' ? 'male' : 'female') + '">'
+                + item.user_name + '</a>'+
+                '<span class="comment-object-date">' + item.date_time + '</span>'+
+                '<div class="comment-object-mark-new">Оценка: <br/>'+
+                '<span>' + item.rating + '</span>'+
+                '</div>'+
+                '</div>'+
+                '<div class="comment-object-content">' +
+                '<p class="comment-object-text">' + item.msg_text + '</p>'+
+                '<div class="comment-object-marker">'+
+                'Отзыв полезен?'+
+                '<span class="comment-object-marker-ins'
+                + (item.already_voted ? ' already-voted' : '')
+                + '" data-id="' + item.id + '">'+
+                '<a class="comment-object-marker-yes green" data-val="1">Да</a> <span>'
+                + item.votes_plus + '</span> / '+
+                '<a class="comment-object-marker-no red" data-val="-1">Нет</a> <span>'
+                + item.votes_minus +
+                '</span></span>'+
+                '</div>'+
+                '</div>' +
+                '<div class="clear"></div>' +
+                '</div>')[action || 'appendTo'](object);
         }
     },
     /**
@@ -1235,6 +1238,33 @@ app = {
         closeAllModals: function () {
             $('.close-modal').click(function() {
                 $(this).parent('.modal').hide();
+            });
+        },
+
+        objectSubmitReview: function (object, detailsObjectId) {
+            object.find('button[name=submit]').on('click', function () {
+                var $this = $(this);
+                var fields = {
+                    'subject': object.find('input[name=subject]').val(),
+                    'msg_text': object.find('textarea').val(),
+                    'rating': object.find('div.jquery-ratings-full').length,
+                    'obj_id': detailsObjectId,
+                    'get_new_data': true
+                };
+                $.post(app.CONST.app_url + 'map/?act=add_object_review', fields, function (data) {
+                    if (data.success === true) {
+                        data.already_voted = true;
+                        app.categories.appendNewReview(
+                            $('div.comment-object-wrap .comments-list'), data, 'prependTo', 'display-none'
+                        );
+                        $('div.comment-object-item.display-none').slideDown();
+                    } else {
+                        $.jGrowl(data.error, {add_class:'fail'});
+                    }
+//                    console.log(data);
+                });
+//                console.log(fields);
+                return false;
             });
         }
     },

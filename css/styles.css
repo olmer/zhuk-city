@@ -32,6 +32,10 @@ a:hover { text-decoration: none; }
     margin-top: -4px;
 }
 
+.display-none {
+    display: none;
+}
+
 .clear-input-text {
     position: relative;
     -webkit-border-radius: 3px;
