@@ -2105,6 +2105,13 @@ footer {
     bottom: -10px;
     width: 170px;
 }
+.comment-object-marker .comment-edit {
+    position: absolute;
+    left: -84px;
+    top: 14px;
+    text-decoration: underline;
+    cursor: pointer;
+}
 .comment-object-marker-ins {
     float: right;
 }
