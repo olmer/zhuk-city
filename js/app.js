@@ -100,7 +100,6 @@ app = {
                 });
 
             $('.gray-input.schedule-from input').bind('keyup', function (e) {
-                console.log(e);
                 e.stopPropagation();
                 e.preventDefault();
                 if (e.keyCode != 13) {
@@ -358,7 +357,6 @@ app = {
 
         removeAllMarkers:function () {
             for (var i = 0; i < app.objects.length; i++) {
-//                console.log(app.objects[i].mapItem.marker);
                 app.objects[i].mapItem.marker.setMap(null);
             }
         }
@@ -984,10 +982,11 @@ app = {
                 });
 
                 app.gmap.showObject(id);
+                app.categories.infiniteScrollReviews($('.comments-list'));
             });
         },
 
-        appendNewReview: function (object, item, action, cssClass) {
+        appendNewReview: function (commentsContainer, item, action, cssClass) {
             return $('<div class="comment-object-item' + (cssClass ? ' ' + cssClass : '') + '">' +
                 ' <div class="comment-object-info">'
                 + '<input type="hidden" name="object-data" value="' + encodeURI(JSON.stringify(item)) + '"/>'
@@ -1014,7 +1013,31 @@ app = {
                 '</div>'+
                 '</div>' +
                 '<div class="clear"></div>' +
-                '</div>')[action || 'appendTo'](object);
+                '</div>')[action || 'appendTo'](commentsContainer);
+        },
+
+        infiniteScrollReviews: function ($reviewsContainer) {
+            var loading = false,
+                currentOffset = 0,
+                limit = 5,
+                isNearBottomOfPage = function () {
+                    return $(window).scrollTop() > $(document).height() - $(window).height() - 300;
+            };
+
+            $(window).scroll(function () {
+                if (loading) {
+                    return;
+                }
+
+                if (isNearBottomOfPage()) {
+                    loading = true;
+                    $.each(app.getReviews(currentOffset, limit), function (k, v) {
+                        app.categories.appendNewReview($reviewsContainer, v)
+                    });
+                    currentOffset += limit;
+                    loading = false;
+                }
+            });
         }
     },
     /**
@@ -1247,7 +1270,7 @@ app = {
             });
         },
 
-        objectSubmitReviewEdit: function (object, reviewId) {
+        objectSubmitReviewEdit: function (object, reviewId, $reviewContainer) {
             object.find('button[name=submit]').on('click', function () {
                 var $this = $(this),
                     fields = {
@@ -1260,6 +1283,7 @@ app = {
                         $this.closest('.modal').hide();
                         data.already_voted = true;
                         data.editable = true;
+                        $reviewContainer.find('.comment-object-text').html(data.msg_text);
                     } else {
                         $.jGrowl(data.error, {add_class:'fail'});
                     }
@@ -1277,7 +1301,9 @@ app = {
                     $form = $(app.getHtml.reviewForm(item));
                 $form.insertAfter(linkToBind).show();
                 app.bind.ratings($form.find('.rating-stars'), item.rating, true);
-                app.bind.objectSubmitReviewEdit($form, item.id);
+                app.bind.objectSubmitReviewEdit(
+                    $form, item.id, linkToBind.closest('div.comment-object-item')
+                );
                 app.bind.closeAllModals();
             });
         }
