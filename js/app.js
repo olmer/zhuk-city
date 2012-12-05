@@ -1,8 +1,9 @@
 app = {
     CONST: {
-        app_url: 'http://test.zhukcity.ru/',
+        appUrl: 'http://test.zhukcity.ru/',
         worktime_min: 0, //values to display active/unactive object
-        worktime_max: 0
+        worktime_max: 0,
+        reviewsLoadQty: 10
     },
 
     objects:[],
@@ -17,7 +18,6 @@ app = {
         transportLimit:5,
         transportType:'train',
         transportRefreshInterval:60000, //1 min
-
 
         buildTransportForm:function () {
             if (app.getCookie('transType')) {
@@ -201,7 +201,7 @@ app = {
             }
             var fromVal = $('.gray-input.schedule-from input').val();
             var toVal = $('.gray-input.schedule-to input').val();
-            var URL = app.CONST.app_url + 'transport?act=get_schedule&type=' + app.transport.transportType
+            var URL = app.CONST.appUrl + 'transport?act=get_schedule&type=' + app.transport.transportType
                 + '&dep_from=' + fromVal + '&arr_to=' + toVal + '&when=today&limit=' + app.transport.transportLimit;
             $.get(URL, function (data) {
                 if (data.success) {
@@ -419,7 +419,7 @@ app = {
 
             // Login click
             $loginBtn.on('click', function () {
-                $.post(app.CONST.app_url + 'profile/?act=login', {
+                $.post(app.CONST.appUrl + 'profile/?act=login', {
                     login: loginInputs.login.val(),
                     passw: loginInputs.passw.val()
                 }, function (data) {
@@ -437,7 +437,7 @@ app = {
             });
 
             $('#auth-user-exit').on('click', function () {
-                $.get(app.CONST.app_url + 'profile/?act=logout', function (data) {
+                $.get(app.CONST.appUrl + 'profile/?act=logout', function (data) {
                     if (data.success === true) {
                         $loginFormUnauthorized.css('display', 'block');
                         $loginFormAuthorized.css('display', 'none');
@@ -474,10 +474,10 @@ app = {
                         def = $field.attr('data-defaultvalue');
                     $field.val(def || ($field.attr('name') === 'gender' ? $field.val() : ''));
                 });
-                $.post(app.CONST.app_url + 'profile/?act=captcha', function (data) {
+                $.post(app.CONST.appUrl + 'profile/?act=captcha', function (data) {
                     captchaId = data.code_id;
                     $('div.register-modal-register form label img').attr('src',
-                        app.CONST.app_url + 'images/code.png?id=' + data.code_id);
+                        app.CONST.appUrl + 'images/code.png?id=' + data.code_id);
                 });
             });
 
@@ -497,10 +497,10 @@ app = {
             var submitObj = new app.login.ForgotPasswordSubmit();
             // Open register, get captcha
             $('a.forgot-link').on('click', function () {
-                $.post(app.CONST.app_url + 'profile/?act=captcha', function (data) {
+                $.post(app.CONST.appUrl + 'profile/?act=captcha', function (data) {
                     captchaId = data.code_id;
                     $('div.forgot-modal form label img').attr('src',
-                        app.CONST.app_url + 'images/code.png?id=' + data.code_id);
+                        app.CONST.appUrl + 'images/code.png?id=' + data.code_id);
                     submitObj.captchaId = captchaId;
                 });
             });
@@ -533,7 +533,7 @@ app = {
                 });
                 data['code_id'] = $this.captchaId;
 
-                $.post(app.CONST.app_url + 'profile/password', data, function (data) {
+                $.post(app.CONST.appUrl + 'profile/password', data, function (data) {
                     if (data.success === false) {
                         app.login.displayErrorByField(formSelector, data.field, data.error);
                     } else {
@@ -579,7 +579,7 @@ app = {
                 app.login.displayErrorByField(form, 'passw', 'Пароли не совпадают');
                 return false;
             }
-            $.post(app.CONST.app_url + 'profile/' + (actionType === 'register' ? 'register' : 'edit' ) + '/', data,
+            $.post(app.CONST.appUrl + 'profile/' + (actionType === 'register' ? 'register' : 'edit' ) + '/', data,
                 function (data) {
                     if (data.success === false) {
                         app.login.displayErrorByField(form, data.field, data.error);
@@ -647,7 +647,7 @@ app = {
          * @param $loginFormAuthorized jQuery object
          */
         loadProfileData: function ($loginFormUnauthorized, $loginFormAuthorized) {
-            $.post(app.CONST.app_url + 'profile/edit?act=get_profile', function (data) {
+            $.post(app.CONST.appUrl + 'profile/edit?act=get_profile', function (data) {
                 if (data.success === true) {
                     var $personalProfile = $('div.register-modal-login');
                     $personalProfile.find('input[name="old_passw"],input[name="passw"],input[name="passw-again"]')
@@ -710,7 +710,7 @@ app = {
         },
 
         fillObjectsData: function (id, sortBy) {
-            var URL = app.CONST.app_url + 'map?act=get_objects&cat_ids=' + id + '&sort_by=' + (sortBy || 0);
+            var URL = app.CONST.appUrl + 'map?act=get_objects&cat_ids=' + id + '&sort_by=' + (sortBy || 0);
             $.get(URL, function (data) {
                 $('section.items-list.object-list').html('');
                 if (data.success) {
@@ -863,8 +863,9 @@ app = {
             }
         },
 
-        openObjectDetails:function (id) {//item details
-            $.getJSON(app.CONST.app_url + 'map/?act=get_object&obj_id=' + id, function (data) {
+        openObjectDetails:function (objId) {//item details
+            $.getJSON(app.CONST.appUrl + 'map/?act=get_object&limit='
+                + app.CONST.reviewsLoadQty + '&obj_id=' + objId, function (data) {
                 $('.list-item.object-item').remove();
 
                 var details = $('<div class="list-item object-details">')
@@ -905,15 +906,15 @@ app = {
                 $.each(data.attachments, function (k, v) {
                     if (v.type !== 'image' || v.has_thumb !== true) {
                         links += '<a' +
-                            ' href="' + app.CONST.app_url +'map/attachments/' + v.id + '"' +
+                            ' href="' + app.CONST.appUrl +'map/attachments/' + v.id + '"' +
                             ' alt="' + v.descr + '">' + (v.title ? v.title : v.filename) + '</a>';
                     } else {
                         gallery.append('<li><a class="lightbox-open"' +
                             ' data-title="' + v.title + '"'+
                             ' data-descr="' + v.descr + '"'+
-                                ' href="' + app.CONST.app_url +'map/attachments/' + v.id + '">' +
+                                ' href="' + app.CONST.appUrl +'map/attachments/' + v.id + '">' +
                             '<img' +
-                                ' src="' + app.CONST.app_url + 'map/attachments/thumb/' + v.id + '"' +
+                                ' src="' + app.CONST.appUrl + 'map/attachments/thumb/' + v.id + '"' +
                                 ' width="' + v.thumb_width +'"/>' +
                             '</a></li>');
                     }
@@ -981,12 +982,12 @@ app = {
                     imageBtnNext: 'images/lightbox-btn-next.gif'
                 });
 
-                app.gmap.showObject(id);
-                app.categories.infiniteScrollReviews($('.comments-list'));
+                app.gmap.showObject(objId);
+                app.categories.infiniteScrollReviews($('.comments-list'), objId);
             });
         },
 
-        appendNewReview: function (commentsContainer, item, action, cssClass) {
+        appendNewReview: function (commentsContainer, item, action, cssClass) {//TODO: keep in mind $.tmpl method
             return $('<div class="comment-object-item' + (cssClass ? ' ' + cssClass : '') + '">' +
                 ' <div class="comment-object-info">'
                 + '<input type="hidden" name="object-data" value="' + encodeURI(JSON.stringify(item)) + '"/>'
@@ -1016,10 +1017,10 @@ app = {
                 '</div>')[action || 'appendTo'](commentsContainer);
         },
 
-        infiniteScrollReviews: function ($reviewsContainer) {
+        infiniteScrollReviews: function ($reviewsContainer, objId) {
             var loading = false,
                 currentOffset = 0,
-                limit = 5,
+                limit = app.CONST.reviewsLoadQty,
                 isNearBottomOfPage = function () {
                     return $(window).scrollTop() > $(document).height() - $(window).height() - 300;
             };
@@ -1030,12 +1031,16 @@ app = {
                 }
 
                 if (isNearBottomOfPage()) {
-                    loading = true;
-                    $.each(app.getReviews(currentOffset, limit), function (k, v) {
-                        app.categories.appendNewReview($reviewsContainer, v)
+                    var url = app.CONST.appUrl + 'map/?act=get_object_reviews&obj_id=' + objId + '&limit=' + limit
+                        + '&offset=' + currentOffset;
+                    $.getJSON(url, function (data) {
+                        loading = true;
+                        $.each(data.reviews, function (k, v) {
+                            app.categories.appendNewReview($reviewsContainer, v)
+                        });
+                        currentOffset += limit;
+                        loading = !loading;
                     });
-                    currentOffset += limit;
-                    loading = false;
                 }
             });
         }
@@ -1167,7 +1172,7 @@ app = {
             if ($this.parent().hasClass('already-voted')) {
                 return false;
             }
-            $.get(app.CONST.app_url + 'map/?act=vote_object_review&id='
+            $.get(app.CONST.appUrl + 'map/?act=vote_object_review&id='
                 + $(this).parent().attr('data-id') + '&vote=' + $(this).attr('data-val'),
             function (data) {
                 if (data.success !== true) {
@@ -1252,7 +1257,7 @@ app = {
                     fields.rating = object.find('div.jquery-ratings-full').length;
                     fields.get_new_data = true;
                 }
-                $.post(app.CONST.app_url + 'map/?act=add_object_review', fields, function (data) {
+                $.post(app.CONST.appUrl + 'map/?act=add_object_review', fields, function (data) {
                     if (data.success === true) {
                         $this.closest('.modal').hide();
                         data.already_voted = true;
@@ -1277,7 +1282,7 @@ app = {
                         'subject': object.find('input[name=subject]').val(),
                         'msg_text': object.find('textarea').val()
                     };
-                $.post(app.CONST.app_url + 'map/?act=edit_object_review&review_id=' + reviewId, fields,
+                $.post(app.CONST.appUrl + 'map/?act=edit_object_review&review_id=' + reviewId, fields,
                 function (data) {
                     if (data.success === true) {
                         $this.closest('.modal').hide();
