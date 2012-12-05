@@ -1341,6 +1341,12 @@ footer {
 }
 .comments-list {
     padding-top: 10px;
+    display: table;
+    width: 100%;
+}
+
+.comments-row {
+    display: table-row;
 }
 
 .comment-object-item {
@@ -1348,7 +1354,27 @@ footer {
     padding-bottom: 15px;
     border-bottom: 1px solid #ededed;
     margin-bottom: 7px;
+    display: table-cell;
 }
+
+.on-moderation .comment-object-item {
+    background: #dde8ff;
+}
+
+.on-moderation-text {
+    display: none;
+    color: #bbb;
+    height: 12px;
+    line-height: 12px;
+    font-size: 10px;
+    padding: 0 0 0 20px;
+    background: url("../images/icon-views-sm.png") 0 1px no-repeat;
+}
+
+.on-moderation .on-moderation-text {
+    display: inline-block;
+}
+
 .comment-object-info {
     float: left;
     width: 59px;

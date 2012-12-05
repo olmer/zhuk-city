@@ -988,7 +988,8 @@ app = {
         },
 
         appendNewReview: function (commentsContainer, item, action, cssClass) {//TODO: keep in mind $.tmpl method
-            return $('<div class="comment-object-item' + (cssClass ? ' ' + cssClass : '') + '">' +
+            return $('<div class="comments-row' + (item.awaits_premoderation ? ' on-moderation' : '') + '">' +
+                '<div class="comment-object-item' + (cssClass ? ' ' + cssClass : '') + '">' +
                 ' <div class="comment-object-info">'
                 + '<input type="hidden" name="object-data" value="' + encodeURI(JSON.stringify(item)) + '"/>'
                 + '<a class="comment-object-name ' + (item.user_gender === 'M' ? 'male' : 'female') + '">'
@@ -999,7 +1000,8 @@ app = {
                 '</div>'+
                 '</div>'+
                 '<div class="comment-object-content">' +
-                '<p class="comment-object-text">' + item.msg_text + '</p>'+
+                '<p class="comment-object-text">' + item.msg_text + '</p>' +
+                '<span class="on-moderation-text">Отзыв на модерации</span>'+
                 '<div class="comment-object-marker">' +
                 (item.editable && item.editable === true ? '<span class="comment-edit">Редактировать</span>' : '') +
                 'Отзыв полезен?'+
@@ -1014,7 +1016,7 @@ app = {
                 '</div>'+
                 '</div>' +
                 '<div class="clear"></div>' +
-                '</div>')[action || 'appendTo'](commentsContainer);
+                '</div></div>')[action || 'appendTo'](commentsContainer);
         },
 
         infiniteScrollReviews: function ($reviewsContainer, objId) {
