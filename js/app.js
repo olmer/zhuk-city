@@ -955,9 +955,9 @@ app = {
                 app.bind.ratings($('div.object-item-footer .rating-stars'), data.rating, true);
                 app.bind.ratings($('div.object-details .add-comment-modal .rating-stars'));
                 app.bind.lunchInfo();
-                app.bind.objectItemAddToBookmarks($('a.object-item-addto-bookmarks'));
-                app.bind.objectItemAddFile($('div.object-details .open-add-file'));
-                app.bind.objectItemShowError($('div.object-details .show-error'));
+                app.bind.buttonClickCheckIsAuthorized($('a.object-item-addto-bookmarks'), 'добавить в закладки ');
+                app.bind.buttonClickCheckIsAuthorized($('div.object-details .open-add-file'), 'добавить файл ');
+                app.bind.buttonClickCheckIsAuthorized($('div.object-details .show-error'), 'сообщить об ошибке ');
                 app.bind.objectItemSendReview($('div.object-details .add-comment-object'));
                 app.bind.closeAllModals();
                 app.bind.objectSubmitReview($('#object-details-send-review-form'), data.id);
@@ -1185,37 +1185,11 @@ app = {
             return true;
         },
 
-        objectItemAddToBookmarks: function (object) {
+        buttonClickCheckIsAuthorized: function (object, subj) {
             object.on('click', function () {
                 if (!app.user.isAuthorized()) {
                     $.jGrowl(
-                        'Чтобы добавить в закладки необходимо зарегистрироваться на сайте.' +
-                        ' Если Вы уже зарегистрированы, введите имя пользователя и пароль в верхней правой части окна',
-                        {add_class: 'fail'}
-                    );
-                }
-                return false;
-            });
-        },
-
-        objectItemAddFile: function (object) {
-            object.on('click', function () {
-                if (!app.user.isAuthorized()) {
-                    $.jGrowl(
-                        'Чтобы добавить файл необходимо зарегистрироваться на сайте.' +
-                        ' Если Вы уже зарегистрированы, введите имя пользователя и пароль в верхней правой части окна',
-                        {add_class: 'fail'}
-                    );
-                }
-                return false;
-            });
-        },
-
-        objectItemShowError: function (object) {
-            object.on('click', function () {
-                if (!app.user.isAuthorized()) {
-                    $.jGrowl(
-                        'Чтобы сообщить об ошибке необходимо зарегистрироваться на сайте.' +
+                        'Чтобы ' + subj + 'необходимо зарегистрироваться на сайте.' +
                         ' Если Вы уже зарегистрированы, введите имя пользователя и пароль в верхней правой части окна',
                         {add_class: 'fail'}
                     );
