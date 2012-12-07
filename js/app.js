@@ -791,21 +791,21 @@ app = {
                     .html(item.data.name))
                     .append($('<p class="list-item-info">').html(
                         'Адрес: <a class="wo-underscore">' + item.data.address + '</a> <br>' +
-                        (item.data.phone ? 'Телефон: ' + item.data.phone.replace('\n', '<br/>') + '  <br>' : '') +
+                        (item.data.phone ? 'Телефон: ' + item.data.phone.replace(/\n/g, '<br/>') + '  <br>' : '') +
                         (item.data.website ? 'Сайт: <a href="' + item.data.website
                             + '" target="_blank" class="website-link wo-underscore">'
-                            + item.data.website.split('/')[2] + '</a> <br>' : '')
+                            + item.data.website.split('/')[2].split('?')[0] + '</a> <br>' : '')
                     ))
                     .append($('<div class="object-list-time">')
                     .append($('<ul class="object-list-time-details">')
-                    .append($('<li>' + item.data.worktime.replace('\n', '<br/>') + '</li>'))
+                    .append($('<li>' + item.data.worktime.replace(/\n/g, '<br/>') + '</li>'))
                     .append(item.data.worktime_breaks === '' ? '' : $('<li>') //do not show link and items if empty
                         .html(
                             '<a class="open-lunch-info">перерывы</a>' +
                             '<div class="lunch-info">' +
                             '<table>' +
                             '<tr>' +
-                            '<th>' + item.data.worktime_breaks.replace('\n', '<br/>') + '</th>' +
+                            '<th>' + item.data.worktime_breaks.replace(/\n/g, '<br/>') + '</th>' +
                             '</tr>' +
                             '</table>' +
                             '</div>'
@@ -874,19 +874,19 @@ app = {
                     .html(data.operating_minutes > app.CONST.worktime_max ? 'работает' : 'неработает')))
                     .append('<a class="list-item-name">' + (data.full_name ? data.full_name : data.name) + '</a>')
                     .append('<p class="list-item-info">' + (data.address ?
-                    'Адрес: <a class="wo-underscore">' + data.address.replace('\n', '<br/>') + '</a> <br>' : '') +
-                    (data.phone ? 'Телефон: ' + data.phone.replace('\n', '<br/>') + '  <br>' : '') +
+                    'Адрес: <a class="wo-underscore">' + data.address.replace(/\n/g, '<br/>') + '</a> <br>' : '') +
+                    (data.phone ? 'Телефон: ' + data.phone.replace(/\n/g, '<br/>') + '  <br>' : '') +
                     (data.website ? 'Сайт: <a href="' + data.website
                         + '" target="_blank" class="website-link wo-underscore">'
-                    + data.website.split('/')[2] + '</a> <br>' : '') + // parse domain from link
+                    + data.website.split('/')[2].split('?')[0] + '</a> <br>' : '') + // parse domain from link
                     '</p>')
                     .append('<div class="object-list-time">'+
                     '<ul class="object-list-time-details">'+
-                    '<li>' + data.worktime.replace('\n', '<br/>') + '</li>'+ (data.worktime_breaks ?
+                    '<li>' + data.worktime.replace(/\n/g, '<br/>') + '</li>'+ (data.worktime_breaks ?
                     '<li>'+
                     '<table>'+
                     '<tbody><tr>'+
-                    '<td>' + data.worktime_breaks.replace('\n', '<br/>') + '</td>'+
+                    '<td>' + data.worktime_breaks.replace(/\n/g, '<br/>') + '</td>'+
                     '</tr>'+
                     '</tbody></table>'+
                     '</li>' : '' ) +
@@ -987,17 +987,20 @@ app = {
             });
         },
 
-        appendNewReview: function (commentsContainer, item, action, cssClass) {//TODO: keep in mind $.tmpl method
-            return $('<div class="comments-row' + (item.awaits_premoderation ? ' on-moderation' : '') + '">' +
+        appendNewReview: function (commentsContainer, item, action, cssClass) {
+            //TODO: keep in mind $.tmpl method
+            var $author = $('<div class="author-info">'),
+                $review = $('<div class="comments-row' + (item.awaits_premoderation ? ' on-moderation' : '') + '">' +
                 '<div class="comment-object-item' + (cssClass ? ' ' + cssClass : '') + '">' +
                 ' <div class="comment-object-info">'
                 + '<input type="hidden" name="object-data" value="' + encodeURI(JSON.stringify(item)) + '"/>'
-                + '<a class="comment-object-name ' + (item.user_gender === 'M' ? 'male' : 'female') + '">'
+                + '<a class="comment-object-name ' + (item.user_gender === 'M' ? 'male' : 'female') + '" ' +
+                'data-author-id="' + item.id + '">'
                 + item.user_name + '</a>'+
                 '<span class="comment-object-date">' + item.date_time + '</span>'+
-                '<div class="comment-object-mark-new">Оценка: <br/>'+
+                (item.rating ? '<div class="comment-object-mark-new">Оценка: <br/>'+
                 '<span>' + item.rating + '</span>'+
-                '</div>'+
+                '</div>' : '')+
                 '</div>'+
                 '<div class="comment-object-content">' +
                 '<p class="comment-object-text">' + item.msg_text + '</p>' +
@@ -1017,7 +1020,20 @@ app = {
                 '</div>' +
                 '<div class="clear"></div>' +
                 '</div></div>')[action || 'appendTo'](commentsContainer);
+            app.categories.loadAuthorData(item.user_id, $author, $review);
         },
+
+        loadAuthorData: function (id, $container, $review) {
+            if (app.user.isAuthorized()) {
+                $.get(app.CONST.appUrl + 'profile/?act=get_user_details&id=' + id, function (data) {
+                    console.log(data);
+                    $container.append('Дата регистрации: ' + data.date_reg +
+                    (data.date_birth ? '<br/>День рождения: ' + data.date_birth : ''));
+                    $review.find('.comment-object-name').append($container);
+                });
+            }
+        },
+
 
         infiniteScrollReviews: function ($reviewsContainer, objId) {
             var loading = false,
@@ -1208,7 +1224,7 @@ app = {
                     $.jGrowl(
                         'Чтобы оставить отзыв необходимо зарегистрироваться на сайте.' +
                         ' Если Вы уже зарегистрированы, введите имя пользователя и пароль в верхней правой части окна',
-                        {add_class: 'fail'}
+                        {add_class: 'fail', 'position': 'top-left'}
                     );
                 }
                 return false;

@@ -1389,6 +1389,7 @@ footer {
     text-decoration: none;
     line-height: 20px;
     height: 20px;
+    position: relative;
 }
 .comment-object-name.male {
     background: url("../images/male.png") 45px 3px no-repeat;
@@ -2247,4 +2248,24 @@ footer {
 
 a.wo-underscore {
     text-decoration: none;
+}
+
+.comment-object-item .author-info {
+    position: absolute;
+    background: white;
+    top: 12px;
+    padding: 3px 6px;
+    border: 1px solid #D1D1D1;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    display: none;
+    z-index: 600;
+    font-size: 9px;
+    line-height: 11px;
+    width: 200px;
+}
+
+.comment-object-name:hover .author-info {
+    display: block;
 }
