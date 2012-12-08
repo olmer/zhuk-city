@@ -939,7 +939,7 @@ app = {
                         +'</div>'))
                 .append('<a class="gray-btn back-object-list"><span class="arrow-left"></span>К списку обьектов</a>' +
                     '<a class="gray-btn add-comment-object open-modal">Оставить отзыв</a>' +
-                    app.getHtml.reviewForm() +
+                    app.getHtml.reviewForm({}, 'add-comment-modal') +
                     '<div class="clear-r"></div>'+
                     '<div class="comment-object-wrap">'+
                     '<span class="comments-object-count">Всего отзывов: <b>' + data.totalReviewsCount + '</b></span>'+
@@ -966,7 +966,6 @@ app = {
                     for (var i = 0; i < data.reviews.length; i++) {
                         app.categories.appendNewReview($('.comments-list'), data.reviews[i]);
                     }
-                    app.bind.renderReviewEditForm($('div.comment-object-item .comment-edit'));
                 }
 
                 $('a.comment-object-marker-yes, a.comment-object-marker-no').on('click', app.bind.voteForComment);
@@ -1003,7 +1002,8 @@ app = {
                 '</div>' : '')+
                 '</div>'+
                 '<div class="comment-object-content">' +
-                '<p class="comment-object-text">' + item.msg_text + '</p>' +
+                '<p class="comment-object-text">' +
+                    (item.subject ? '<strong>' + item.subject + '</strong>: ' : '') + item.msg_text + '</p>' +
                 '<span class="on-moderation-text">Отзыв на модерации</span>'+
                 '<div class="comment-object-marker">' +
                 (item.editable && item.editable === true ? '<span class="comment-edit">Редактировать</span>' : '') +
@@ -1020,13 +1020,13 @@ app = {
                 '</div>' +
                 '<div class="clear"></div>' +
                 '</div></div>')[action || 'appendTo'](commentsContainer);
+            app.bind.renderReviewEditForm($review.find('.comment-edit'));
             app.categories.loadAuthorData(item.user_id, $author, $review);
         },
 
         loadAuthorData: function (id, $container, $review) {
             if (app.user.isAuthorized()) {
                 $.get(app.CONST.appUrl + 'profile/?act=get_user_details&id=' + id, function (data) {
-                    console.log(data);
                     $container.append('Дата регистрации: ' + data.date_reg +
                     (data.date_birth ? '<br/>День рождения: ' + data.date_birth : ''));
                     $review.find('.comment-object-name').append($container);
@@ -1037,7 +1037,7 @@ app = {
 
         infiniteScrollReviews: function ($reviewsContainer, objId) {
             var loading = false,
-                currentOffset = 0,
+                currentOffset = 10,
                 limit = app.CONST.reviewsLoadQty,
                 isNearBottomOfPage = function () {
                     return $(window).scrollTop() > $(document).height() - $(window).height() - 300;
@@ -1049,15 +1049,17 @@ app = {
                 }
 
                 if (isNearBottomOfPage()) {
+                    loading = true;
                     var url = app.CONST.appUrl + 'map/?act=get_object_reviews&obj_id=' + objId + '&limit=' + limit
                         + '&offset=' + currentOffset;
                     $.getJSON(url, function (data) {
-                        loading = true;
                         $.each(data.reviews, function (k, v) {
                             app.categories.appendNewReview($reviewsContainer, v)
                         });
+                        var voteButtons = $('a.comment-object-marker-yes, a.comment-object-marker-no');
+                        voteButtons.off('click').on('click', app.bind.voteForComment);
                         currentOffset += limit;
-                        loading = !loading;
+                        loading = false;
                     });
                 }
             });
@@ -1291,6 +1293,7 @@ app = {
 
         renderReviewEditForm: function (linkToBind) {
             linkToBind.on('click', function () {
+                $('.edit-comment-modal').remove();
                 var $this = $(this),
                     item = $.parseJSON(
                         decodeURI($this.closest('div.comment-object-item').find('input[name=object-data]').val())
@@ -1314,9 +1317,10 @@ app = {
     },
 
     getHtml: {
-        reviewForm: function (data) {
+        reviewForm: function (data, cssClass) {
+            cssClass = cssClass || 'edit-comment-modal';
             data = data || {};
-            return '<div class="modal add-comment-modal">'+
+            return '<div class="modal ' + cssClass + '">'+
                 '<a class="close-modal"></a>'+
                 '<div class="modal-header">'+
                 '<h3 class="modal-name">Оставить отзыв</h3>'+

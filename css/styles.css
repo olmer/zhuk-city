@@ -1448,6 +1448,9 @@ footer {
     font-size: 11px;
     line-height: 14px;
 }
+.comment-object-text strong {
+    font-weight: bold;
+}
 .comment-object-mark {
     font-size: 10px;
     color: #727272;
@@ -1467,18 +1470,18 @@ footer {
     right: 0;
     bottom: 5px;
 }
-.add-comment-modal {
+.add-comment-modal, .edit-comment-modal {
     width: 430px;
     top: 230px;
     left: 460px;
     z-index: 600;
     background: #fff;
 }
-.add-comment-modal label {
+.add-comment-modal label, .edit-comment-modal label {
     float: left;
     width: 175px;
 }
-.add-comment-modal .rating-stars {
+.add-comment-modal .rating-stars, .edit-comment-modal .rating-stars {
     float: none;
     margin-left: -5px;
 }
@@ -2134,8 +2137,8 @@ footer {
 }
 .comment-object-marker .comment-edit {
     position: absolute;
-    left: -84px;
-    top: 14px;
+    left: -89px;
+    top: -1px;
     text-decoration: underline;
     cursor: pointer;
 }
