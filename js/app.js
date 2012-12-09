@@ -714,6 +714,8 @@ app = {
                 var $this = $(this);
                 app.categories.fillObjectsData($this.attr('data-cat-id'));
             });
+
+            app.bind.addObjectToMap();
         },
 
         fillSubcategories: function () {
@@ -1337,6 +1339,12 @@ app = {
                 );
                 app.bind.closeAllModals();
             });
+        },
+
+        addObjectToMap: function () {
+            $('#add-object-to-map').on('click', function () {
+                console.log(app.getHtml.objectAdd());
+            });
         }
     },
 
@@ -1378,6 +1386,77 @@ app = {
                 '<button class="blue-btn modal-submit" name="submit">Отправить</button>'+
                 '</form>'+
                 '</div>';
+        },
+
+        objectAdd: function () {
+            var data = {}, tmpl = '<div class="add-object-form">' +
+                '<h3 class="add-object-title">Добавить обьект</h3>' +
+            '<form>' +
+                '<label>' +
+                'Категория <span class="oblige">*</span>'+
+                    '<div class="select-wrap">' +
+                        '<select>' +
+                            '<option>Образование</option>' +
+                            '<option>Здоровье и красота</option>' +
+                            '<option>Торговля</option>' +
+                            '<option>Питание</option>' +
+                            '<option>Культура</option>' +
+                            '<option>Услуги</option>' +
+                        '</select>' +
+                    '</div>' +
+                    '<a class="more-category">Ещё категорию +</a>' +
+
+                '</label>' +
+                '<label>' +
+                'Адрес <span class="oblige">*</span><br>' +
+                '<div class="modal-input street-input">' +
+                    '<input type="text" value="Улица, дом" onfocus="if (this.value==\'Улица, дом\') this.value=\'\';" onblur="if (this.value==\'\'){this.value=\'Улица, дом\'}">' +
+                    '</div>' +
+                    '<div class="clear-l"></div>' +
+                '</label>' +
+                '<a class="object-add-onmap">Отметить на карте</a>' +
+                '<label>' +
+                'Веб-сайт:' +
+                '<div class="modal-input">' +
+                    '<input type="text" value="http://example.com/" onfocus="if (this.value==\'http://example.com/\') this.value=\'\';" onblur="if (this.value==\'\'){this.value=\'http://example.com/\'}">' +
+                    '</div>' +
+                '</label>' +
+                '<label>' +
+                'E-mail:' +
+                '<div class="modal-input">' +
+                    '<input type="text" value="example@mail.com" onfocus="if (this.value==\'example@mail.com\') this.value=\'\';" onblur="if (this.value==\'\'){this.value=\'example@mail.com\'}">' +
+                    '</div>' +
+                '</label>' +
+                '<label class="object-add-area">' +
+                'Телефоны:  <br>' +
+                    '<textarea></textarea>' +
+                '</label>' +
+                '<label>' +
+                'Название <span class="oblige">*</span>' +
+                '<div class="modal-input object-add-name">' +
+                    '<input type="text">' +
+                    '</div>' +
+                '</label>' +
+                '<label class="object-add-area">' +
+                'График работы:  <br>' +
+                    '<textarea></textarea>' +
+                '</label>' +
+                '<label class="object-add-area">' +
+                'Перерывы:  <br>' +
+                    '<textarea></textarea>' +
+                '</label>' +
+                '<label class="object-add-area">' +
+                'Описание:  <br>' +
+                    '<textarea></textarea>' +
+                '</label>' +
+                    '<label class="object-add-area">' +
+                    'Ключевые слова:  <br>' +
+                        '<textarea></textarea>' +
+                    '</label>' +
+                        '<button class="blue-btn modal-submit">Сохранить</button>' +
+                    '</form>' +
+                '</div>';
+            return $.tmpl(tmpl, data);
         }
     }
 };
