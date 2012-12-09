@@ -289,16 +289,15 @@ app = {
                 '<div class="onmap-comment-count">' + object.n_reviews + '</div>' +
                 '</div>' +
                 '<div class="object-onmap-content">' +
-                'Категория: <a>Банки</a> <br>' +
-                'Адрес: <a>' + object.address + '</a> <br>' +
-                'Телефон: ' + object.phone +
+                'Адрес: <a>' + object.address.replace(/\n/g, '<br/>') + '</a> <br>' +
+                'Телефон: ' + object.phone.replace(/\n/g, '<br/>') +
                 '</div>' +
                 '<div class="object-onmap-time">' +
-                object.worktime +
+                object.worktime.replace(/\n/g, '<br/>') +
                 '</div>' +
                 '<div class="object-onmap-footer">' +
                 '<span class="object-onmap-rating">Рейтинг: <b>' + object.rating + '</b></span>' +
-                '<a class="object-onmap-comment">Оставить отзыв</a>' +
+                '<a class="object-onmap-comment" id="object-onmap-comment-' + object.id + '">Оставить отзыв</a>' +
                 '</div>' +
                 '</div>';
 
@@ -326,6 +325,28 @@ app = {
             };
 
             var infoBox = new InfoBox(infoBoxOptions);
+
+            google.maps.event.addListener(infoBox, 'domready', function () {
+                $('#object-onmap-comment-' + object.id).off('click');
+                $('#object-onmap-comment-' + object.id).on('click', function () {
+                    if (app.user.isAuthorized()) {
+                        $('.comment-modal-onmap').remove();
+                        var $form = $(app.getHtml.reviewForm({}, 'add-comment-modal comment-modal-onmap'));
+
+                        $form.insertAfter($('.object-list')).show();
+
+                        app.bind.objectSubmitReview($form, object.id);
+                        app.bind.ratings($form.find('div.rating-stars'));
+                        app.bind.closeAllModals();
+                    } else {
+                        $.jGrowl(
+                            'Чтобы оставить отзыв необходимо зарегистрироваться на сайте. Если Вы уже ' +
+                            'зарегистрированы, введите имя пользователя и пароль в верхней правой части окна',
+                            {add_class: 'fail', 'position': 'top-left'}
+                        );
+                    }
+                });
+            });
 
             google.maps.event.addListener(marker, 'click', function () {
                 app.gmap.closeAllInfoWindows();
@@ -864,6 +885,7 @@ app = {
         },
 
         openObjectDetails:function (objId) {//item details
+            $('div.list-filter').css('height', '3px').find('ul,.work-filter').hide();
             $.getJSON(app.CONST.appUrl + 'map/?act=get_object&limit='
                 + app.CONST.reviewsLoadQty + '&obj_id=' + objId, function (data) {
                 $('.list-item.object-item').remove();
@@ -954,13 +976,16 @@ app = {
 
                 app.bind.ratings($('div.object-item-footer .rating-stars'), data.rating, true);
                 app.bind.ratings($('div.object-details .add-comment-modal .rating-stars'));
+
                 app.bind.lunchInfo();
+
                 app.bind.buttonClickCheckIsAuthorized($('a.object-item-addto-bookmarks'), 'добавить в закладки ');
                 app.bind.buttonClickCheckIsAuthorized($('div.object-details .open-add-file'), 'добавить файл ');
                 app.bind.buttonClickCheckIsAuthorized($('div.object-details .show-error'), 'сообщить об ошибке ');
+
                 app.bind.objectItemSendReview($('div.object-details .add-comment-object'));
-                app.bind.closeAllModals();
                 app.bind.objectSubmitReview($('#object-details-send-review-form'), data.id);
+                app.bind.closeAllModals();
 
                 if (data.reviews.length) {
                     for (var i = 0; i < data.reviews.length; i++) {
@@ -986,8 +1011,11 @@ app = {
             });
         },
 
-        appendNewReview: function (commentsContainer, item, action, cssClass) {
+        appendNewReview: function ($commentsContainer, item, action, cssClass) {
             //TODO: keep in mind $.tmpl method
+            if (!$commentsContainer) {
+                return false;
+            }
             var $author = $('<div class="author-info">'),
                 $review = $('<div class="comments-row' + (item.awaits_premoderation ? ' on-moderation' : '') + '">' +
                 '<div class="comment-object-item' + (cssClass ? ' ' + cssClass : '') + '">' +
@@ -1016,10 +1044,10 @@ app = {
                 '<a class="comment-object-marker-no red" data-val="-1">Нет</a> <span>'
                 + item.votes_minus +
                 '</span></span>'+
-                '</div>'+
+                '</div>' +
                 '</div>' +
                 '<div class="clear"></div>' +
-                '</div></div>')[action || 'appendTo'](commentsContainer);
+                '</div></div>')[action || 'appendTo']($commentsContainer);
             app.bind.renderReviewEditForm($review.find('.comment-edit'));
             app.categories.loadAuthorData(item.user_id, $author, $review);
         },
@@ -1218,8 +1246,8 @@ app = {
             });
         },
 
-        objectItemSendReview: function (object) {
-            object.on('click', function () {
+        objectItemSendReview: function ($object) {
+            $object.on('click', function () {
                 if (app.user.isAuthorized()) {
                     $(this).next('.modal').show();
                 } else {
@@ -1234,21 +1262,22 @@ app = {
         },
 
         closeAllModals: function () {
-            $('.close-modal').click(function() {
+            $('.close-modal').off('click');
+            $('.close-modal').on('click', function() {
                 $(this).parent('.modal').hide();
             });
         },
 
-        objectSubmitReview: function (object, detailsObjectId) {
-            object.find('button[name=submit]').on('click', function () {
+        objectSubmitReview: function ($object, detailsObjectId) {
+            $object.find('button[name=submit]').on('click', function () {
                 var $this = $(this),
                     fields = {
-                        'subject': object.find('input[name=subject]').val(),
-                        'msg_text': object.find('textarea').val()
+                        'subject': $object.find('input[name=subject]').val(),
+                        'msg_text': $object.find('textarea').val()
                     };
                 if (detailsObjectId) {
                     fields.obj_id = detailsObjectId;
-                    fields.rating = object.find('div.jquery-ratings-full').length;
+                    fields.rating = $object.find('div.jquery-ratings-full').length;
                     fields.get_new_data = true;
                 }
                 $.post(app.CONST.appUrl + 'map/?act=add_object_review', fields, function (data) {
@@ -1259,7 +1288,9 @@ app = {
                         var newReview = app.categories.appendNewReview(
                             $('div.comment-object-wrap .comments-list'), data, 'prependTo', 'display-none'
                         );
-                        app.bind.renderReviewEditForm(newReview.find('.comment-edit'));
+                        if (newReview) {
+                            app.bind.renderReviewEditForm(newReview.find('.comment-edit'));
+                        }
                         $('div.comment-object-item.display-none').slideDown();
                     } else {
                         $.jGrowl(data.error, {add_class:'fail'});

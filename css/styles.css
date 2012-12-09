@@ -1810,6 +1810,7 @@ footer {
     font-size: 10px;
     line-height: 12px;
     color: #727272;
+    min-height: 32px;
 }
 .object-onmap-footer {
     padding: 5px 10px 10px;
