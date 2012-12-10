@@ -1955,7 +1955,12 @@ footer {
     float: none;
     height: 42px;
 }
-.more-category {
+
+.add-object-form label.add-subcategory {
+    height: auto;
+}
+
+.more-categories {
     display: block;
     position: absolute;
     top: 25px;

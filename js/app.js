@@ -380,6 +380,73 @@ app = {
             for (var i = 0; i < app.objects.length; i++) {
                 app.objects[i].mapItem.marker.setMap(null);
             }
+        },
+
+        geocoderInit: function () {
+            var geocoder = new google.maps.Geocoder(),
+
+            geocodePosition = function (pos) {
+                geocoder.geocode({
+                    latLng: pos
+                }, function(responses) {
+                    if (responses && responses.length > 0) {
+                        updateMarkerAddress(responses[0].formatted_address);
+                    } else {
+                        updateMarkerAddress('Cannot determine address at this location.');
+                    }
+                });
+                },
+
+            updateMarkerStatus = function (str) {
+//                document.getElementById('markerStatus').innerHTML = str;
+            },
+
+            updateMarkerPosition = function (latLng) {
+                /*document.getElementById('info').innerHTML = [
+                    latLng.lat(),
+                    latLng.lng()
+                ].join(', ');*/
+            },
+
+            updateMarkerAddress = function (str) {
+                $('#add-object-form-adress').val(str);
+            },
+
+            initialize = function () {
+                var latLng = new google.maps.LatLng(app.gmap.startPosition.lat, app.gmap.startPosition.lng),
+                map = app.gmap.map,
+                markerImage = new google.maps.MarkerImage(
+                    "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|04a207"
+                );
+                marker = new google.maps.Marker({
+                    position: latLng,
+                    title: 'Point A',
+                    map: map,
+                    icon: markerImage,
+                    draggable: true
+                });
+
+                // Update current position info.
+                updateMarkerPosition(latLng);
+                geocodePosition(latLng);
+
+                // Add dragging event listeners.
+                google.maps.event.addListener(marker, 'dragstart', function() {
+                    updateMarkerAddress('Dragging...');
+                });
+
+                google.maps.event.addListener(marker, 'drag', function() {
+                    updateMarkerStatus('Dragging...');
+                    updateMarkerPosition(marker.getPosition());
+                });
+
+                google.maps.event.addListener(marker, 'dragend', function() {
+                    updateMarkerStatus('Drag ended');
+                    geocodePosition(marker.getPosition());
+                });
+            };
+
+            initialize();
         }
     },
 
@@ -714,8 +781,6 @@ app = {
                 var $this = $(this);
                 app.categories.fillObjectsData($this.attr('data-cat-id'));
             });
-
-            app.bind.addObjectToMap();
         },
 
         fillSubcategories: function () {
@@ -1133,6 +1198,7 @@ app = {
         app.gmap.initMap();
         app.login.init();
         app.categories.init();
+        app.newObject.initAdd();
     },
 
     setCookie:function (name, value, expires, path, domain, secure) {
@@ -1346,8 +1412,35 @@ app = {
             $('#add-object-to-map').on('click', function () {
                 $('.list-item.object-item').hide();
                 $('.category-list').addClass('hide-subcategory');
-                app.getHtml.objectAdd().appendTo('.object-list');
+                app.newObject.renderAddForm();
+                app.gmap.geocoderInit();
             });
+        },
+
+        addSubcategorySelect: function () {
+            $('div.add-object-form .more-categories').on('click', function () {
+                var $selectWrap = $(this).siblings('.select-wrap');
+                $selectWrap.append($selectWrap.find('select').last().clone());
+            });
+        }
+    },
+
+    newObject: {
+        initAdd: function () {
+            app.bind.addObjectToMap();
+        },
+
+        renderAddForm: function () {
+            var subcategories = '';
+
+            $.each(app.map_categories, function (k, v) {
+                $.each(v.subcategories, function (kk, subcategory) {
+                    subcategories += ('<option data-id="' + subcategory.id + '">' + subcategory.title + '</option>');
+                });
+            });
+            app.getHtml.objectAdd({subcategories: subcategories}).appendTo('.object-list');
+            app.bind.addSubcategorySelect();
+            app.gmap.removeAllMarkers();
         }
     },
 
@@ -1393,30 +1486,22 @@ app = {
 
         objectAdd: function (data) {
             data = data || {};
-            data.subcategories = '';
-
-            $.each(app.map_categories, function (k, v) {
-                $.each(v.subcategories, function (kk, subcategory) {
-                    data.subcategories
-                        += ('<option data-id="' + subcategory.id + '">' + subcategory.title + '</option>');
-                });
-            });
 
             var tmpl = '<div class="add-object-form">' +
                 '<h3 class="add-object-title">Добавить обьект</h3>' +
             '<form>' +
-                '<label>' +
+                '<label class="add-subcategory">' +
                 'Категория <span class="oblige">*</span>'+
                     '<div class="select-wrap">' +
-                        '<select>{{html subcategories}}</select>' +
+                        '<select name="subcategories">{{html subcategories}}</select>' +
                     '</div>' +
-                    '<a class="more-category">Ещё категорию +</a>' +
+                    '<a class="more-categories">Ещё категорию +</a>' +
 
                 '</label>' +
                 '<label>' +
                 'Адрес <span class="oblige">*</span><br>' +
                 '<div class="modal-input street-input">' +
-                    '<input type="text" value="Улица, дом" onfocus="if (this.value==\'Улица, дом\') this.value=\'\';" onblur="if (this.value==\'\'){this.value=\'Улица, дом\'}">' +
+                    '<input id="add-object-form-adress" type="text" value="Улица, дом" onfocus="if (this.value==\'Улица, дом\') this.value=\'\';" onblur="if (this.value==\'\'){this.value=\'Улица, дом\'}">' +
                     '</div>' +
                     '<div class="clear-l"></div>' +
                 '</label>' +
