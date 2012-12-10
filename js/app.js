@@ -1052,6 +1052,7 @@ app = {
                 '</div></div>')[action || 'appendTo']($commentsContainer);
             app.bind.renderReviewEditForm($review.find('.comment-edit'));
             app.categories.loadAuthorData(item.user_id, $author, $review);
+            return true;
         },
 
         loadAuthorData: function (id, $container, $review) {
@@ -1343,7 +1344,9 @@ app = {
 
         addObjectToMap: function () {
             $('#add-object-to-map').on('click', function () {
-                console.log(app.getHtml.objectAdd());
+                $('.list-item.object-item').hide();
+                $('.category-list').addClass('hide-subcategory');
+                app.getHtml.objectAdd().appendTo('.object-list');
             });
         }
     },
@@ -1388,21 +1391,24 @@ app = {
                 '</div>';
         },
 
-        objectAdd: function () {
-            var data = {}, tmpl = '<div class="add-object-form">' +
+        objectAdd: function (data) {
+            data = data || {};
+            data.subcategories = '';
+
+            $.each(app.map_categories, function (k, v) {
+                $.each(v.subcategories, function (kk, subcategory) {
+                    data.subcategories
+                        += ('<option data-id="' + subcategory.id + '">' + subcategory.title + '</option>');
+                });
+            });
+
+            var tmpl = '<div class="add-object-form">' +
                 '<h3 class="add-object-title">Добавить обьект</h3>' +
             '<form>' +
                 '<label>' +
                 'Категория <span class="oblige">*</span>'+
                     '<div class="select-wrap">' +
-                        '<select>' +
-                            '<option>Образование</option>' +
-                            '<option>Здоровье и красота</option>' +
-                            '<option>Торговля</option>' +
-                            '<option>Питание</option>' +
-                            '<option>Культура</option>' +
-                            '<option>Услуги</option>' +
-                        '</select>' +
+                        '<select>{{html subcategories}}</select>' +
                     '</div>' +
                     '<a class="more-category">Ещё категорию +</a>' +
 
