@@ -1420,8 +1420,7 @@ app = {
 
         addObjectToMap: function () {
             $('#add-object-to-map').on('click', function () {
-                $('.list-item.object-item').hide();
-                $('.category-list').addClass('hide-subcategory');
+                app.newObject.hideBlocksDuringAdd();
                 app.newObject.renderAddForm();
                 app.gmap.geocoderInit();
                 app.bind.addressAutocomplete();
@@ -1449,7 +1448,13 @@ app = {
                 submitData.latitude = app.gmap.newObjectMarker.getPosition().lat();
                 submitData.longitude = app.gmap.newObjectMarker.getPosition().lng();
                 $.post(app.CONST.appUrl + 'map/modify', submitData, function (data) {
-                    console.log(data);
+                    if (data.success !== true) {
+                        $.jGrowl(data.error, {add_class: 'fail'});
+                    } else {
+                        $('.add-object-form').remove();
+                        app.newObject.showBlocksDuringAdd();
+                        $.jGrowl('Объект добавлен!', {add_class: 'success', position: 'top-left'});
+                    }
                 });
                 return false;
             });
@@ -1497,9 +1502,22 @@ app = {
                         + subcategory.title + '</option>');
                 });
             });
+            $('.add-object-form').remove();
             app.getHtml.objectAdd({subcategories: subcategories}).appendTo('.object-list');
             app.bind.addSubcategorySelect();
             app.gmap.removeAllMarkers();
+        },
+
+        hideBlocksDuringAdd: function () {
+            $('.list-item.object-item').addClass('has-been-hidden').hide();
+            if (!$('.category-list').hasClass('hide-subcategory')) {
+                $('.category-list').addClass('hide-subcategory').addClass('has-been-hidden');
+            }
+        },
+
+        showBlocksDuringAdd: function () {
+            $('.category-list.has-been-hidden').removeClass('hide-subcategory');
+            $('.list-item.object-item.has-been-hidden').show();
         }
     },
 
