@@ -1058,7 +1058,7 @@ app = {
 
                 app.bind.buttonClickCheckIsAuthorized($('a.object-item-addto-bookmarks'), 'добавить в закладки ');
                 app.bind.buttonClickCheckIsAuthorized($('div.object-details .open-add-file'), 'добавить файл ');
-                app.bind.buttonClickCheckIsAuthorized($('div.object-details .show-error'), 'сообщить об ошибке ');
+                app.bind.buttonClickCheckIsAuthorized($('div.object-details .show-error'), 'сообщить об ошибке ', data);
 
                 app.bind.objectItemSendReview($('div.object-details .add-comment-object'));
                 app.bind.objectSubmitReview($('#object-details-send-review-form'), data.id);
@@ -1312,7 +1312,8 @@ app = {
             return true;
         },
 
-        buttonClickCheckIsAuthorized: function (object, subj) {
+        buttonClickCheckIsAuthorized: function (object, subj, objectData) {
+            objectData = objectData || {};
             object.on('click', function () {
                 if (!app.user.isAuthorized()) {
                     $.jGrowl(
@@ -1320,6 +1321,9 @@ app = {
                         ' Если Вы уже зарегистрированы, введите имя пользователя и пароль в верхней правой части окна',
                         {add_class: 'fail'}
                     );
+                } else {
+                    app.newObject.hideBlocksDuringAdd();
+                    app.newObject.renderEditForm(objectData);
                 }
                 return false;
             });
@@ -1421,8 +1425,7 @@ app = {
         addObjectToMap: function () {
             $('#add-object-to-map').on('click', function () {
                 app.newObject.hideBlocksDuringAdd();
-                app.newObject.renderAddForm();
-                app.gmap.geocoderInit();
+                app.newObject.renderAddForm({});
                 app.bind.addressAutocomplete();
                 app.bind.submitNewObject();
             });
@@ -1453,7 +1456,8 @@ app = {
                     } else {
                         $('.add-object-form').remove();
                         app.newObject.showBlocksDuringAdd();
-                        $.jGrowl('Объект добавлен!', {add_class: 'success', position: 'top-left'});
+                        $.jGrowl('Благодарим за предоставленную информацию! Ваша заявка будет рассмотрена' +
+                            ' администрацией сайта в ближайшее время.', {add_class: 'success', position: 'top-left'});
                     }
                 });
                 return false;
@@ -1493,30 +1497,46 @@ app = {
             app.bind.addObjectToMap();
         },
 
-        renderAddForm: function () {
-            var subcategories = '';
+        renderAddForm: function (data) {
+            data.form_title = 'Добавить объект';
+            app.newObject.renderObjectForm(data);
+        },
 
+        renderEditForm: function (data) {
+            data.form_title = 'Редактирование объекта';
+            app.newObject.renderObjectForm(data);
+        },
+
+        renderObjectForm: function (data) {
+            $('.add-object-form').remove();
+            data.subcategories = app.newObject.getSubcategoriesForForm();
+            app.getHtml.objectAdd(data).appendTo('.object-list');
+            app.bind.addSubcategorySelect();
+            app.gmap.removeAllMarkers();
+            app.gmap.closeAllInfoWindows();
+            app.gmap.geocoderInit();
+        },
+
+        getSubcategoriesForForm: function () {
+            var subcategories = '';
             $.each(app.map_categories, function (k, v) {
                 $.each(v.subcategories, function (kk, subcategory) {
                     subcategories += ('<option value="' + subcategory.id + '" data-id="' + subcategory.id + '">'
                         + subcategory.title + '</option>');
                 });
             });
-            $('.add-object-form').remove();
-            app.getHtml.objectAdd({subcategories: subcategories}).appendTo('.object-list');
-            app.bind.addSubcategorySelect();
-            app.gmap.removeAllMarkers();
+            return subcategories;
         },
 
         hideBlocksDuringAdd: function () {
             $('.list-item.object-item').addClass('has-been-hidden').hide();
-            if (!$('.category-list').hasClass('hide-subcategory')) {
-                $('.category-list').addClass('hide-subcategory').addClass('has-been-hidden');
-            }
+            $('div.object-details').addClass('has-been-hidden').hide();
+            $('.category-list:not(.hide-subcategory)').addClass('hide-subcategory').addClass('has-been-hidden');
         },
 
         showBlocksDuringAdd: function () {
             $('.category-list.has-been-hidden').removeClass('hide-subcategory');
+            $('div.object-details.has-been-hidden').show();
             $('.list-item.object-item.has-been-hidden').show();
         }
     },
@@ -1563,9 +1583,10 @@ app = {
 
         objectAdd: function (data) {
             data = data || {};
+//            console.log(data);
 
             var tmpl = '<div class="add-object-form">' +
-                '<h3 class="add-object-title">Добавить обьект</h3>' +
+                '<h3 class="add-object-title">${form_title}</h3>' +
             '<form>' +
                 '<label class="add-subcategory">' +
                 'Категория <span class="oblige">*</span>'+
@@ -1573,7 +1594,6 @@ app = {
                         '<select name="cat_ids">{{html subcategories}}</select>' +
                     '</div>' +
                     '<a class="more-categories">Ещё категорию +</a>' +
-
                 '</label>' +
                 '<label>' +
                 'Адрес <span class="oblige">*</span><br>' +
