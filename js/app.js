@@ -1,9 +1,11 @@
-app = {
+'use strict';
+window.app = {
     CONST: {
-        appUrl: 'http://test.zhukcity.ru/',
-        worktime_min: 0, //values to display active/unactive object
-        worktime_max: 0,
-        reviewsLoadQty: 10
+        URL: 'http://test.zhukcity.ru/',
+        WORKTIME_MIN: 0, //values to display active/unactive object
+        WORKTIME_MAX: 0,
+        REVIEWS_LOAD_QTY: 10,
+        DEFAULT_POSTER_CATEGORY: 'cinema'
     },
 
     objects:[],
@@ -201,7 +203,7 @@ app = {
             }
             var fromVal = $('.gray-input.schedule-from input').val();
             var toVal = $('.gray-input.schedule-to input').val();
-            var URL = app.CONST.appUrl + 'transport?act=get_schedule&type=' + app.transport.transportType
+            var URL = app.CONST.URL + 'transport?act=get_schedule&type=' + app.transport.transportType
                 + '&dep_from=' + fromVal + '&arr_to=' + toVal + '&when=today&limit=' + app.transport.transportLimit;
             $.get(URL, function (data) {
                 if (data.success) {
@@ -429,7 +431,7 @@ app = {
                     new google.maps.Point(0, 0),
                     new google.maps.Point(12, 36)
                 );
-                marker = new google.maps.Marker({
+                var marker = new google.maps.Marker({
                     position: latLng,
                     title: 'Point A',
                     map: map,
@@ -522,7 +524,7 @@ app = {
 
             // Login click
             $loginBtn.on('click', function () {
-                $.post(app.CONST.appUrl + 'profile/?act=login', {
+                $.post(app.CONST.URL + 'profile/?act=login', {
                     login: loginInputs.login.val(),
                     passw: loginInputs.passw.val()
                 }, function (data) {
@@ -540,7 +542,7 @@ app = {
             });
 
             $('#auth-user-exit').on('click', function () {
-                $.get(app.CONST.appUrl + 'profile/?act=logout', function (data) {
+                $.get(app.CONST.URL + 'profile/?act=logout', function (data) {
                     if (data.success === true) {
                         $loginFormUnauthorized.css('display', 'block');
                         $loginFormAuthorized.css('display', 'none');
@@ -577,10 +579,10 @@ app = {
                         def = $field.attr('data-defaultvalue');
                     $field.val(def || ($field.attr('name') === 'gender' ? $field.val() : ''));
                 });
-                $.post(app.CONST.appUrl + 'profile/?act=captcha', function (data) {
+                $.post(app.CONST.URL + 'profile/?act=captcha', function (data) {
                     captchaId = data.code_id;
                     $('div.register-modal-register form label img').attr('src',
-                        app.CONST.appUrl + 'images/code.png?id=' + data.code_id);
+                        app.CONST.URL + 'images/code.png?id=' + data.code_id);
                 });
             });
 
@@ -600,10 +602,10 @@ app = {
             var submitObj = new app.login.ForgotPasswordSubmit();
             // Open register, get captcha
             $('a.forgot-link').on('click', function () {
-                $.post(app.CONST.appUrl + 'profile/?act=captcha', function (data) {
+                $.post(app.CONST.URL + 'profile/?act=captcha', function (data) {
                     captchaId = data.code_id;
                     $('div.forgot-modal form label img').attr('src',
-                        app.CONST.appUrl + 'images/code.png?id=' + data.code_id);
+                        app.CONST.URL + 'images/code.png?id=' + data.code_id);
                     submitObj.captchaId = captchaId;
                 });
             });
@@ -636,7 +638,7 @@ app = {
                 });
                 data['code_id'] = $this.captchaId;
 
-                $.post(app.CONST.appUrl + 'profile/password', data, function (data) {
+                $.post(app.CONST.URL + 'profile/password', data, function (data) {
                     if (data.success === false) {
                         app.login.displayErrorByField(formSelector, data.field, data.error);
                     } else {
@@ -682,7 +684,7 @@ app = {
                 app.login.displayErrorByField(form, 'passw', 'Пароли не совпадают');
                 return false;
             }
-            $.post(app.CONST.appUrl + 'profile/' + (actionType === 'register' ? 'register' : 'edit' ) + '/', data,
+            $.post(app.CONST.URL + 'profile/' + (actionType === 'register' ? 'register' : 'edit' ) + '/', data,
                 function (data) {
                     if (data.success === false) {
                         app.login.displayErrorByField(form, data.field, data.error);
@@ -750,7 +752,7 @@ app = {
          * @param $loginFormAuthorized jQuery object
          */
         loadProfileData: function ($loginFormUnauthorized, $loginFormAuthorized) {
-            $.post(app.CONST.appUrl + 'profile/edit?act=get_profile', function (data) {
+            $.post(app.CONST.URL + 'profile/edit?act=get_profile', function (data) {
                 if (data.success === true) {
                     var $personalProfile = $('div.register-modal-login');
                     $personalProfile.find('input[name="old_passw"],input[name="passw"],input[name="passw-again"]')
@@ -813,7 +815,7 @@ app = {
         },
 
         fillObjectsData: function (id, sortBy) {
-            var URL = app.CONST.appUrl + 'map?act=get_objects&cat_ids=' + id + '&sort_by=' + (sortBy || 0);
+            var URL = app.CONST.URL + 'map?act=get_objects&cat_ids=' + id + '&sort_by=' + (sortBy || 0);
             $.get(URL, function (data) {
                 $('section.items-list.object-list').html('');
                 if (data.success) {
@@ -888,8 +890,8 @@ app = {
                 var listItem = $('<div class="list-item object-item" data-status-online="'
                     + !!item.data.operating_minutes +'" data-obj-id=' + item.data.id + '>')
                     .append(!item.data.operating_minutes ? '' : ($('<span class="status-work">')
-                    .addClass(item.data.operating_minutes > app.CONST.worktime_max ? 'online' : 'offline')
-                    .html(item.data.operating_minutes > app.CONST.worktime_max ? 'работает' : 'не работает')))
+                    .addClass(item.data.operating_minutes > app.CONST.WORKTIME_MAX ? 'online' : 'offline')
+                    .html(item.data.operating_minutes > app.CONST.WORKTIME_MAX ? 'работает' : 'не работает')))
                     .append($('<a class="list-item-name">')
                     .html(item.data.name))
                     .append($('<p class="list-item-info">').html(
@@ -968,14 +970,14 @@ app = {
 
         openObjectDetails:function (objId) {//item details
             $('div.list-filter').css('height', '3px').find('ul,.work-filter').hide();
-            $.getJSON(app.CONST.appUrl + 'map/?act=get_object&limit='
-                + app.CONST.reviewsLoadQty + '&obj_id=' + objId, function (data) {
+            $.getJSON(app.CONST.URL + 'map/?act=get_object&limit='
+                + app.CONST.REVIEWS_LOAD_QTY + '&obj_id=' + objId, function (data) {
                 $('.list-item.object-item').remove();
 
                 var details = $('<div class="list-item object-details">')
                     .append(!data.operating_minutes ? '' : ($('<span class="status-work">')
-                    .addClass(data.operating_minutes > app.CONST.worktime_max ? 'online' : 'offline')
-                    .html(data.operating_minutes > app.CONST.worktime_max ? 'работает' : 'неработает')))
+                    .addClass(data.operating_minutes > app.CONST.WORKTIME_MAX ? 'online' : 'offline')
+                    .html(data.operating_minutes > app.CONST.WORKTIME_MAX ? 'работает' : 'неработает')))
                     .append('<a class="list-item-name">' + (data.full_name ? data.full_name : data.name) + '</a>')
                     .append('<p class="list-item-info">' + (data.address ?
                     'Адрес: <a class="wo-underscore">' + data.address.replace(/\n/g, '<br/>') + '</a> <br>' : '') +
@@ -1010,15 +1012,15 @@ app = {
                 $.each(data.attachments, function (k, v) {
                     if (v.type !== 'image' || v.has_thumb !== true) {
                         links += '<a' +
-                            ' href="' + app.CONST.appUrl +'map/attachments/' + v.id + '"' +
+                            ' href="' + app.CONST.URL +'map/attachments/' + v.id + '"' +
                             ' alt="' + v.descr + '">' + (v.title ? v.title : v.filename) + '</a>';
                     } else {
                         gallery.append('<li><a class="lightbox-open"' +
                             ' data-title="' + v.title + '"'+
                             ' data-descr="' + v.descr + '"'+
-                                ' href="' + app.CONST.appUrl +'map/attachments/' + v.id + '">' +
+                                ' href="' + app.CONST.URL +'map/attachments/' + v.id + '">' +
                             '<img' +
-                                ' src="' + app.CONST.appUrl + 'map/attachments/thumb/' + v.id + '"' +
+                                ' src="' + app.CONST.URL + 'map/attachments/thumb/' + v.id + '"' +
                                 ' width="' + v.thumb_width +'"/>' +
                             '</a></li>');
                     }
@@ -1137,7 +1139,7 @@ app = {
 
         loadAuthorData: function (id, $container, $review) {
             if (app.user.isAuthorized()) {
-                $.get(app.CONST.appUrl + 'profile/?act=get_user_details&id=' + id, function (data) {
+                $.get(app.CONST.URL + 'profile/?act=get_user_details&id=' + id, function (data) {
                     $container.append('Дата регистрации: ' + data.date_reg +
                     (data.date_birth ? '<br/>День рождения: ' + data.date_birth : ''));
                     $review.find('.comment-object-name').append($container);
@@ -1149,7 +1151,7 @@ app = {
         infiniteScrollReviews: function ($reviewsContainer, objId) {
             var loading = false,
                 currentOffset = 10,
-                limit = app.CONST.reviewsLoadQty,
+                limit = app.CONST.REVIEWS_LOAD_QTY,
                 isNearBottomOfPage = function () {
                     return $(window).scrollTop() > $(document).height() - $(window).height() - 300;
             };
@@ -1161,7 +1163,7 @@ app = {
 
                 if (isNearBottomOfPage()) {
                     loading = true;
-                    var url = app.CONST.appUrl + 'map/?act=get_object_reviews&obj_id=' + objId + '&limit=' + limit
+                    var url = app.CONST.URL + 'map/?act=get_object_reviews&obj_id=' + objId + '&limit=' + limit
                         + '&offset=' + currentOffset;
                     $.getJSON(url, function (data) {
                         $.each(data.reviews, function (k, v) {
@@ -1214,6 +1216,7 @@ app = {
         app.login.init();
         app.categories.init();
         app.newObject.initAdd();
+        app.poster.init();
     },
 
     setCookie:function (name, value, expires, path, domain, secure) {
@@ -1304,7 +1307,7 @@ app = {
             if ($this.parent().hasClass('already-voted')) {
                 return false;
             }
-            $.get(app.CONST.appUrl + 'map/?act=vote_object_review&id='
+            $.get(app.CONST.URL + 'map/?act=vote_object_review&id='
                 + $(this).parent().attr('data-id') + '&vote=' + $(this).attr('data-val'),
             function (data) {
                 if (data.success !== true) {
@@ -1369,7 +1372,7 @@ app = {
                     fields.rating = $object.find('div.jquery-ratings-full').length;
                     fields.get_new_data = true;
                 }
-                $.post(app.CONST.appUrl + 'map/?act=add_object_review', fields, function (data) {
+                $.post(app.CONST.URL + 'map/?act=add_object_review', fields, function (data) {
                     if (data.success === true) {
                         $this.closest('.modal').hide();
                         data.already_voted = true;
@@ -1396,7 +1399,7 @@ app = {
                         'subject': object.find('input[name=subject]').val(),
                         'msg_text': object.find('textarea').val()
                     };
-                $.post(app.CONST.appUrl + 'map/?act=edit_object_review&review_id=' + reviewId, fields,
+                $.post(app.CONST.URL + 'map/?act=edit_object_review&review_id=' + reviewId, fields,
                 function (data) {
                     if (data.success === true) {
                         $this.closest('.modal').hide();
@@ -1456,7 +1459,7 @@ app = {
                 submitData.cat_ids = ids.join();
                 submitData.latitude = app.gmap.newObjectMarker.getPosition().lat();
                 submitData.longitude = app.gmap.newObjectMarker.getPosition().lng();
-                $.post(app.CONST.appUrl + 'map/modify' + (objectData ? '&obj_id=' + objectData.id : ''), submitData, function (data) {
+                $.post(app.CONST.URL + 'map/modify' + (objectData ? '&obj_id=' + objectData.id : ''), submitData, function (data) {
                     if (data.success !== true) {
                         $.jGrowl(data.error, {add_class: 'fail', position: 'top-left'});
                     } else {
@@ -1495,58 +1498,26 @@ app = {
                     $(this).autocomplete('widget').css({'z-index': 1000, position: 'absolute'});
                 }
             });
-        }
-    },
-
-    newObject: {
-        initAdd: function () {
-            app.bind.addObjectToMap();
         },
 
-        renderAddForm: function (data) {
-            data.form_title = 'Добавить объект';
-            data.customPos = false;
-            app.newObject.renderObjectForm(data);
-        },
-
-        renderEditForm: function (data) {
-            data.form_title = 'Редактирование объекта';
-            data.customPos = {lat: data.latitude, lng: data.longitude};
-            app.newObject.renderObjectForm(data);
-            $('select[name="cat_ids"]').val(data.cat_ids[0] || 65);
-        },
-
-        renderObjectForm: function (data) {
-            $('.add-object-form').remove();
-            data.subcategories = app.newObject.getSubcategoriesForForm();
-            app.getHtml.objectAdd(data).appendTo('.object-list');
-            app.bind.addSubcategorySelect();
-            app.gmap.removeAllMarkers();
-            app.gmap.closeAllInfoWindows();
-            app.gmap.geocoderInit(data.customPos);
-        },
-
-        getSubcategoriesForForm: function () {
-            var subcategories = '';
-            $.each(app.map_categories, function (k, v) {
-                $.each(v.subcategories, function (kk, subcategory) {
-                    subcategories += ('<option value="' + subcategory.id + '" data-id="' + subcategory.id + '">'
-                        + subcategory.title + '</option>');
-                });
+        posterCategoryChange: function () {
+            var $posterContainer = $('ul.poster-category');
+            $posterContainer.on('click' ,'a', function () {
+                var name = $(this).attr('data-name');
+                $posterContainer.find('li').removeClass('active');
+                $(this).parent().addClass('active');
+                app.poster.loadEvents(name);
             });
-            return subcategories;
         },
 
-        hideBlocksDuringAdd: function () {
-            $('.list-item.object-item').addClass('has-been-hidden').hide();
-            $('div.object-details').addClass('has-been-hidden').hide();
-            $('.category-list:not(.hide-subcategory)').addClass('hide-subcategory').addClass('has-been-hidden');
-        },
-
-        showBlocksDuringAdd: function () {
-            $('.category-list.has-been-hidden').removeClass('hide-subcategory');
-            $('div.object-details.has-been-hidden').show();
-            $('.list-item.object-item.has-been-hidden').show();
+        postersEventHover: function ($posters) {
+            $posters.find('dt').eq(0).addClass('active');
+            $posters.find('dd').eq(0).addClass('active');
+            $posters.find('dd').hover(function () {
+                $posters.find('dt,dd').removeClass('active');
+                $(this).addClass('active');
+                $(this).prev().addClass('active');
+            });
         }
     },
 
@@ -1654,6 +1625,85 @@ app = {
                     '</form>' +
                 '</div>';
             return $.tmpl(tmpl, data);
+        }
+    },
+
+    newObject: {
+        initAdd: function () {
+            app.bind.addObjectToMap();
+        },
+
+        renderAddForm: function (data) {
+            data.form_title = 'Добавить объект';
+            data.customPos = false;
+            app.newObject.renderObjectForm(data);
+        },
+
+        renderEditForm: function (data) {
+            data.form_title = 'Редактирование объекта';
+            data.customPos = {lat: data.latitude, lng: data.longitude};
+            app.newObject.renderObjectForm(data);
+            $('select[name="cat_ids"]').val(data.cat_ids[0] || 65);
+        },
+
+        renderObjectForm: function (data) {
+            $('.add-object-form').remove();
+            data.subcategories = app.newObject.getSubcategoriesForForm();
+            app.getHtml.objectAdd(data).appendTo('.object-list');
+            app.bind.addSubcategorySelect();
+            app.gmap.removeAllMarkers();
+            app.gmap.closeAllInfoWindows();
+            app.gmap.geocoderInit(data.customPos);
+        },
+
+        getSubcategoriesForForm: function () {
+            var subcategories = '';
+            $.each(app.map_categories, function (k, v) {
+                $.each(v.subcategories, function (kk, subcategory) {
+                    subcategories += ('<option value="' + subcategory.id + '" data-id="' + subcategory.id + '">'
+                        + subcategory.title + '</option>');
+                });
+            });
+            return subcategories;
+        },
+
+        hideBlocksDuringAdd: function () {
+            $('.list-item.object-item').addClass('has-been-hidden').hide();
+            $('div.object-details').addClass('has-been-hidden').hide();
+            $('.category-list:not(.hide-subcategory)').addClass('hide-subcategory').addClass('has-been-hidden');
+        },
+
+        showBlocksDuringAdd: function () {
+            $('.category-list.has-been-hidden').removeClass('hide-subcategory');
+            $('div.object-details.has-been-hidden').show();
+            $('.list-item.object-item.has-been-hidden').show();
+        }
+    },
+
+    poster: {
+        init: function () {
+            app.bind.posterCategoryChange();
+            app.poster.loadEvents(app.CONST.DEFAULT_POSTER_CATEGORY);
+        },
+
+        loadEvents: function (category) {
+            var url = app.CONST.URL + 'afisha/'
+                + '?act=get_afisha'
+                + '&when=today'
+                + (category ? '&type=' + category : '');
+            $.get(url, function (data) {
+                if (data.success === true) {
+                    var html = '',
+                        posterWrap = $('.posters-footer .poster-wrap');
+                    $.each(data.afisha, function (k, v) {
+                        html += '<dt><a><img' +
+                            ' src="' + app.CONST.URL + 'afisha/?act=get_poster&id=' + v.id + '"/></a></dt>' +
+                            '<dd><a>' + v.title + '</a></dd>';
+                    });
+                    posterWrap.html(html);
+                }
+                app.bind.postersEventHover(posterWrap);
+            });
         }
     }
 };

@@ -1,4 +1,5 @@
-app.map_categories = {
+'use strict';
+window.app.map_categories = {
     '10': { "id": 10,
         "title": 'Авто',
         "subcategories": [

@@ -788,7 +788,6 @@ footer {
 .news-wrap dd.active a {
     text-decoration: none;
     color: #727272;
-    cursor: default;
 }
 .poster-wrap dd a,
 .news-wrap dd a {

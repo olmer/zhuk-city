@@ -14,10 +14,6 @@ $(document).ready(function() {
         $(this).parent().prev().show();
 
     });
-    $('.poster-category a').click(function(){
-        $('.poster-category a').parent().removeClass('active');
-        $(this).parent().addClass('active');
-    });
     $('.news-wrap dd a').click(function(){
         $('.news-wrap dd').removeClass('active');
         $('.news-wrap dt').hide();
