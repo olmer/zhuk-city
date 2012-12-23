@@ -5,7 +5,8 @@ window.app = {
         WORKTIME_MIN: 0, //values to display active/unactive object
         WORKTIME_MAX: 0,
         REVIEWS_LOAD_QTY: 10,
-        DEFAULT_POSTER_CATEGORY: 'cinema'
+        POSTER_DEFAULT_CATEGORY: 'cinema',
+        POSTER_LOAD_LIMIT: 5
     },
 
     objects:[],
@@ -1683,7 +1684,7 @@ window.app = {
     poster: {
         init: function () {
             app.bind.posterCategoryChange();
-            app.poster.loadEvents(app.CONST.DEFAULT_POSTER_CATEGORY);
+            app.poster.loadEvents(app.CONST.POSTER_DEFAULT_CATEGORY);
         },
 
         loadEvents: function (category) {
@@ -1696,6 +1697,9 @@ window.app = {
                     var html = '',
                         posterWrap = $('.posters-footer .poster-wrap');
                     $.each(data.afisha, function (k, v) {
+                        if(k > app.CONST.POSTER_LOAD_LIMIT - 1) {
+                            return false;
+                        }
                         html += '<dt><a><img' +
                             ' src="' + app.CONST.URL + 'afisha/?act=get_poster&id=' + v.id + '"/></a></dt>' +
                             '<dd><a>' + v.title + '</a></dd>';
