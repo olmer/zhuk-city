@@ -865,6 +865,7 @@ window.app = {
                 '</div>' +
                 '<div class="clear"></div>' +
                 '</div>';
+            $('div.filter-wrap').remove();
             $('<div class="filter-wrap">').html(tabsControll).appendTo('.items-list');
             $('.news').bind('click', function () {
                 $(this).addClass('active');
@@ -1097,7 +1098,7 @@ window.app = {
         },
 
         appendNewReview: function ($commentsContainer, item, action, cssClass) {
-            //TODO: keep in mind $.tmpl method
+            //TODO: keep in mind .link method
             if (!$commentsContainer) {
                 return false;
             }
@@ -1519,6 +1520,14 @@ window.app = {
                 $(this).addClass('active');
                 $(this).prev().addClass('active');
             });
+        },
+
+        postersOpenDetails: function () {
+            $('dl.poster-wrap').on('click', function () {
+                app.newObject.hideBlocksDuringAdd();
+                app.categories.buildTabs(0);
+                app.poster.buildPosterTab();
+            });
         }
     },
 
@@ -1626,6 +1635,106 @@ window.app = {
                     '</form>' +
                 '</div>';
             return $.tmpl(tmpl, data);
+        },
+
+        posterDetails: function (data) {
+            data = data || {};
+//            console.log(data);
+
+            var tmpl = '<div class="list-item poster-item">'
+                + '<div class="poster-list-img">'
+                + '<img src="${img_src}">'
+                + '</div>'
+                + '<a href="" class="list-item-name">${title}</a>'
+            + '<p class="list-item-info">'
+            + 'Категория: <a href="">${genre}</a> <br>'
+
+            + '</p><div class="poster-popup-wrap">'
+            + 'Ближайшие сеансы:'
+                + '<a href="" class="open-popup-poster">12:30<div class="popup-poster" style="display: none;"><table><tbody><tr><th>Кинотеатр:</th><td>Звезда</td></tr><tr><th>Зал:</th><td>Зелёный</td></tr><tr><th>Цена:</th><td>300р</td></tr></tbody></table></div></a> ,'
+                + '<a href="" class="open-popup-poster">13:30<div class="popup-poster" style="display: none;"><table><tbody><tr><th>Кинотеатр:</th><td>Звезда</td></tr><tr><th>Зал:</th><td>Красный</td></tr><tr><th>Цена:</th><td>300р</td></tr></tbody></table></div></a> ,'
+                + '<a href="" class="open-popup-poster">14:30<div class="popup-poster" style="display: none;"><table><tbody><tr><th>Кинотеатр:</th><td>Звезда</td></tr><tr><th>Зал:</th><td>Синий</td></tr><tr><th>Цена:</th><td>300р</td></tr></tbody></table></div></a> ,'
+                + '<a href="" class="open-popup-poster">15:30<div class="popup-poster" style="display: none;"><table><tbody><tr><th>Кинотеатр:</th><td>Звезда</td></tr><tr><th>Зал:</th><td>Красный</td></tr><tr><th>Цена:</th><td>300р</td></tr></tbody></table></div></a>'
+            + '</div>'
+                + '<a class="open-full-poster-info open-modal">Полное рассписание сеансов</a>'
+                + '<div class="full-poster-info-modal modal">'
+                    + '<a class="close-modal"></a>'
+                    + '<div class="modal-header">'
+                        + '<h3 class="modal-name">Полное рассписание сеансов</h3>'
+                    + '</div>'
+                    + '<h2 class="poster-info-cinema">Кинотеатр "Звезда"</h2>'
+                    + '<table class="full-cinema-info">'
+                        + '<tbody><tr>'
+                            + '<th>Зал</th>'
+                            + '<th>Начало</th>'
+                            + '<th>Цена</th>'
+                            + '<th>Длительность</th>'
+                        + '</tr>'
+                            + '<tr style="background-color: rgb(245, 245, 245); background-position: initial initial; background-repeat: initial;">'
+                                + '<td>Зелёный</td>'
+                                + '<td>13:50</td>'
+                                + '<td>270 р.</td>'
+                                + '<td>93 минуты</td>'
+                            + '</tr>'
+                            + '<tr>'
+                                + '<td>Зелёный</td>'
+                                + '<td>13:50</td>'
+                                + '<td>270 р.</td>'
+                                + '<td>93 минуты</td>'
+                            + '</tr>'
+                            + '<tr style="background-color: rgb(245, 245, 245); background-position: initial initial; background-repeat: initial;">'
+                                + '<td>Зелёный</td>'
+                                + '<td>13:50</td>'
+                                + '<td>270 р.</td>'
+                                + '<td>93 минуты</td>'
+                            + '</tr>'
+                            + '<tr>'
+                                + '<td>Зелёный</td>'
+                                + '<td>13:50</td>'
+                                + '<td>270 р.</td>'
+                                + '<td>93 минуты</td>'
+                            + '</tr>'
+                            + '<tr style="background-color: rgb(245, 245, 245); background-position: initial initial; background-repeat: initial;">'
+                                + '<td>Зелёный</td>'
+                                + '<td>13:50</td>'
+                                + '<td>270 р.</td>'
+                                + '<td>93 минуты</td>'
+                            + '</tr>'
+                            + '<tr>'
+                                + '<td>Зелёный</td>'
+                                + '<td>13:50</td>'
+                                + '<td>270 р.</td>'
+                                + '<td>93 минуты</td>'
+                            + '</tr>'
+                            + '<tr style="background-color: rgb(245, 245, 245); background-position: initial initial; background-repeat: initial;">'
+                                + '<td>Зелёный</td>'
+                                + '<td>13:50</td>'
+                                + '<td>270 р.</td>'
+                                + '<td>93 минуты</td>'
+                            + '</tr>'
+                            + '<tr>'
+                                + '<td>Зелёный</td>'
+                                + '<td>13:50</td>'
+                                + '<td>270 р.</td>'
+                                + '<td>93 минуты</td>'
+                            + '</tr>'
+                        + '</tbody></table>'
+                + '</div>'
+                + '<p></p>'
+                + '<p class="poster-list-content">{{html descr}}</p>'
+
+                + '<div class="object-item-footer">'
+                    + '<div class="rating-poster">'
+                        + '<a href="">IMDB 9.7</a>'
+                        + '<span>298</span>'
+                    + '</div>'
+                    + '<div class="rating-poster">'
+                        + '<a href="">КиноПоиск 9.3</a>'
+                        + '<span>646</span>'
+                    + '</div>'
+                + '</div>'
+            + '</div>';
+            return $.tmpl(tmpl, data);
         }
     },
 
@@ -1671,6 +1780,7 @@ window.app = {
         hideBlocksDuringAdd: function () {
             $('.list-item.object-item').addClass('has-been-hidden').hide();
             $('div.object-details').addClass('has-been-hidden').hide();
+            $('.add-object-form').addClass('has-been-hidden').hide();
             $('.category-list:not(.hide-subcategory)').addClass('hide-subcategory').addClass('has-been-hidden');
         },
 
@@ -1678,6 +1788,7 @@ window.app = {
             $('.category-list.has-been-hidden').removeClass('hide-subcategory');
             $('div.object-details.has-been-hidden').show();
             $('.list-item.object-item.has-been-hidden').show();
+            $('.add-object-form.has-been-hidden').show();
         }
     },
 
@@ -1685,6 +1796,7 @@ window.app = {
         init: function () {
             app.bind.posterCategoryChange();
             app.poster.loadEvents(app.CONST.POSTER_DEFAULT_CATEGORY);
+            app.bind.postersOpenDetails();
         },
 
         loadEvents: function (category) {
@@ -1707,6 +1819,22 @@ window.app = {
                     posterWrap.html(html);
                 }
                 app.bind.postersEventHover(posterWrap);
+            });
+        },
+
+        buildPosterTab: function () {
+            $('.list-item.poster-item').remove();
+            var $this = $(this);
+            var url = app.CONST.URL + 'afisha/'
+                + '?act=get_afisha'
+                + '&when=today';
+            $.get(url, function (data) {
+                if (data.success === true) {
+                    $.each(data.afisha, function (k, v) {
+                        data.afisha[k].img_src = app.CONST.URL + 'afisha/?act=get_poster&id=' + v.id;
+                    });
+                    $('.filter-wrap').after(app.getHtml.posterDetails(data.afisha));
+                }
             });
         }
     }
