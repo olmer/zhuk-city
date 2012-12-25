@@ -6,7 +6,8 @@ window.app = {
         WORKTIME_MAX: 0,
         REVIEWS_LOAD_QTY: 10,
         POSTER_DEFAULT_CATEGORY: 'cinema',
-        POSTER_LOAD_LIMIT: 5
+        POSTER_LOAD_LIMIT: 5,
+        POSTERS_EVENT_TIMES_LIMIT: 4
     },
 
     objects:[],
@@ -1283,6 +1284,27 @@ window.app = {
             return app.bind;
         },
 
+        postersModal: function () {
+            $('.open-popup-poster').on({'mouseenter': function () {}, 'mouseleave': function () {}});
+            $('.open-popup-poster').hover(function() {
+                $('.popup-poster').hide();
+                $(this).find('.popup-poster').show();
+            }, function() {
+                $(this).find('.popup-poster').hide();
+            });
+        },
+
+        postersTimeOfEventsLimit: function () {
+            $.each($('div.poster-popup-wrap'), function () {
+                $(this).find('a.open-popup-poster').slice(app.CONST.POSTERS_EVENT_TIMES_LIMIT).hide();
+            });
+            $('.open-full-poster-info').on('click', function () {
+                var $this = $(this);
+                $this.prev().find('.open-popup-poster').show();
+                $this.remove();
+            });
+        },
+
         objectsFilter: function () {
             var filter = function (e) {
                 var $this = $(this);
@@ -1639,7 +1661,6 @@ window.app = {
 
         posterDetails: function (data) {
             data = data || {};
-//            console.log(data);
 
             var tmpl = '<div class="list-item poster-item">'
                 + '<div class="poster-list-img">'
@@ -1650,76 +1671,10 @@ window.app = {
             + 'Категория: <a href="">${genre}</a> <br>'
 
             + '</p><div class="poster-popup-wrap">'
-            + 'Ближайшие сеансы:'
-                + '<a href="" class="open-popup-poster">12:30<div class="popup-poster" style="display: none;"><table><tbody><tr><th>Кинотеатр:</th><td>Звезда</td></tr><tr><th>Зал:</th><td>Зелёный</td></tr><tr><th>Цена:</th><td>300р</td></tr></tbody></table></div></a> ,'
-                + '<a href="" class="open-popup-poster">13:30<div class="popup-poster" style="display: none;"><table><tbody><tr><th>Кинотеатр:</th><td>Звезда</td></tr><tr><th>Зал:</th><td>Красный</td></tr><tr><th>Цена:</th><td>300р</td></tr></tbody></table></div></a> ,'
-                + '<a href="" class="open-popup-poster">14:30<div class="popup-poster" style="display: none;"><table><tbody><tr><th>Кинотеатр:</th><td>Звезда</td></tr><tr><th>Зал:</th><td>Синий</td></tr><tr><th>Цена:</th><td>300р</td></tr></tbody></table></div></a> ,'
-                + '<a href="" class="open-popup-poster">15:30<div class="popup-poster" style="display: none;"><table><tbody><tr><th>Кинотеатр:</th><td>Звезда</td></tr><tr><th>Зал:</th><td>Красный</td></tr><tr><th>Цена:</th><td>300р</td></tr></tbody></table></div></a>'
-            + '</div>'
-                + '<a class="open-full-poster-info open-modal">Полное рассписание сеансов</a>'
-                + '<div class="full-poster-info-modal modal">'
-                    + '<a class="close-modal"></a>'
-                    + '<div class="modal-header">'
-                        + '<h3 class="modal-name">Полное рассписание сеансов</h3>'
-                    + '</div>'
-                    + '<h2 class="poster-info-cinema">Кинотеатр "Звезда"</h2>'
-                    + '<table class="full-cinema-info">'
-                        + '<tbody><tr>'
-                            + '<th>Зал</th>'
-                            + '<th>Начало</th>'
-                            + '<th>Цена</th>'
-                            + '<th>Длительность</th>'
-                        + '</tr>'
-                            + '<tr style="background-color: rgb(245, 245, 245); background-position: initial initial; background-repeat: initial;">'
-                                + '<td>Зелёный</td>'
-                                + '<td>13:50</td>'
-                                + '<td>270 р.</td>'
-                                + '<td>93 минуты</td>'
-                            + '</tr>'
-                            + '<tr>'
-                                + '<td>Зелёный</td>'
-                                + '<td>13:50</td>'
-                                + '<td>270 р.</td>'
-                                + '<td>93 минуты</td>'
-                            + '</tr>'
-                            + '<tr style="background-color: rgb(245, 245, 245); background-position: initial initial; background-repeat: initial;">'
-                                + '<td>Зелёный</td>'
-                                + '<td>13:50</td>'
-                                + '<td>270 р.</td>'
-                                + '<td>93 минуты</td>'
-                            + '</tr>'
-                            + '<tr>'
-                                + '<td>Зелёный</td>'
-                                + '<td>13:50</td>'
-                                + '<td>270 р.</td>'
-                                + '<td>93 минуты</td>'
-                            + '</tr>'
-                            + '<tr style="background-color: rgb(245, 245, 245); background-position: initial initial; background-repeat: initial;">'
-                                + '<td>Зелёный</td>'
-                                + '<td>13:50</td>'
-                                + '<td>270 р.</td>'
-                                + '<td>93 минуты</td>'
-                            + '</tr>'
-                            + '<tr>'
-                                + '<td>Зелёный</td>'
-                                + '<td>13:50</td>'
-                                + '<td>270 р.</td>'
-                                + '<td>93 минуты</td>'
-                            + '</tr>'
-                            + '<tr style="background-color: rgb(245, 245, 245); background-position: initial initial; background-repeat: initial;">'
-                                + '<td>Зелёный</td>'
-                                + '<td>13:50</td>'
-                                + '<td>270 р.</td>'
-                                + '<td>93 минуты</td>'
-                            + '</tr>'
-                            + '<tr>'
-                                + '<td>Зелёный</td>'
-                                + '<td>13:50</td>'
-                                + '<td>270 р.</td>'
-                                + '<td>93 минуты</td>'
-                            + '</tr>'
-                        + '</tbody></table>'
-                + '</div>'
+            + 'Ближайшие сеансы:{{each schedule}}'
+                + '<a href="" class="open-popup-poster">${$value.time}<div class="popup-poster"><table><tbody><tr><th>Кинотеатр:</th><td>${$value.obj_title}</td></tr><tr><th>Цена:</th><td>{{html $value.price}}</td></tr></tbody></table></div>, </a>'
+            + '{{/each}}</div>'
+                + '<a class="open-full-poster-info">Полное рассписание сеансов</a>'
                 + '<p></p>'
                 + '<p class="poster-list-content">{{html descr}}</p>'
 
@@ -1834,6 +1789,8 @@ window.app = {
                         data.afisha[k].img_src = app.CONST.URL + 'afisha/?act=get_poster&id=' + v.id;
                     });
                     $('.filter-wrap').after(app.getHtml.posterDetails(data.afisha));
+                    app.bind.postersModal();
+                    app.bind.postersTimeOfEventsLimit();
                 }
             });
         }
