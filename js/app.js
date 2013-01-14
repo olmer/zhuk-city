@@ -6,6 +6,7 @@ window.app = {
         WORKTIME_MAX: 0,
         REVIEWS_LOAD_QTY: 10,
         POSTER_DEFAULT_CATEGORY: 'cinema',
+        NEWS_DEFAULT_CATEGORY: 'culture',
         POSTER_LOAD_LIMIT: 5,
         POSTERS_EVENT_TIMES_LIMIT: 4
     },
@@ -1220,6 +1221,7 @@ window.app = {
         app.categories.init();
         app.newObject.initAdd();
         app.poster.init();
+        app.news.init();
     },
 
     setCookie:function (name, value, expires, path, domain, secure) {
@@ -1545,10 +1547,29 @@ window.app = {
         },
 
         postersOpenDetails: function () {
-            $('dl.poster-wrap').on('click', function () {
+            $('dl.poster-wrap,.posters-footer .see-all').on('click', function () {
                 app.newObject.hideBlocksDuringAdd();
                 app.categories.buildTabs(0);
                 app.poster.buildPosterTab();
+                return false;
+            });
+        },
+
+        newsOpenDetails: function () {
+            $('dl.news-wrap,.news-footer .see-all').on('click', function () {
+                app.newObject.hideBlocksDuringAdd();
+                app.categories.buildTabs(0);
+                return false;
+            });
+        },
+
+        newsCategoryChange: function () {
+            var $posterContainer = $('ul.news-category');
+            $posterContainer.on('click' ,'a', function () {
+                var name = $(this).attr('data-name');
+                $posterContainer.find('li').removeClass('active');
+                $(this).parent().addClass('active');
+                app.news.loadNews(name);
             });
         }
     },
@@ -1764,7 +1785,7 @@ window.app = {
                     var html = '',
                         posterWrap = $('.posters-footer .poster-wrap');
                     $.each(data.afisha, function (k, v) {
-                        if(k > app.CONST.POSTER_LOAD_LIMIT - 1) {
+                        if (k > app.CONST.POSTER_LOAD_LIMIT - 1) {
                             return false;
                         }
                         html += '<dt><a><img' +
@@ -1772,14 +1793,13 @@ window.app = {
                             '<dd><a>' + v.title + '</a></dd>';
                     });
                     posterWrap.html(html);
+                    app.bind.postersEventHover(posterWrap);
                 }
-                app.bind.postersEventHover(posterWrap);
             });
         },
 
         buildPosterTab: function () {
             $('.list-item.poster-item').remove();
-            var $this = $(this);
             var url = app.CONST.URL + 'afisha/'
                 + '?act=get_afisha'
                 + '&when=today';
@@ -1791,6 +1811,39 @@ window.app = {
                     $('.filter-wrap').after(app.getHtml.posterDetails(data.afisha));
                     app.bind.postersModal();
                     app.bind.postersTimeOfEventsLimit();
+                }
+            });
+        }
+    },
+
+    news: {
+        init: function () {
+            app.bind.newsCategoryChange();
+            app.news.loadNews();
+            app.bind.newsOpenDetails();
+        },
+
+        loadNews: function (category) {
+            var url = app.CONST.URL + 'news/'
+                + '?act=get_news'
+                + '&limit=5'
+                + (category ? '&type=' + category : '');
+            $.get(url, function (data) {
+                if (data.success === true) {
+                    var html = '',
+                        newsWrap = $('.news-footer .news-wrap');
+                    $.each(data.news, function (k, v) {
+                        if (k > app.CONST.POSTER_LOAD_LIMIT - 1) {
+                            return false;
+                        }
+                        var imgUrl = v.has_poster
+                            ? app.CONST.URL + 'news/?act=get_poster&id=' + v.id
+                            : 'images/news-img.png';
+                        html += '<dt><a><img' + ' src="' + imgUrl + '"/></a></dt>' +
+                            '<dd><a>' + v.title + '</a></dd>';
+                    });
+                    newsWrap.html(html);
+                    app.bind.postersEventHover(newsWrap);
                 }
             });
         }
