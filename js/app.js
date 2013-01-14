@@ -7,6 +7,7 @@ window.app = {
         REVIEWS_LOAD_QTY: 10,
         POSTER_DEFAULT_CATEGORY: 'cinema',
         NEWS_DEFAULT_CATEGORY: 'culture',
+        NEWS_IMAGE_PLACEHOLDER: 'images/news-img.png',
         POSTER_LOAD_LIMIT: 5,
         POSTERS_EVENT_TIMES_LIMIT: 4
     },
@@ -1528,7 +1529,7 @@ window.app = {
 
         posterCategoryChange: function () {
             var $posterContainer = $('ul.poster-category');
-            $posterContainer.on('click' ,'a', function () {
+            $posterContainer.on('click', 'a', function () {
                 var name = $(this).attr('data-name');
                 $posterContainer.find('li').removeClass('active');
                 $(this).parent().addClass('active');
@@ -1559,13 +1560,14 @@ window.app = {
             $('dl.news-wrap,.news-footer .see-all').on('click', function () {
                 app.newObject.hideBlocksDuringAdd();
                 app.categories.buildTabs(0);
+                app.news.buildNewsTab();
                 return false;
             });
         },
 
         newsCategoryChange: function () {
             var $posterContainer = $('ul.news-category');
-            $posterContainer.on('click' ,'a', function () {
+            $posterContainer.on('click', 'a', function () {
                 var name = $(this).attr('data-name');
                 $posterContainer.find('li').removeClass('active');
                 $(this).parent().addClass('active');
@@ -1711,6 +1713,26 @@ window.app = {
                 + '</div>'
             + '</div>';
             return $.tmpl(tmpl, data);
+        },
+
+        newsDetails: function (data) {
+            data = data || {};
+//            console.log(data);
+
+            var tmpl = '<div class="list-item news-item">'
+                + '<a href="#" class="show-news-list-map gray-btn"><span class="object-item-show-map"></span></a>'
+            + '<a href="#" class="news-list-name">${obj_title}</a>'
+            + '<a href="#"><h4 class="news-list-h4">${title}</h4></a>'
+            + '<span class="news-list-date">${date_time_str}</span>'
+            + '<p class="list-item-preview">${short_text}</p>'
+            + '<div class="object-item-footer">'
+                + '<span class="useful-news-list">Новость полезна?</span>'
+                + '<div class="news-useful">'
+                + '<a class="news-useful-yes">Да</a> <span class="news-useful-yes-wrap">2</span> / <a class="news-useful-no">Нет</a> <span class="news-useful-no-wrap">2</span>'
+            + '</div>'
+            + '</div>'
+            + '</div>';
+            return $.tmpl(tmpl, data);
         }
     },
 
@@ -1838,12 +1860,30 @@ window.app = {
                         }
                         var imgUrl = v.has_poster
                             ? app.CONST.URL + 'news/?act=get_poster&id=' + v.id
-                            : 'images/news-img.png';
+                            : app.CONST.NEWS_IMAGE_PLACEHOLDER;
                         html += '<dt><a><img' + ' src="' + imgUrl + '"/></a></dt>' +
                             '<dd><a>' + v.title + '</a></dd>';
                     });
                     newsWrap.html(html);
                     app.bind.postersEventHover(newsWrap);
+                }
+            });
+        },
+
+        buildNewsTab: function () {
+            $('.list-item.news-item').remove();
+            var url = app.CONST.URL + 'news/'
+                + '?act=get_news';
+            $.get(url, function (data) {
+                if (data.success === true) {
+                    $.each(data.news, function (k, v) {
+                        data.news[k].img_src = v.has_poster
+                            ? app.CONST.URL + 'news/?act=get_poster&id=' + v.id
+                            : app.CONST.NEWS_IMAGE_PLACEHOLDER;
+                    });
+                    $('.filter-wrap').after(app.getHtml.newsDetails(data.news));
+                    app.bind.postersModal();
+                    app.bind.postersTimeOfEventsLimit();
                 }
             });
         }
