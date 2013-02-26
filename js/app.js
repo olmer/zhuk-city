@@ -1573,6 +1573,28 @@ window.app = {
                 $(this).parent().addClass('active');
                 app.news.loadNews(name);
             });
+        },
+
+        postersShowOnMap: function () {
+            $('.news-item .object-item-show-map').off('click').on('click', function () {console.log($(this).data('id'));
+                var URL = app.CONST.URL + 'map?act=get_objects';
+                $.get(URL, function (data) {
+                    $('section.items-list.object-list').html('');
+                    console.log(data);
+                    if (data.success) {
+                        app.curentSubcategory = id;
+                        app.gmap.closeAllInfoWindows();
+                        app.gmap.removeAllMarkers();
+                        app.objects = [];
+                        if (data.objects.length > 0) {
+                            for (var i = 0; i < data.objects.length; i++) {
+                            }
+                        }
+                    }
+                });
+//                app.gmap.showObject($(this).data('id'));
+                return false;
+            });
         }
     },
 
@@ -1717,10 +1739,10 @@ window.app = {
 
         newsDetails: function (data) {
             data = data || {};
-//            console.log(data);
 
             var tmpl = '<div class="list-item news-item">'
-                + '<a href="#" class="show-news-list-map gray-btn"><span class="object-item-show-map"></span></a>'
+                + '<a href="#" class="show-news-list-map gray-btn">' +
+                '<span class="object-item-show-map" data-id="${obj_id}"></span></a>'
             + '<a href="#" class="news-list-name">${obj_title}</a>'
             + '<a href="#"><h4 class="news-list-h4">${title}</h4></a>'
             + '<span class="news-list-date">${date_time_str}</span>'
@@ -1884,6 +1906,7 @@ window.app = {
                     $('.filter-wrap').after(app.getHtml.newsDetails(data.news));
                     app.bind.postersModal();
                     app.bind.postersTimeOfEventsLimit();
+                    app.bind.postersShowOnMap();
                 }
             });
         }
