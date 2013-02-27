@@ -1576,7 +1576,8 @@ window.app = {
         },
 
         postersShowOnMap: function () {
-            $('.news-item .object-item-show-map').off('click').on('click', function () {console.log($(this).data('id'));
+            $('.news-item .show-news-list-map').off('click').on('click', function () {
+                console.log($(this).data('id'));
                 var URL = app.CONST.URL + 'map?act=get_objects';
                 $.get(URL, function (data) {
                     $('section.items-list.object-list').html('');
@@ -1741,8 +1742,8 @@ window.app = {
             data = data || {};
 
             var tmpl = '<div class="list-item news-item">'
-                + '<a href="#" class="show-news-list-map gray-btn">' +
-                '<span class="object-item-show-map" data-id="${obj_id}"></span></a>'
+                + '{{if obj_id}}<a href="#" class="show-news-list-map gray-btn" data-id="${obj_id}">' +
+                '<span class="object-item-show-map" data-id="${obj_id}"></span></a>{{/if}}'
             + '<a href="#" class="news-list-name">${obj_title}</a>'
             + '<a href="#"><h4 class="news-list-h4">${title}</h4></a>'
             + '<span class="news-list-date">${date_time_str}</span>'
